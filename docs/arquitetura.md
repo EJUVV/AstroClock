@@ -184,6 +184,9 @@ Funções (todas `async`; em erro, lançam `Error` com mensagem em português pr
 | `rh.ts` | `percentualDaSemana(semana: string)` | `number` (0 a 100) | Raíssa | Semana 3 |
 | `rh.ts` | `resumoDaSemana(semana: string)` | `ResumoMembroSemana[]` | Raíssa | Semana 3 |
 | `rh.ts` | `abaixoDaMeta(semana: string)` | `ResumoMembroSemana[]` | Raíssa | Semana 3 |
+| `rh.ts` | `buscarRegistrosDoMembro(membroId: string, semana: string)` | `Registro[]` | Raíssa | A definir |
+| `rh.ts` | `editarRegistroDeMembro(id: string, dados: NovoRegistro)` | `Registro` | Raíssa | A definir |
+| `rh.ts` | `cancelarRegistroDeMembro(id: string)` | `void` | Raíssa | A definir |
 
 Semanas e meses são passados como strings ISO: semana = data da segunda-feira (`'2026-11-02'`), mês = `'2026-11'`.
 

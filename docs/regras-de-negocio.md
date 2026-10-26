@@ -12,7 +12,7 @@ Itens marcados com **[PENDENTE]** ainda não foram decididos.
   - de pelo menos **5h na sede**.
 - As duas condições são obrigatórias. **Horas online não compensam horas faltantes na sede.**
 - A presença na sede é **autodeclarada**: o membro escolhe `sede` ou `online` em cada registro.
-- As metas (10h e 5h) são editáveis **somente pelo diretor do RH**, com histórico. **Cada semana usa a meta vigente naquela semana** (a meta não é aplicada retroativamente).
+- As metas (10h e 5h) são editáveis **somente pelo diretor do RH**, com histórico. Uma alteração **passa a valer na semana seguinte**. **Cada semana usa a meta vigente naquela semana** (a meta não é aplicada retroativamente).
 - A meta é igual para todos os setores.
 - [PENDENTE] Se as metas valem normalmente em período de férias.
 
@@ -30,7 +30,8 @@ Itens marcados com **[PENDENTE]** ainda não foram decididos.
 
 ## 3. Prazos de edição
 
-- O membro pode **lançar, editar e cancelar** registros com até **7 dias** de antecedência.
+- O membro pode **editar e cancelar** um registro até **7 dias depois de criá-lo** (a contagem começa no momento em que o registro foi feito).
+- O membro só pode **lançar** horas de até **7 dias atrás** (ex.: em 26/10, de 19/10 em diante). Para datas anteriores, procura o RH. [PENDENTE: confirmar com a diretoria; pode mudar]
 - Depois de 7 dias, **só o RH** pode alterar.
 - Garantido no banco, não só na tela.
 

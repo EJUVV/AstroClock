@@ -4,6 +4,7 @@ import type {
   Local,
   Membro,
   Metas,
+  NovoRegistro,
   Perfil,
   ProgressoSemana,
   Registro,
@@ -178,12 +179,45 @@ export const registros: Registro[] = [
   reg('r25', 'm9', 0, 1, '09:00', '11:00', 'sede', 'Integração de novos membros'),
 ]
 
-export const metas: Metas[] = [{ horasTotal: 10, horasSede: 5, vigenteDesde: '2026-02-02' }]
+// Momento em que cada registro foi criado (o tipo Registro não expõe esse campo).
+// Nos dados iniciais, cada registro foi criado no horário em que começou.
+export const criadoEm = new Map<string, number>(registros.map((r) => [r.id, Date.parse(r.inicio)]))
+
+export const metas: Metas[] =[{ horasTotal: 10, horasSede: 5, vigenteDesde: '2026-02-02' }]
 
 export const dispensas: { membroId: string; semana: string; motivo: string }[] = [
   { membroId: 'm6', semana: segundaAtual, motivo: 'Semana de provas (conversado com o RH)' },
   { membroId: 'm1', semana: somarDias(segundaAtual, -14), motivo: 'Problema de saúde (conversado com o RH)' },
 ]
+
+// ---------- Validação de registros (usada pelo membro e pelo RH) ----------
+
+// deQuem completa a mensagem de sobreposição: "seu" (membro) ou "deste membro" (RH).
+export function validarRegistro(
+  membroId: string,
+  dados: NovoRegistro,
+  ignorarId?: string,
+  deQuem = 'seu',
+): void {
+  if (!dados.descricao.trim()) throw new Error('A descrição é obrigatória')
+  const inicio = Date.parse(dados.inicio)
+  const fim = Date.parse(dados.fim)
+  if (Number.isNaN(inicio) || Number.isNaN(fim)) throw new Error('Horário inválido')
+  if (fim <= inicio) throw new Error('O fim precisa ser depois do início')
+  const sobrepoe = registros.some((r) => {
+    if (r.membroId !== membroId || r.cancelado || r.id === ignorarId) return false
+    const outroFim = r.fim === null ? Infinity : Date.parse(r.fim) // cronômetro ativo ainda não acabou
+    return inicio < outroFim && Date.parse(r.inicio) < fim
+  })
+  if (sobrepoe) throw new Error(`Este horário se sobrepõe a outro registro ${deQuem}`)
+}
+
+export function aplicarEdicao(registro: Registro, dados: NovoRegistro): void {
+  registro.inicio = dados.inicio
+  registro.fim = dados.fim
+  registro.local = dados.local
+  registro.descricao = dados.descricao.trim()
+}
 
 // ---------- Cálculos (seguem docs/regras-de-negocio.md, seção 8) ----------
 
