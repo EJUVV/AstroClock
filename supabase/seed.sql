@@ -1,0 +1,3 @@
+-- Dados falsos para o banco de desenvolvimento (horas-dev).
+-- Este arquivo será preenchido pelo Bernardo na semana 1.
+-- Nunca coloque dados reais aqui e nunca aplique este seed em produção.
