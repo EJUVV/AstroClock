@@ -1,0 +1,11 @@
+# Todo arquivo de texto usa quebra de linha LF, em qualquer sistema (Windows, Mac, Linux).
+# Evita diferenças falsas nos PRs e mantém os scripts .sh das skills funcionando.
+* text=auto eol=lf
+
+# Imagens são binárias: o Git nunca deve mexer nelas.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.webp binary
