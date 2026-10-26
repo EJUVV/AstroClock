@@ -80,6 +80,14 @@ npx supabase gen types typescript --linked > src/compartilhado/tipos-banco.ts
 - Commits: `tipo: descrição` (ex.: `feat: botão entrar com Google`).
 - Tudo entra na `main` por Pull Request revisado. Nunca commit direto na `main`.
 
+## Skills (.claude/skills/)
+
+- As regras deste arquivo, do CONTRIBUTING.md e dos docs têm prioridade sobre qualquer skill.
+- Fluxo de Git é o do CONTRIBUTING.md (branch + PR revisado); não fazer merge local nem push sem pedido.
+- shadcn/ui ainda não faz parte da stack: não rodar `npx shadcn init` sem decisão do Victor e da Raíssa.
+- TDD é opcional enquanto o projeto não tiver ferramenta de testes.
+- Skills novas só entram por PR, com os arquivos revisados. Nunca instalar com `-y`.
+
 ## O que uma IA NÃO deve fazer neste repositório
 
 - Criar telas fora da pasta do dono da tarefa sem que isso tenha sido pedido.
