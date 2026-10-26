@@ -33,3 +33,6 @@ supabase/.temp
 
 # Planejamento local (fora do repositório)
 .planejamento/
+
+# Configurações pessoais do Claude Code (as skills em .claude/skills/ vão para o Git)
+.claude/settings.local.json

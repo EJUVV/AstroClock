@@ -1,19 +1,37 @@
-# Fase 0 — Especificação da configuração inicial
+# Fase 0 — Tudo o que precisa estar pronto antes do kickoff
 
-Este documento é a especificação que o assistente de código (Claude Code) segue para preparar o repositório antes de a equipe entrar. Execute **uma etapa por vez**, mostre o resultado e espere aprovação antes da próxima.
+Período: **26/10 a 01/11/2026**. Responsável: **Victor**, com ajuda do Claude Code na parte de código.
+
+Este documento é o checklist completo da Fase 0. Cada item tem um dono:
+
+- **[Claude Code]** — feito pelo assistente, nas Etapas 1 a 4 abaixo, uma por vez, com aprovação do Victor entre elas.
+- **[Victor]** — exige login nas contas da EJUVV (GitHub, Supabase, Google Cloud) ou contato com pessoas; feito manualmente, seguindo a Parte M no fim deste documento.
 
 Leia antes: [`AGENTS.md`](../AGENTS.md), [`regras-de-negocio.md`](regras-de-negocio.md) e [`arquitetura.md`](arquitetura.md).
 
-## Fora do escopo do assistente
+## Checklist geral
 
-Estas tarefas exigem login nas contas da EJUVV e são feitas pelo Victor manualmente:
+| # | Item | Dono | Onde |
+| --- | --- | --- | --- |
+| 1 | Repositório `astroclock` criado (privado) na organização da EJUVV e clonado | Victor | M1 |
+| 2 | Projeto Vite + React + TS + Tailwind + React Router + Supabase CLI, pastas e rotas | Claude Code | Etapa 1 |
+| 3 | Dois projetos no Supabase (`horas-dev` e `horas-prod`) em organizações separadas | Victor | M2 |
+| 4 | `.env.local` preenchido com os valores do `horas-dev` | Victor | M3 |
+| 5 | Cliente do Supabase, `.env.example`, tipos e todas as funções de dados falsas | Claude Code | Etapa 2 |
+| 6 | Projeto e Client ID OAuth no Google Cloud (tipo Interno) | Victor | M4 |
+| 7 | Provedor Google ativado no Supabase dev | Victor (pode ser no dia 4–5 da semana 1, com o Bernardo) | M5 |
+| 8 | README, CONTRIBUTING, AGENTS, CLAUDE, regras, arquitetura e skills conferidos; modelos de issue e PR | Claude Code | Etapa 3 |
+| 9 | Workflows de CI e de backup | Claude Code | Etapa 4 |
+| 10 | Push para o GitHub e conferir o CI rodando | Victor | M6 |
+| 11 | Segredo `SUPABASE_PROD_DB_URL` cadastrado e backup rodado manualmente uma vez | Victor (pode ficar para a semana 1; obrigatório antes do piloto) | M7 |
+| 12 | Proteção da `main` (ou decisão de manter sem bloqueio) | Victor | M8 |
+| 13 | Quadro no GitHub Projects com as issues da semana 1 atribuídas | Victor | M9 |
+| 14 | Convites: GitHub, Supabase dev (Bernardo), grupo do WhatsApp | Victor | M10 |
+| 15 | Guias enviados para a equipe ler antes do kickoff | Victor | M10 |
+| 16 | Teste final: clone limpo seguindo só o README | Victor + Claude Code | M11 |
+| 17 | Kickoff marcado (dia, horário, local na sede) | Victor | M10 |
 
-- Criar os projetos `horas-dev` e `horas-prod` no Supabase.
-- Criar o projeto e o Client ID OAuth no Google Cloud.
-- Ativar o provedor Google no Supabase.
-- Cadastrar o segredo `SUPABASE_PROD_DB_URL` no GitHub.
-- Ativar a proteção da branch `main`.
-- Convidar a equipe e criar issues no GitHub Projects.
+**Commits na `main`:** durante a Fase 0, os commits das etapas vão direto na `main`. É a única exceção à regra do `CONTRIBUTING.md`, porque a equipe ainda não entrou e a proteção da branch ainda não foi ativada.
 
 O assistente **não cria** tabelas, migrações, RLS ou seed real (tarefa do Bernardo na semana 1) e **não cria telas** além do mínimo descrito aqui (tarefas do Guilherme e da Raíssa).
 
@@ -45,7 +63,7 @@ O assistente **não cria** tabelas, migrações, RLS ou seed real (tarefa do Ber
    - `/rh` → `src/rh/PainelRH.tsx` (só o título "Painel do RH")
    - qualquer outra → redireciona para `/`
 7. `npx supabase init` (cria `supabase/config.toml`). Criar `supabase/migrations/.gitkeep` e `supabase/seed.sql` vazio com um comentário explicando que o Bernardo preenche na semana 1.
-8. `.gitignore`: garantir `node_modules`, `dist`, `.env`, `.env.local`, `.env.*.local`, `supabase/.temp`, `.planejamento/`.
+8. `.gitignore`: garantir `node_modules`, `dist`, `.env`, `.env.local`, `.env.*.local`, `supabase/.temp`, `.planejamento/` e `.claude/settings.local.json`. **Não** ignorar `.claude/skills/` (as skills são do projeto e vão para o Git).
 
 **Pronto quando:** `npm run dev` abre as quatro rotas; `npm run lint` e `npm run build` passam.
 
@@ -104,7 +122,8 @@ O assistente **não cria** tabelas, migrações, RLS ou seed real (tarefa do Ber
 
 **Fazer**
 
-1. Conferir que estes arquivos já existem na raiz e em `docs/` (foram fornecidos): `README.md`, `CONTRIBUTING.md`, `AGENTS.md`, `CLAUDE.md`, `docs/regras-de-negocio.md`, `docs/arquitetura.md`, `docs/fase-0.md`. Não reescreva; só corrija caminhos ou comandos que não batam com o que foi gerado nas etapas 1 e 2, e liste as mudanças.
+1. Conferir que estes arquivos já existem (foram fornecidos): `README.md`, `CONTRIBUTING.md`, `AGENTS.md`, `CLAUDE.md`, `docs/regras-de-negocio.md`, `docs/arquitetura.md`, `docs/fase-0.md` e as skills em `.claude/skills/` (`nova-migracao`, `funcao-de-dados`, `regras-de-calculo`, `nova-tela`, `revisar-pr`). Não reescreva; só corrija caminhos ou comandos que não batam com o que foi gerado nas etapas 1 e 2, e liste as mudanças.
+   - Conferir que cada `SKILL.md` começa com o bloco `---` de frontmatter na primeira linha e que as skills aparecem no menu `/` do Claude Code.
 2. `.github/ISSUE_TEMPLATE/tarefa.md`:
    ```markdown
    ---
@@ -200,8 +219,106 @@ O assistente **não cria** tabelas, migrações, RLS ou seed real (tarefa do Ber
 
 ## Ao terminar
 
+**Teste de clone limpo:** clone o repositório local numa pasta temporária (`git clone . <pasta-temporaria>`), siga **apenas** o `README.md` (instalar, copiar `.env.example`, rodar) e confirme que o site abre e que "Entrar com Google" leva ao painel do membro com as funções falsas. Corrija o README se algum passo faltar. Depois apague a pasta temporária.
+
 Mostre ao Victor:
 - a lista de arquivos criados;
 - a saída de `npm run lint` e `npm run build`;
 - qualquer desvio desta especificação e o motivo;
-- o que ainda depende das tarefas manuais dele (lista do início deste documento).
+- quais itens da Parte M ainda dependem dele.
+
+---
+
+# Parte M — Tarefas manuais do Victor
+
+O assistente não executa esta parte. Se for consultado sobre ela, apenas explica e confere.
+
+## M1 — Repositório
+
+- GitHub da EJUVV → New repository → nome `astroclock` → **Private** → sem README → criar.
+- Clonar na máquina e copiar para a raiz os arquivos do pacote de documentação (incluindo a pasta oculta `.claude/`).
+
+## M2 — Projetos no Supabase
+
+Com a conta `@ejuvv.com`, região **São Paulo**:
+
+1. Criar a organização **"EJUVV Dev"** e, nela, o projeto `horas-dev`.
+2. Criar a organização **"EJUVV Prod"** e, nela, o projeto `horas-prod`.
+3. Guardar as senhas dos bancos num gerenciador de senhas (nunca no repositório).
+
+Por que duas organizações: no plano gratuito, quem entra numa organização vê todos os projetos dela. Assim o Bernardo acessa só o dev. Conferir que os dois projetos gratuitos continuam ativos com essa divisão.
+
+## M3 — `.env.local`
+
+Em `horas-dev` → Project Settings → API: copiar a URL e a chave pública (anon/publishable) para o `.env.local` na raiz do projeto (o arquivo não vai para o Git). **Nunca** usar a chave `service_role` no front.
+
+## M4 — Google Cloud (cerca de 15 min)
+
+Em console.cloud.google.com, com a conta `@ejuvv.com`:
+
+1. Criar o projeto `astroclock`.
+2. Tela de consentimento OAuth: tipo **Interno**, nome "AstroClock", seu e-mail. Escopos básicos (e-mail, perfil, openid). Se "Interno" não aparecer, usar "Externo".
+3. Credenciais → Criar ID do cliente OAuth → Aplicativo da Web.
+4. URIs de redirecionamento autorizados:
+   - `https://<ref-do-dev>.supabase.co/auth/v1/callback`
+   - `https://<ref-do-prod>.supabase.co/auth/v1/callback`
+5. Guardar o ID do cliente e a chave secreta (fora do repositório).
+
+Se o Google Cloud estiver bloqueado para a organização, pedir à diretoria para liberar.
+
+## M5 — Login Google no Supabase dev
+
+Pode ser feito no dia 4 ou 5 da semana 1, junto com o Bernardo:
+
+- Authentication → Providers → Google: colar o ID do cliente e a chave secreta.
+- Authentication → URL Configuration: Site URL `http://localhost:5173`; Redirect URLs `http://localhost:5173/inicio`.
+
+## M6 — Push e CI
+
+- `git push` dos commits das Etapas 1 a 4.
+- Na aba **Actions** do GitHub, confirmar que o workflow **CI** rodou e passou.
+
+## M7 — Segredo do backup
+
+- `horas-prod` → **Connect** → copiar a connection string do **Session pooler** (com a senha do banco).
+- GitHub → Settings → Secrets and variables → Actions → New repository secret → nome `SUPABASE_PROD_DB_URL`.
+- Actions → **Backup diario** → Run workflow. Conferir que o artefato `backup-...` aparece.
+- Antes do piloto: baixar um backup e restaurar no `horas-dev` com o Bernardo.
+
+## M8 — Proteção da `main`
+
+- Ver o plano da organização em Settings → Billing.
+- **Team ou superior** (inclusive pelo programa do GitHub para ONGs): Settings → Rules → nova regra para `main` exigindo PR, 1 aprovação e o CI passando, e bloqueando push direto.
+- **Free com repositório privado:** a regra não funciona. Escolher entre deixar o repositório público (o código não tem dados nem segredos) ou manter privado e confiar na regra da equipe + CI. Registrar a escolha.
+
+## M9 — GitHub Projects e issues da semana 1
+
+Criar um quadro com as colunas **A fazer**, **Em andamento**, **Em revisão** e **Pronto**, e as issues abaixo, já atribuídas, usando o modelo de tarefa:
+
+| Pessoa | Issues da semana 1 |
+| --- | --- |
+| Bernardo | Modelar tabelas iniciais com o Victor · Migrações de `membros`, `setores`, `metas` e `registros` · RLS de `membros` e funções `meu_id`, `eh_rh` e `meu_perfil` · Login Google real (`entrarComGoogle`, `sair`, `meuPerfil`, `meuNome`) · Seed inicial e tipos gerados |
+| Raíssa | Protótipo das 4 telas (com o Guilherme) · Base visual em `src/compartilhado/ui/` · Painel do RH vazio com navegação |
+| Guilherme | Tela de login · Página `/inicio` com redirecionamento (em par com o Victor) · `RotaProtegida` · Painel do membro vazio com "Olá, nome" e sair |
+| Victor | Backup diário funcionando · Validação do protótipo com o RH e a diretora |
+
+O assistente pode gerar os textos dessas issues se o Victor pedir.
+
+## M10 — Equipe
+
+- Convidar Bernardo, Raíssa e Guilherme para o repositório com permissão **write**.
+- Convidar o Bernardo para a organização **"EJUVV Dev"** no Supabase.
+- Criar o grupo do WhatsApp.
+- Enviar a cada um o Guia geral e o guia individual, pedindo para lerem antes do kickoff.
+- Marcar o kickoff (1h, presencial na sede) e a primeira demo.
+
+## M11 — Pronto para o kickoff
+
+A Fase 0 está concluída quando:
+
+- [ ] Um clone limpo do repositório, seguindo só o `README.md`, roda o site e "Entrar com Google" leva ao painel do membro (funções falsas).
+- [ ] O CI passa no GitHub.
+- [ ] Os dois projetos do Supabase existem e o Bernardo tem acesso só ao dev.
+- [ ] O Client ID do Google existe (a ativação no Supabase pode ficar para a semana 1).
+- [ ] As issues da semana 1 estão no quadro, atribuídas.
+- [ ] A equipe foi convidada, recebeu os guias e sabe dia e local do kickoff.
