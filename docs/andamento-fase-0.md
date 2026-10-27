@@ -1,6 +1,6 @@
 # Andamento da Fase 0
 
-Retrato de onde a Fase 0 parou (atualizado em 26/10/2026). Ao retomar com uma IA, peça para ela ler este arquivo e o [`fase-0.md`](fase-0.md). Quando a Fase 0 terminar, este arquivo pode ser apagado.
+Retrato de onde a Fase 0 parou (atualizado em 27/10/2026). Ao retomar com uma IA, peça para ela ler este arquivo e o [`fase-0.md`](fase-0.md). Quando a Fase 0 terminar, este arquivo pode ser apagado (antes, passe a seção "Ambientes" para o `arquitetura.md` ou o `README.md`).
 
 ## Já feito (Claude Code)
 
@@ -29,41 +29,79 @@ Teste de clone limpo seguindo o README: 9 de 9 verificações OK no navegador, 0
 - 3 funções novas no contrato (`buscarRegistrosDoMembro`, `editarRegistroDeMembro`, `cancelarRegistroDeMembro`), já em `arquitetura.md`.
 - As 5 skills do projeto (`nova-migracao`, `funcao-de-dados`, `regras-de-calculo`, `nova-tela`, `revisar-pr`) não existem no repositório; no lugar entraram 22 skills de terceiros escolhidas pelo Victor.
 
-## Falta fazer (Victor, Parte M do `fase-0.md`)
+## Parte M (Victor)
 
 | # | Tarefa | Situação |
 | --- | --- | --- |
-| M1 | Repositório no GitHub | Feito (`EJUVV/AstroClock`) |
-| M6 | `git push` dos commits e conferir o CI na aba Actions | A fazer. Se aparecer aviso de versão das actions, avisar a IA |
-| M2 | `horas-dev` (org "EJUVV Dev") e `horas-prod` (org "EJUVV Prod") no Supabase | **Em andamento** (ver opções abaixo) |
-| M3 | `.env.local` com URL e chave pública do `horas-dev` | Depois da M2 |
-| M4 | Projeto e Client ID OAuth no Google Cloud (tipo Interno) | A fazer |
-| M5 | Provedor Google no Supabase dev | Pode ficar para a semana 1, com o Bernardo |
-| M7 | Segredo `SUPABASE_PROD_DB_URL` no GitHub e rodar o backup uma vez | A fazer. Até lá o backup falha todo dia e o GitHub manda e-mail (esperado) |
-| M8 | Proteção da `main` (ou decisão registrada de não proteger) | A fazer |
+| M1 | Repositório no GitHub | Feito (`EJUVV/AstroClock`, privado) |
+| M2 | `horas-dev` e `horas-prod` no Supabase | Feito (27/10). Ver "Ambientes" |
+| M3 | `.env.local` com URL e chave pública do `horas-dev` | Feito (27/10) |
+| M4 | Projeto e Client ID OAuth no Google Cloud (tipo Interno) | Feito (27/10). Ver "Ambientes" |
+| M5 | Provedor Google no Supabase dev | Semana 1, com o Bernardo. Ver "Login com Google (M5)" |
+| M6 | `git push` e CI passando no GitHub | Feito (27/10): CI verde |
+| M7 | Segredo `SUPABASE_PROD_DB_URL` e backup rodado uma vez | Feito (27/10): backup verde, artefato gerado |
+| M8 | Proteção da `main` | Decidido (27/10): sem proteção. Ver "Decisões tomadas" |
 | M9 | GitHub Projects com as issues da semana 1 | A fazer (a IA pode gerar os textos) |
 | M10 | Convites, grupo do WhatsApp, guias, kickoff | A fazer |
 | M11 | Checklist final | A fazer |
 
-### Opções escolhidas ao criar os projetos no Supabase (M2)
+## Ambientes
 
-Usar as **mesmas opções** no dev e no prod:
+Nada desta seção é segredo. Senhas, chaves secretas e connection strings ficam só no gerenciador de senhas da EJUVV (peça ao Victor).
 
-- Uma conta só (`@ejuvv.com`), duas organizações.
-- GitHub: **não conectar** (migrações são aplicadas pelo Bernardo com `npx supabase db push`).
-- Nome: `horas-dev` / `horas-prod`.
-- Senha: gerada pelo Supabase, guardada no gerenciador de senhas (uma diferente para cada).
-- Região: **South America (São Paulo)**, em "Need a specific region?".
-- Enable Data API: **ligado**.
-- Automatically expose new tables: **desligado**.
-- Enable automatic RLS: **ligado**.
-- Depois de criar, conferir que os dois projetos gratuitos aparecem como ativos.
+### Supabase
+
+Os dois projetos estão na conta `@ejuvv.com` da diretoria de projetos, plano gratuito, região **South America (São Paulo)**.
+
+| | Dev | Prod |
+| --- | --- | --- |
+| Organização | EJUVV Dev | EJUVV Prod |
+| Projeto | `horas-dev` | `horas-prod` |
+| Ref | `cwvnzzqpqohvqjzigalu` | `zetjgqdagnlkodbexnoe` |
+| URL da API | `https://cwvnzzqpqohvqjzigalu.supabase.co` | `https://zetjgqdagnlkodbexnoe.supabase.co` |
+| Painel | [abrir](https://supabase.com/dashboard/project/cwvnzzqpqohvqjzigalu) | [abrir](https://supabase.com/dashboard/project/zetjgqdagnlkodbexnoe) |
+| Bernardo | Convidar na M10 | Sem acesso |
+
+Opções usadas ao criar os dois: GitHub **não conectado**, Data API **ligada**, "Automatically expose new tables" **desligado**, RLS automático **ligado**.
+
+Para o Bernardo (semana 1):
+
+- Ligar o CLI ao dev: `npx supabase link --project-ref cwvnzzqpqohvqjzigalu` (pede a senha do banco do dev).
+- Aplicar migrações: `npx supabase db push` (sempre no dev primeiro).
+- Como "expose new tables" está desligado, cada migração precisa de `grant` nas tabelas que o site usa; senão o site recebe "permission denied".
+- O `.env.local` usa a chave **publishable** do dev (`sb_publishable_...`). Nunca usar a chave `secret`/`service_role` no front.
+
+### Google Cloud
+
+- Projeto `astroclock-512918` (nome AstroClock), na organização ejuvv.com, conta `victor.gomes@ejuvv.com`.
+- Tela de consentimento (Google Auth Platform): app "AstroClock", público **Interno** (só contas `@ejuvv.com` entram).
+- Cliente OAuth "AstroClock Supabase" (Aplicativo da Web), com os URIs de redirecionamento:
+  - `https://cwvnzzqpqohvqjzigalu.supabase.co/auth/v1/callback`
+  - `https://zetjgqdagnlkodbexnoe.supabase.co/auth/v1/callback`
+- O ID do cliente e a chave secreta estão no gerenciador de senhas.
+
+### Login com Google (M5)
+
+No `horas-dev` (o prod fica para antes do piloto):
+
+1. Authentication → Sign In / Providers → Google: ligar e colar o ID do cliente e a chave secreta.
+2. Authentication → URL Configuration: Site URL `http://localhost:5173`; Redirect URLs `http://localhost:5173/inicio`.
+
+### GitHub
+
+- CI (`ci.yml`): lint e build em todo PR e push na `main`.
+- Backup (`backup.yml`): todo dia às 3h (Brasília), exporta o `horas-prod` e guarda como artefato por 30 dias. Usa o segredo `SUPABASE_PROD_DB_URL` (Session pooler).
+
+## Decisões tomadas
+
+- **M8 (27/10/2026):** a organização está no plano Free e o repositório é privado, então o GitHub não aplica proteção na `main`. Decisão: manter privado e sem proteção técnica. Vale a regra do `CONTRIBUTING.md` (nada direto na `main`, sempre PR com revisão) e só aprovar PR com o CI verde. Reavaliar se a EJUVV obtiver o plano Team (por exemplo, pelo GitHub for Nonprofits).
 
 ## Lembretes
 
-- **Avisar o Bernardo (semana 1):** como "expose new tables" está desligado, cada migração precisa de `grant` para as tabelas que o site usa; senão o site recebe "permission denied".
+- Reforçar no kickoff que a `main` não tem bloqueio: a regra de PR depende da equipe.
+- Antes do piloto: baixar um backup e restaurar no `horas-dev`, com o Bernardo.
+- Quem tem acesso ao repositório consegue baixar os backups na aba Actions. Quando houver dados reais, considerar isso nas permissões da equipe e na LGPD.
 - `.env.local` não vai para o Git: em cada máquina nova, criar de novo a partir do `.env.example`.
-- Nunca usar a chave `service_role` no front.
 
 ## Decisões em aberto
 
