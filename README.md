@@ -15,7 +15,7 @@ Pré-requisitos: Node.js 22 ou superior e Git.
 1. Clone o repositório e entre na pasta:
    ```bash
    git clone <url-do-repositorio>
-   cd astroclock
+   cd AstroClock
    ```
 2. Instale as dependências:
    ```bash
