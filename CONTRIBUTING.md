@@ -4,7 +4,7 @@ Cada semana entrega uma fatia que atravessa o sistema inteiro: tela, função de
 
 ## Do começo ao fim de uma tarefa
 
-1. **Pegue uma issue** atribuída a você no GitHub Projects e mova para "Em andamento".
+1. **Pegue uma tarefa** atribuída a você no Notion (lista em [`docs/tarefas-semana-1.md`](docs/tarefas-semana-1.md)) e mova para "Em andamento".
 2. **Atualize a `main` e crie sua branch:**
    ```bash
    git checkout main
@@ -17,9 +17,9 @@ Cada semana entrega uma fatia que atravessa o sistema inteiro: tela, função de
    git commit -m "feat: botão entrar com Google"
    git push -u origin feat/tela-login
    ```
-4. **Abra o Pull Request** para a `main`, preenchendo o modelo: o que foi feito, como testar, print ou vídeo curto, e `Fecha #<número da issue>`.
+4. **Abra o Pull Request** para a `main`, preenchendo o modelo: o que foi feito, como testar e print ou vídeo curto. No lugar de `Fecha #`, escreva o código e o nome da tarefa (ex.: `G1 — Tela de login`).
 5. **O Victor revisa em até 2 dias.** Se pedir ajuste, corrija na mesma branch e faça push; o PR atualiza sozinho.
-6. **Aprovado, entra na `main`** e a issue vai para "Pronto".
+6. **Aprovado, entra na `main`** e a tarefa vai para "Pronto" no Notion.
 
 ## Nomes de branch
 
@@ -71,4 +71,4 @@ No fim de cada semana, cada pessoa mostra presencialmente, no site rodando a par
 - O PR da semana precisa estar aberto **até 2 dias antes da demo**.
 - **Travou?** Fale no grupo no mesmo dia.
 - **Não vai entregar?** Avise no grupo assim que perceber, no máximo na véspera do prazo do PR.
-- Discussão técnica fica nas issues e PRs, não no WhatsApp.
+- Discussão técnica fica nos PRs, não no WhatsApp.
