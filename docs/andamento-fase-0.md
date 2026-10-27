@@ -41,7 +41,7 @@ Teste de clone limpo seguindo o README: 9 de 9 verificações OK no navegador, 0
 | M6 | `git push` e CI passando no GitHub | Feito (27/10): CI verde |
 | M7 | Segredo `SUPABASE_PROD_DB_URL` e backup rodado uma vez | Feito (27/10): backup verde, artefato gerado |
 | M8 | Proteção da `main` | Decidido (27/10): sem proteção. Ver "Decisões tomadas" |
-| M9 | GitHub Projects com as issues da semana 1 | A fazer (a IA pode gerar os textos) |
+| M9 | Tarefas da semana 1 | Feito (27/10): em vez do GitHub Projects, as tarefas ficam em [`tarefas-semana-1.md`](tarefas-semana-1.md) e no Notion. Falta passar para o Notion e enviar à equipe |
 | M10 | Convites, grupo do WhatsApp, guias, kickoff | A fazer |
 | M11 | Checklist final | A fazer |
 
@@ -95,6 +95,8 @@ No `horas-dev` (o prod fica para antes do piloto):
 ## Decisões tomadas
 
 - **M8 (27/10/2026):** a organização está no plano Free e o repositório é privado, então o GitHub não aplica proteção na `main`. Decisão: manter privado e sem proteção técnica. Vale a regra do `CONTRIBUTING.md` (nada direto na `main`, sempre PR com revisão) e só aprovar PR com o CI verde. Reavaliar se a EJUVV obtiver o plano Team (por exemplo, pelo GitHub for Nonprofits).
+
+- **M9 (27/10/2026):** as tarefas não usam issues nem GitHub Projects; ficam documentadas em [`tarefas-semana-1.md`](tarefas-semana-1.md) e no Notion. O modelo de PR (`Fecha #`) e o modelo de issue continuam como estão por enquanto. O `CONTRIBUTING.md` ainda fala em issues e GitHub Projects: ajustar antes do kickoff.
 
 ## Lembretes
 
