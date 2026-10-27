@@ -1,0 +1,25 @@
+name: Backup diario
+on:
+  schedule:
+    - cron: '0 6 * * *'   # 3h em Brasilia
+  workflow_dispatch:
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - name: Exportar banco
+        env:
+          DB_URL: ${{ secrets.SUPABASE_PROD_DB_URL }}
+        run: |
+          if [ -z "$DB_URL" ]; then echo "Segredo SUPABASE_PROD_DB_URL ausente"; exit 1; fi
+          supabase db dump --db-url "$DB_URL" -f roles.sql --role-only
+          supabase db dump --db-url "$DB_URL" -f esquema.sql
+          supabase db dump --db-url "$DB_URL" -f dados.sql --use-copy --data-only
+      - uses: actions/upload-artifact@v4
+        with:
+          name: backup-${{ github.run_id }}
+          path: '*.sql'
+          retention-days: 30

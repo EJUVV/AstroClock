@@ -39,3 +39,7 @@ supabase/.temp
 
 # Arquivos temporários das skills superpowers (brainstorming e planos)
 .superpowers/
+
+# Backups do banco nunca entram no repositório (só arquivos .sql da raiz;
+# supabase/seed.sql e supabase/migrations/ continuam versionados)
+/*.sql
