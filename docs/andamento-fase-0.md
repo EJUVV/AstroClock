@@ -2,6 +2,33 @@
 
 Retrato de onde a Fase 0 parou (atualizado em 27/10/2026). Ao retomar com uma IA, peça para ela ler este arquivo e o [`fase-0.md`](fase-0.md). Quando a Fase 0 terminar, este arquivo pode ser apagado (antes, passe a seção "Ambientes" para o `arquitetura.md` ou o `README.md`).
 
+## Próxima sessão: comece por aqui
+
+Onde paramos (27/10/2026, à noite): regras revisadas com a diretora de RH e escopo do piloto decidido (seção 14 do [`regras-de-negocio.md`](regras-de-negocio.md)). O Victor parou no meio do planejamento de novembro.
+
+**Objetivo do Victor:** terminar a grande maioria do piloto em **novembro** (kickoff no início de novembro, ~4 semanas de desenvolvimento) e começar o teste real com os membros em **dezembro**, por pelo menos 1 mês.
+
+### Decisões que o Victor precisa tomar (a IA deve perguntar, de preferência com opções para escolher)
+
+1. **Férias durante o teste.** O teste cai nas férias de fim de ano, mas a regra de férias ficou para a Fase 2. Opções:
+   - (a) a diretora de RH muda a meta na mão para 5h sem sede durante as férias (função de alterar metas, já no piloto; vale na semana seguinte). Recomendação da IA.
+   - (b) cada membro usa o requerimento "só remoto".
+   - (c) desenvolver a regra de férias já em novembro.
+2. **Cronograma de novembro.** A IA sugeriu, sem aprovação ainda:
+   - Semanas 1–2: essencial (login, registros, cronômetro, metas, cálculo semanal).
+   - Semana 3: painéis com indicador de meta e barras de tempo, requerimento (primeiro sem e-mail), destaque de 2+ semanas.
+   - Semana 4: ranking mensal, presença na sede, gráfico de horas por dia, e-mail do requerimento.
+   - Risco apontado: o escopo é apertado para novembro; se a semana 4 atrasar, o teste começa com o essencial.
+3. **Tarefas das semanas 2, 3 e 4.** A IA ofereceu escrever no mesmo formato do [`tarefas-semana-1.md`](tarefas-semana-1.md). Esperando o "sim" do Victor e a aprovação do cronograma.
+4. **B1 e `arquitetura.md`.** Requerimento de ausência e presença na sede mudam o esboço do banco (`dispensas` vira requerimento; tabela nova de presença) e o contrato de funções. A IA ofereceu atualizar a tarefa B1 e o esboço antes do kickoff.
+
+### Tarefas do Victor fora da IA
+
+- **M10:** convites no GitHub (write) e no Supabase (só o Bernardo, só "EJUVV Dev"), grupo do WhatsApp, tarefas no Notion, guias, marcar kickoff e primeira demo. O Victor já conversou um pouco com os membros; vai fazer depois de estruturar o planejamento.
+- **M11:** checklist final, assim que chamar a equipe para o grupo.
+- **Diretora de RH:** repassar o [`pauta-diretora-rh.md`](pauta-diretora-rh.md). Urgentes para o piloto: perguntas 3 a 7 (requerimento) e 15 (presença na sede).
+- **Segredos:** o Victor optou por guardar o ID do cliente e a chave secreta do Google num bloco de notas no computador (a IA recomendou um gerenciador de senhas).
+
 ## Já feito (Claude Code)
 
 As 4 etapas do [`fase-0.md`](fase-0.md) estão prontas e commitadas na `main`:
