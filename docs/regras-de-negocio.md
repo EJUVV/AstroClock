@@ -2,7 +2,7 @@
 
 Fonte única das regras do sistema. Código, banco e telas seguem este documento. Se uma regra não está aqui, ela não foi decidida: pergunte antes de implementar.
 
-Itens marcados com **[PENDENTE]** ainda não foram decididos. Itens marcados com **[ESCOPO]** foram pedidos pela diretoria de RH, mas ainda não foi decidido se entram no piloto ou na Fase 2 (ver seção 14).
+Itens marcados com **[PENDENTE]** ainda não foram decididos. Itens marcados com **[FASE 2]** são regras decididas, mas que só serão implementadas depois do piloto (ver seção 14).
 
 Última revisão: 27/10/2026, com as respostas da diretora de RH.
 
@@ -18,7 +18,7 @@ Itens marcados com **[PENDENTE]** ainda não foram decididos. Itens marcados com
 - A meta é igual para todos os setores.
 - **Feriados não mudam a meta**: a semana com feriado continua com 10h no total e 5h na sede.
 
-### Férias
+### Férias [FASE 2]
 
 - O RH cadastra no sistema as datas de início e fim de cada período de férias.
 - Durante as férias, a meta é de **5h no total**, e **não há exigência de horas na sede** (as horas contam como remotas).
@@ -112,7 +112,7 @@ Substitui a antiga "dispensa de semana inteira registrada pelo RH".
 - **Semana entre dois meses** conta para o mês da **segunda-feira**. Trimestre e ano seguem o calendário normal.
 - Os totais **nunca são armazenados**: sempre calculados a partir dos registros.
 
-## 9. Ano e histórico
+## 9. Ano e histórico [FASE 2]
 
 - O ano é o **ano civil** (janeiro a dezembro).
 - As métricas do membro (totais, ranking, progresso) são **por ano**: na virada do ano começam do zero, e as horas do ano anterior não interferem no ano atual.
@@ -131,18 +131,18 @@ Substitui a antiga "dispensa de semana inteira registrada pelo RH".
   - semana encerrada **sem a meta**: **vermelho**;
   - semana em andamento ainda sem a meta: um indicador de que **ainda não cumpriu**.
 - Barras de **quanto do tempo já passou**: do dia, da semana, do mês e do ano (em %), para o membro comparar com as próprias horas.
-- [ESCOPO] **Gráfico de barras** com as horas feitas por dia. [PENDENTE] Quais gráficos entram: a discutir.
+- **Gráfico de barras** com as horas feitas por dia. [PENDENTE] Outros gráficos: a discutir.
 
 ## 12. Ranking e selos
 
-### Ranking [ESCOPO]
+### Ranking
 
 - Período: **mês**.
 - Ordem: **horas totais**; desempate por **horas na sede**; dispensados no fim.
 - **O RH** vê o ranking completo.
 - **O membro** vê só a **própria posição**, em relação a toda a EJ e em relação ao seu setor.
 
-### Selos [ESCOPO]
+### Selos [FASE 2]
 
 - O membro ganha selos ao atingir marcos de horas, por exemplo **50, 100, 200 e 400 horas**.
 - As horas contam **desde a entrada na EJUVV** (não zeram na virada do ano). Todas as horas contam; alguns selos podem ser só de horas na sede.
@@ -150,7 +150,7 @@ Substitui a antiga "dispensa de semana inteira registrada pelo RH".
 - A foto é a da conta Google. [PENDENTE] Se dá para trocar a foto no sistema.
 - [PENDENTE] A lista definitiva de selos e onde os membros veem os selos dos outros.
 
-## 13. Presença na sede em tempo real [ESCOPO]
+## 13. Presença na sede em tempo real
 
 - Botão para o membro **avisar que está na sede** agora. Ele **não** registra horas: só informa a presença.
 - O membro **desmarca** quando sai.
@@ -162,13 +162,22 @@ Substitui a antiga "dispensa de semana inteira registrada pelo RH".
 
 O piloto deve funcionar por **pelo menos 1 mês**, com testes durante o uso (fim de ano, então o aproveitamento será menor).
 
-**Entra no piloto:** login, perfis, registro manual e cronômetro, prazos, sobreposição, revisão de cronômetro, metas com histórico, setores, cálculo semanal, painel do membro (barras sede x/5h e total x/10h, resumo, grade de semanas do mês, histórico), painel do RH (visão geral com % de cumprimento, lista de quem ficou abaixo, detalhe por membro, cadastro), PWA básico instalável.
+Escopo decidido pelo líder do projeto em 27/10/2026.
 
-**[ESCOPO] Pedidos da diretoria de RH, a decidir pelo líder do projeto (piloto ou Fase 2):** férias com meta própria, requerimento de ausência (no lugar da dispensa; com e-mail para o RH), indicador de meta (vermelho / ainda não cumpriu), barras de tempo (dia, semana, mês, ano), histórico por ano, destaque de quem ficou 2+ semanas seguidas abaixo, ranking mensal com posição na EJ e no setor, selos de horas, presença na sede em tempo real, gráfico de horas por dia, relatórios CSV mensais e anuais.
+**Entra no piloto:**
+- Login, perfis, setores, metas com histórico.
+- Registro manual e cronômetro, prazos, sobreposição, revisão de cronômetro.
+- Requerimento de ausência (o membro envia, o RH aprova ou reprova), com e-mail para o RH.
+- Cálculo semanal.
+- Painel do membro: barras sede x/5h e total x/10h, indicador de meta (vermelho / ainda não cumpriu), barras de tempo (dia, semana, mês, ano), gráfico de horas por dia, resumo, grade de semanas do mês, histórico.
+- Painel do RH: visão geral com % de cumprimento, lista de quem ficou abaixo, destaque de quem ficou 2+ semanas seguidas abaixo, detalhe por membro, cadastro, ranking mensal completo.
+- Ranking mensal: o membro vê a própria posição na EJ e no setor.
+- Presença na sede em tempo real.
+- PWA básico instalável.
 
 **Se houver tempo no piloto:** comparativo e abas por setor, seletor de trimestre e ano.
 
-**Fase 2:** exportação CSV (relatórios mensais e anuais; está no projeto, mas não é prioridade), gráficos, PDF, PWA offline e notificações, arquivamento de gestões.
+**Fase 2:** férias com meta própria, histórico e métricas por ano, selos de horas, relatórios CSV mensais e anuais (primeiro item; está no projeto, mas não é prioridade), outros gráficos, PDF, PWA offline e notificações, arquivamento de gestões.
 
 ## 15. Dados e LGPD
 

@@ -40,6 +40,6 @@ Perguntas que ainda faltam responder. As respostas de 27/10/2026 já estão no [
 16. Quais gráficos ela quer além das horas por dia? (A discutir com calma.)
 17. O que precisa ter nos relatórios CSV mensais e anuais? (Não é prioridade.)
 
-## Para o Victor decidir (não é com a diretora)
+## Prioridade
 
-- Quais pedidos marcados [ESCOPO] no `regras-de-negocio.md` entram no piloto e quais ficam para a Fase 2.
+Para o piloto, as mais urgentes são as do requerimento (3 a 7) e a da presença na sede (15). Férias (1 e 2) e selos (12 a 14) ficaram para a Fase 2 e podem esperar.

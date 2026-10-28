@@ -98,7 +98,7 @@ No `horas-dev` (o prod fica para antes do piloto):
 
 - **M9 (27/10/2026):** as tarefas não usam issues nem GitHub Projects; ficam documentadas em [`tarefas-semana-1.md`](tarefas-semana-1.md) e no Notion. O modelo de PR (`Fecha #`) e o modelo de issue continuam como estão por enquanto. O `CONTRIBUTING.md` já foi ajustado para tarefas no Notion.
 
-- **Diretora de RH (27/10/2026):** respostas registradas no [`regras-de-negocio.md`](regras-de-negocio.md). O que ainda falta perguntar está em [`pauta-diretora-rh.md`](pauta-diretora-rh.md). Os pedidos novos estão marcados [ESCOPO]: o Victor decide o que entra no piloto. Férias e requerimento de ausência mudam o esboço de `metas` e `dispensas` no `arquitetura.md`: rever na B1, com o Bernardo.
+- **Diretora de RH (27/10/2026):** respostas registradas no [`regras-de-negocio.md`](regras-de-negocio.md). O que ainda falta perguntar está em [`pauta-diretora-rh.md`](pauta-diretora-rh.md). Escopo do piloto decidido pelo Victor (seção 14 das regras). Requerimento de ausência e presença na sede mudam o esboço do banco (`dispensas`) no `arquitetura.md`: rever na B1, com o Bernardo.
 
 ## Lembretes
 
@@ -110,7 +110,7 @@ No `horas-dev` (o prod fica para antes do piloto):
 ## Decisões em aberto
 
 1. Registro que passa da meia-noite: qual dos dois registros `criarRegistro()` / `pararCronometro()` devolvem no sistema real (com o Bernardo, antes da semana 2).
-2. Escopo do piloto: quais pedidos [ESCOPO] do `regras-de-negocio.md` entram (Victor).
+2. Férias ficaram para a Fase 2, mas o piloto deve cair no fim do ano: decidir como tratar as semanas de férias durante o piloto.
 3. Prazo ("Vira real") das 3 funções novas do RH em `arquitetura.md`.
 4. shadcn/ui na stack: decidir com a Raíssa.
 5. As 5 skills do projeto: achar no pacote original ou escrever a partir dos docs.
