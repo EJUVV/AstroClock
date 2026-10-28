@@ -18,10 +18,13 @@ Lembretes para todos:
 
 **O que fazer**
 - Revisar com o Victor o esboço da seção 5 do `arquitetura.md` (`membros`, `setores`, `metas`, `registros`): colunas, tipos e restrições.
+- Revisar também o esboço de `requerimentos` e `presenca_sede` (as migrações delas ficam para a semana 2), já com as respostas da diretora de RH registradas no `regras-de-negocio.md`. Atenção: a lista de quem está na sede precisa mostrar nomes, mas o membro só vê a própria linha de `membros`.
+- Lembrar que a meta de sede pode ser **0** (férias durante o piloto, seção 7 do [`planejamento-novembro.md`](planejamento-novembro.md)).
 - Anotar no `arquitetura.md` o que mudar no esboço.
 
 **Como saber que terminou**
 - O esboço das 4 tabelas está fechado e atualizado no `arquitetura.md`.
+- O esboço de `requerimentos` e `presenca_sede` está revisado, com as dúvidas que sobraram anotadas.
 
 **Depende de**
 - Nada.

@@ -2,7 +2,15 @@
 
 Perguntas que ainda faltam responder. As respostas de 27/10/2026 já estão no [`regras-de-negocio.md`](regras-de-negocio.md). Depois de cada conversa, passe as novas respostas para lá e apague daqui o que foi resolvido.
 
-## Férias
+## Férias durante o teste (dezembro e janeiro)
+
+O teste começa em 07/12 e cai nas férias. Até a regra de férias existir no sistema (Fase 2), a ideia é: a diretora muda a meta na mão para **5h no total, sem sede**, e depois volta para 10h e 5h. A mudança vale na semana seguinte e para todos.
+
+18. Ela concorda com esse jeito durante o teste?
+19. Quais são as datas das férias da EJ neste fim de ano (início e volta)?
+20. Ela consegue mudar a meta na semana anterior ao início e na semana anterior à volta? (O sistema não aplica a meta na mesma semana.)
+
+## Férias (regra definitiva, Fase 2)
 
 1. As datas de férias podem ser cadastradas por qualquer pessoa do RH ou só pela diretora? (As metas normais só a diretora altera.)
 2. Se as férias começam no meio da semana (ex.: numa quarta), qual meta vale naquela semana: a normal (10h, 5h na sede) ou a de férias (5h, sem sede)?
@@ -42,4 +50,6 @@ Perguntas que ainda faltam responder. As respostas de 27/10/2026 já estão no [
 
 ## Prioridade
 
-Para o piloto, as mais urgentes são as do requerimento (3 a 7) e a da presença na sede (15). Férias (1 e 2) e selos (12 a 14) ficaram para a Fase 2 e podem esperar.
+Para o piloto, as mais urgentes são as do requerimento (3 a 7), a da presença na sede (15) e as das férias durante o teste (18 a 20). Férias definitivas (1 e 2) e selos (12 a 14) ficaram para a Fase 2 e podem esperar.
+
+Ordem sugerida para a conversa de 29/10: 18 a 20, 3 a 7, 15. Se sobrar tempo: 8 a 11. O resto pode esperar.

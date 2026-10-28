@@ -25,6 +25,14 @@ Itens marcados com **[PENDENTE]** ainda não foram decididos. Itens marcados com
 - [PENDENTE] Se as datas de férias são cadastradas por qualquer pessoa do RH ou só pelo diretor do RH (as metas normais só o diretor altera).
 - [PENDENTE] Semana parcialmente em férias (ex.: as férias começam numa quarta): qual meta vale nessa semana.
 
+### Férias durante o piloto
+
+Decidido pelo líder do projeto em 28/10/2026, enquanto a regra de férias não existe no sistema:
+
+- O **diretor do RH altera a meta na mão**: **5h no total e 0h na sede** durante as férias; depois, volta para 10h e 5h.
+- Como toda alteração de meta, vale **na semana seguinte**, e vale **para todos**.
+- Por isso, a meta de sede pode ser **0**.
+
 ## 2. Registros de horas
 
 - Duas formas de registrar:
@@ -162,7 +170,7 @@ Substitui a antiga "dispensa de semana inteira registrada pelo RH".
 
 O piloto deve funcionar por **pelo menos 1 mês**, com testes durante o uso (fim de ano, então o aproveitamento será menor).
 
-Escopo decidido pelo líder do projeto em 27/10/2026.
+Escopo decidido pelo líder do projeto em 27/10/2026. Prioridades e cronograma em [`planejamento-novembro.md`](planejamento-novembro.md).
 
 **Entra no piloto:**
 - Login, perfis, setores, metas com histórico.

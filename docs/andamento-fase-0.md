@@ -1,26 +1,18 @@
 # Andamento da Fase 0
 
-Retrato de onde a Fase 0 parou (atualizado em 27/10/2026). Ao retomar com uma IA, peça para ela ler este arquivo e o [`fase-0.md`](fase-0.md). Quando a Fase 0 terminar, este arquivo pode ser apagado (antes, passe a seção "Ambientes" para o `arquitetura.md` ou o `README.md`).
+Retrato de onde a Fase 0 parou (atualizado em 28/10/2026). Ao retomar com uma IA, peça para ela ler este arquivo e o [`fase-0.md`](fase-0.md). Quando a Fase 0 terminar, este arquivo pode ser apagado (antes, passe a seção "Ambientes" para o `arquitetura.md` ou o `README.md`).
 
 ## Próxima sessão: comece por aqui
 
-Onde paramos (27/10/2026, à noite): regras revisadas com a diretora de RH e escopo do piloto decidido (seção 14 do [`regras-de-negocio.md`](regras-de-negocio.md)). O Victor parou no meio do planejamento de novembro.
+Onde paramos (28/10/2026): planejamento de novembro aprovado e escrito em [`planejamento-novembro.md`](planejamento-novembro.md) (prioridades P0/P1/P2, plano por semana, riscos). Decisão das férias durante o teste registrada no [`regras-de-negocio.md`](regras-de-negocio.md) (seção 1). Esboço de `requerimentos` e `presenca_sede` e as funções novas acrescentados ao [`arquitetura.md`](arquitetura.md). B1 atualizada.
 
-**Objetivo do Victor:** terminar a grande maioria do piloto em **novembro** (kickoff no início de novembro, ~4 semanas de desenvolvimento) e começar o teste real com os membros em **dezembro**, por pelo menos 1 mês.
+O Victor conversa com a diretora de RH em **29/10 à tarde** ([`pauta-diretora-rh.md`](pauta-diretora-rh.md), ordem sugerida no fim).
 
-### Decisões que o Victor precisa tomar (a IA deve perguntar, de preferência com opções para escolher)
+### Próximos passos com a IA (depois da conversa com a diretora)
 
-1. **Férias durante o teste.** O teste cai nas férias de fim de ano, mas a regra de férias ficou para a Fase 2. Opções:
-   - (a) a diretora de RH muda a meta na mão para 5h sem sede durante as férias (função de alterar metas, já no piloto; vale na semana seguinte). Recomendação da IA.
-   - (b) cada membro usa o requerimento "só remoto".
-   - (c) desenvolver a regra de férias já em novembro.
-2. **Cronograma de novembro.** A IA sugeriu, sem aprovação ainda:
-   - Semanas 1–2: essencial (login, registros, cronômetro, metas, cálculo semanal).
-   - Semana 3: painéis com indicador de meta e barras de tempo, requerimento (primeiro sem e-mail), destaque de 2+ semanas.
-   - Semana 4: ranking mensal, presença na sede, gráfico de horas por dia, e-mail do requerimento.
-   - Risco apontado: o escopo é apertado para novembro; se a semana 4 atrasar, o teste começa com o essencial.
-3. **Tarefas das semanas 2, 3 e 4.** A IA ofereceu escrever no mesmo formato do [`tarefas-semana-1.md`](tarefas-semana-1.md). Esperando o "sim" do Victor e a aprovação do cronograma.
-4. **B1 e `arquitetura.md`.** Requerimento de ausência e presença na sede mudam o esboço do banco (`dispensas` vira requerimento; tabela nova de presença) e o contrato de funções. A IA ofereceu atualizar a tarefa B1 e o esboço antes do kickoff.
+1. Passar as respostas da diretora para o `regras-de-negocio.md` e ajustar o esboço de `requerimentos` e `presenca_sede`.
+2. Completar o contrato (seção 8 do `planejamento-novembro.md`) e criar as versões falsas no código, incluindo meta de sede 0 em `alterarMetas`. Antes do kickoff.
+3. Escrever as tarefas detalhadas das semanas 2, 3 e 4 no formato do [`tarefas-semana-1.md`](tarefas-semana-1.md).
 
 ### Tarefas do Victor fora da IA
 
@@ -137,7 +129,7 @@ No `horas-dev` (o prod fica para antes do piloto):
 ## Decisões em aberto
 
 1. Registro que passa da meia-noite: qual dos dois registros `criarRegistro()` / `pararCronometro()` devolvem no sistema real (com o Bernardo, antes da semana 2).
-2. Férias ficaram para a Fase 2, mas o piloto deve cair no fim do ano: decidir como tratar as semanas de férias durante o piloto.
+2. Férias durante o piloto: decidido em 28/10 (o RH muda a meta na mão). Falta a diretora concordar e informar as datas.
 3. Prazo ("Vira real") das 3 funções novas do RH em `arquitetura.md`.
 4. shadcn/ui na stack: decidir com a Raíssa.
 5. As 5 skills do projeto: achar no pacote original ou escrever a partir dos docs.

@@ -73,9 +73,14 @@ Esboço inicial, refinado pelo Bernardo na semana 1. Nomes em snake_case.
 | `setores` | `id`, `nome`, `ativo` | Todos | Todos (RH edita) |
 | `registros` | `id`, `membro_id`, `inicio`, `fim` (null = cronômetro ativo), `local` (`sede`/`online`), `descricao`, `origem` (`manual`/`cronometro`), `cancelado`, `precisa_revisao`, `criado_em`, `atualizado_em` | Só os próprios | Todos |
 | `metas` | `id`, `horas_total`, `horas_sede`, `vigente_desde` (segunda-feira), `alterado_por` | Todas | Todas (só `diretor_rh` cria) |
-| `dispensas` | `id`, `membro_id`, `semana` (segunda-feira), `motivo`, `registrado_por` | Se a própria semana foi dispensada | Todas |
+| `requerimentos` | `id`, `membro_id`, `tipo` (`so_remoto`/`ausencia_total`), `data_inicio`, `data_fim`, `motivo`, `situacao` (`pendente`/`aprovado`/`reprovado`), `criado_em`, `respondido_por`, `respondido_em` | Os próprios (e cria) | Todos (aprova ou reprova) |
+| `presenca_sede` | `id`, `membro_id`, `entrada`, `saida` (null = está na sede agora) | Quem está na sede agora (só o nome); marca e desmarca só a própria | Todas |
 | `historico_setor` | `id`, `membro_id`, `setor_id`, `desde` | O próprio | Todos |
 | `auditoria` | `id`, `tabela`, `registro_id`, `acao`, `quem`, `quando`, `antes`, `depois` | Não | Todas |
+
+**Requerimento de ausência** (seção 7 do `regras-de-negocio.md`): substitui a antiga tabela `dispensas`. Só requerimento `aprovado` muda a meta: `so_remoto` zera a exigência de sede na semana; `ausencia_total` dispensa a semana. Ainda depende da diretora de RH (perguntas 3 a 7 do [`pauta-diretora-rh.md`](pauta-diretora-rh.md)): se um requerimento de parte da semana vale para a semana inteira, se pode cobrir várias semanas e se o RH pode dispensar alguém direto.
+
+**Presença na sede** (seção 13 do `regras-de-negocio.md`): não registra horas. Índice único parcial: uma única linha com `saida is null` por membro. Como o membro só vê a própria linha de `membros`, a lista de quem está na sede precisa de uma visão ou função que exponha só o nome. Ainda depende da pergunta 15 (desmarcar sozinho).
 
 Funções auxiliares previstas no banco: `meu_id()`, `eh_rh()`, `meu_perfil()` (todas `security definer`, filtrando pelo e-mail de `auth.jwt()` e `ativo = true`).
 
@@ -155,7 +160,37 @@ export interface ResumoMembroSemana {
   cumpriu: boolean
   dispensada: boolean
 }
+
+export type TipoRequerimento = 'so_remoto' | 'ausencia_total'
+export type SituacaoRequerimento = 'pendente' | 'aprovado' | 'reprovado'
+
+export interface Requerimento {
+  id: string
+  membroId: string
+  nomeMembro: string
+  tipo: TipoRequerimento
+  inicio: string        // ISO date
+  fim: string           // ISO date
+  motivo: string
+  situacao: SituacaoRequerimento
+  criadoEm: string      // ISO datetime
+}
+
+export interface NovoRequerimento {
+  tipo: TipoRequerimento
+  inicio: string
+  fim: string
+  motivo: string
+}
+
+export interface PresencaSede {
+  membroId: string
+  nome: string
+  desde: string         // ISO datetime
+}
 ```
+
+Semana com requerimento `so_remoto` aprovado: `metaSede` vem como 0 em `ProgressoSemana`. Semana com `ausencia_total` aprovado: `dispensada` vem como `true`.
 
 Funções (todas `async`; em erro, lançam `Error` com mensagem em português pronta para a tela):
 
@@ -178,7 +213,7 @@ Funções (todas `async`; em erro, lançam `Error` com mensagem em português pr
 | `membros.ts` | `cadastrarMembro(dados: NovoMembro)` | `Membro` | Raíssa | Semana 2 |
 | `membros.ts` | `desativarMembro(id: string)` | `void` | Raíssa | Semana 2 |
 | `membros.ts` | `alterarPerfil(id: string, perfil: Perfil)` | `void` | Raíssa | Semana 2 |
-| `rh.ts` | `registrarDispensa(dados: NovaDispensa)` | `void` | Raíssa | Semana 2 |
+| `rh.ts` | `registrarDispensa(dados: NovaDispensa)` | `void` | Raíssa | Depende da pergunta 6 da pauta com a diretora de RH; se o RH não puder dispensar direto, sai do contrato |
 | `rh.ts` | `metasAtuais()` | `Metas` | Raíssa, Guilherme | Semana 2 |
 | `rh.ts` | `alterarMetas(horasTotal: number, horasSede: number)` | `void` | Raíssa | Semana 2 |
 | `rh.ts` | `percentualDaSemana(semana: string)` | `number` (0 a 100) | Raíssa | Semana 3 |
@@ -187,6 +222,16 @@ Funções (todas `async`; em erro, lançam `Error` com mensagem em português pr
 | `rh.ts` | `buscarRegistrosDoMembro(membroId: string, semana: string)` | `Registro[]` | Raíssa | A definir |
 | `rh.ts` | `editarRegistroDeMembro(id: string, dados: NovoRegistro)` | `Registro` | Raíssa | A definir |
 | `rh.ts` | `cancelarRegistroDeMembro(id: string)` | `void` | Raíssa | A definir |
+| `requerimentos.ts` | `enviarRequerimento(dados: NovoRequerimento)` | `Requerimento` | Guilherme | Semana 3 |
+| `requerimentos.ts` | `meusRequerimentos()` | `Requerimento[]` | Guilherme | Semana 3 |
+| `rh.ts` | `listarRequerimentos(situacao?: SituacaoRequerimento)` | `Requerimento[]` | Raíssa | Semana 3 |
+| `rh.ts` | `responderRequerimento(id: string, aprovar: boolean)` | `void` | Raíssa | Semana 3 |
+| `presenca.ts` | `quemEstaNaSede()` | `PresencaSede[]` | Guilherme, Raíssa | Semana 4 |
+| `presenca.ts` | `estouNaSede()` | `boolean` | Guilherme | Semana 4 |
+| `presenca.ts` | `marcarNaSede()` | `void` | Guilherme | Semana 4 |
+| `presenca.ts` | `desmarcarNaSede()` | `void` | Guilherme | Semana 4 |
+
+As funções de `requerimentos.ts`, `presenca.ts`, `listarRequerimentos` e `responderRequerimento` foram acrescentadas em 28/10/2026 e **ainda não têm versão falsa no código**. Outras lacunas do contrato estão na seção 8 do [`planejamento-novembro.md`](planejamento-novembro.md).
 
 Semanas e meses são passados como strings ISO: semana = data da segunda-feira (`'2026-11-02'`), mês = `'2026-11'`.
 
