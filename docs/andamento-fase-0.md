@@ -119,6 +119,8 @@ No `horas-dev` (o prod fica para antes do piloto):
 
 - **Diretora de RH (27/10/2026):** respostas registradas no [`regras-de-negocio.md`](regras-de-negocio.md). O que ainda falta perguntar está em [`pauta-diretora-rh.md`](pauta-diretora-rh.md). Escopo do piloto decidido pelo Victor (seção 14 das regras). Requerimento de ausência e presença na sede mudam o esboço do banco (`dispensas`) no `arquitetura.md`: rever na B1, com o Bernardo.
 
+- **Equipe (28/10/2026):** Raíssa saiu do projeto por motivos externos. Johannes assume as mesmas frentes (identidade visual, base visual em `src/compartilhado/ui/`, protótipo com o Guilherme e painel do RH) e entra no kickoff, sem mudança no plano. Convite e guia individual (M10) vão para Johannes.
+
 ## Lembretes
 
 - Reforçar no kickoff que a `main` não tem bloqueio: a regra de PR depende da equipe.
@@ -131,6 +133,6 @@ No `horas-dev` (o prod fica para antes do piloto):
 1. Registro que passa da meia-noite: qual dos dois registros `criarRegistro()` / `pararCronometro()` devolvem no sistema real (com o Bernardo, antes da semana 2).
 2. Férias durante o piloto: decidido em 28/10 (o RH muda a meta na mão). Falta a diretora concordar e informar as datas.
 3. Prazo ("Vira real") das 3 funções novas do RH em `arquitetura.md`.
-4. shadcn/ui na stack: decidir com a Raíssa.
+4. shadcn/ui na stack: decidir junto com Johannes.
 5. As 5 skills do projeto: achar no pacote original ou escrever a partir dos docs.
 6. Pendentes de `regras-de-negocio.md`: ver [`pauta-diretora-rh.md`](pauta-diretora-rh.md).

@@ -33,7 +33,7 @@ Leia antes: [`AGENTS.md`](../AGENTS.md), [`regras-de-negocio.md`](regras-de-nego
 
 **Commits na `main`:** durante a Fase 0, os commits das etapas vão direto na `main`. É a única exceção à regra do `CONTRIBUTING.md`, porque a equipe ainda não entrou e a proteção da branch ainda não foi ativada.
 
-O assistente **não cria** tabelas, migrações, RLS ou seed real (tarefa do Bernardo na semana 1) e **não cria telas** além do mínimo descrito aqui (tarefas do Guilherme e da Raíssa).
+O assistente **não cria** tabelas, migrações, RLS ou seed real (tarefa do Bernardo na semana 1) e **não cria telas** além do mínimo descrito aqui (tarefas de Guilherme e Johannes).
 
 ---
 
@@ -298,7 +298,7 @@ Criar um quadro com as colunas **A fazer**, **Em andamento**, **Em revisão** e 
 | Pessoa | Issues da semana 1 |
 | --- | --- |
 | Bernardo | Modelar tabelas iniciais com o Victor · Migrações de `membros`, `setores`, `metas` e `registros` · RLS de `membros` e funções `meu_id`, `eh_rh` e `meu_perfil` · Login Google real (`entrarComGoogle`, `sair`, `meuPerfil`, `meuNome`) · Seed inicial e tipos gerados |
-| Raíssa | Protótipo das 4 telas (com o Guilherme) · Base visual em `src/compartilhado/ui/` · Painel do RH vazio com navegação |
+| Johannes | Protótipo das 4 telas (com o Guilherme) · Base visual em `src/compartilhado/ui/` · Painel do RH vazio com navegação |
 | Guilherme | Tela de login · Página `/inicio` com redirecionamento (em par com o Victor) · `RotaProtegida` · Painel do membro vazio com "Olá, nome" e sair |
 | Victor | Backup diário funcionando · Validação do protótipo com o RH e a diretora |
 
@@ -306,7 +306,7 @@ O assistente pode gerar os textos dessas issues se o Victor pedir.
 
 ## M10 — Equipe
 
-- Convidar Bernardo, Raíssa e Guilherme para o repositório com permissão **write**.
+- Convidar Bernardo, Johannes e Guilherme para o repositório com permissão **write**.
 - Convidar o Bernardo para a organização **"EJUVV Dev"** no Supabase.
 - Criar o grupo do WhatsApp.
 - Enviar a cada um o Guia geral e o guia individual, pedindo para lerem antes do kickoff.

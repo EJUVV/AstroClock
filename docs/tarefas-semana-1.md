@@ -91,7 +91,7 @@ Lembretes para todos:
 
 ---
 
-## Raíssa (visual e painel do RH)
+## Johannes (visual e painel do RH)
 
 ### R1. Protótipo das 4 telas (com o Guilherme)
 
@@ -204,7 +204,7 @@ Feito em 27/10/2026: segredo cadastrado e backup rodado com sucesso.
 - Apresentar o protótipo (R1) ao RH e à diretora e anotar os ajustes pedidos.
 
 **Como saber que terminou**
-- Protótipo aprovado ou com a lista de ajustes repassada à Raíssa e ao Guilherme.
+- Protótipo aprovado ou com a lista de ajustes repassada para Johannes e Guilherme.
 
 **Depende de**
 - R1.

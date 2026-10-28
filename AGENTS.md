@@ -27,10 +27,10 @@ Este arquivo vale para qualquer assistente de código (Claude Code, Copilot, Ant
 ```text
 src/
   membro/              tela de login e painel do membro (dono: Guilherme)
-  rh/                  painel do RH (dono: Raíssa)
+  rh/                  painel do RH (responsável: Johannes)
   compartilhado/
     api/               funções de dados — ÚNICO lugar que importa o supabase (donos: Bernardo e Victor)
-    ui/                componentes visuais usados pelos dois painéis (dona: Raíssa)
+    ui/                componentes visuais usados pelos dois painéis (responsável: Johannes)
     supabase.ts        cliente do Supabase
     tipos.ts           tipos combinados entre front e dados
     tipos-banco.ts     tipos gerados do banco (npx supabase gen types)
@@ -84,7 +84,7 @@ npx supabase gen types typescript --linked > src/compartilhado/tipos-banco.ts
 
 - As regras deste arquivo, do CONTRIBUTING.md e dos docs têm prioridade sobre qualquer skill.
 - Fluxo de Git é o do CONTRIBUTING.md (branch + PR revisado); não fazer merge local nem push sem pedido.
-- shadcn/ui ainda não faz parte da stack: não rodar `npx shadcn init` sem decisão do Victor e da Raíssa.
+- shadcn/ui ainda não faz parte da stack: não rodar `npx shadcn init` sem uma decisão conjunta de Victor e Johannes.
 - TDD é opcional enquanto o projeto não tiver ferramenta de testes.
 - Skills novas só entram por PR, com os arquivos revisados. Nunca instalar com `-y`.
 

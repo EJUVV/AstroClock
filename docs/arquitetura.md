@@ -198,8 +198,8 @@ Funções (todas `async`; em erro, lançam `Error` com mensagem em português pr
 | --- | --- | --- | --- | --- |
 | `auth.ts` | `entrarComGoogle()` | `void` | Guilherme | Semana 1 |
 | `auth.ts` | `sair()` | `void` | Todos | Semana 1 |
-| `auth.ts` | `meuPerfil()` | `Perfil \| null` | Guilherme, Raíssa | Semana 1 |
-| `auth.ts` | `meuNome()` | `string` | Guilherme, Raíssa | Semana 1 |
+| `auth.ts` | `meuPerfil()` | `Perfil \| null` | Guilherme, Johannes | Semana 1 |
+| `auth.ts` | `meuNome()` | `string` | Guilherme, Johannes | Semana 1 |
 | `registros.ts` | `buscarMeusRegistros(semana: string)` | `Registro[]` | Guilherme | Meio da semana 2 |
 | `registros.ts` | `criarRegistro(dados: NovoRegistro)` | `Registro` | Guilherme | Meio da semana 2 |
 | `registros.ts` | `editarRegistro(id: string, dados: NovoRegistro)` | `Registro` | Guilherme | Semana 2 |
@@ -209,24 +209,24 @@ Funções (todas `async`; em erro, lançam `Error` com mensagem em português pr
 | `cronometro.ts` | `pararCronometro()` | `Registro` | Guilherme | Semana 2 |
 | `progresso.ts` | `progressoDaSemana(semana: string)` | `ProgressoSemana` | Guilherme | Começo da semana 3 |
 | `progresso.ts` | `progressoDoMes(mes: string)` | `ProgressoSemana[]` | Guilherme | Semana 3 |
-| `membros.ts` | `listarMembros()` | `Membro[]` | Raíssa | Semana 2 |
-| `membros.ts` | `cadastrarMembro(dados: NovoMembro)` | `Membro` | Raíssa | Semana 2 |
-| `membros.ts` | `desativarMembro(id: string)` | `void` | Raíssa | Semana 2 |
-| `membros.ts` | `alterarPerfil(id: string, perfil: Perfil)` | `void` | Raíssa | Semana 2 |
-| `rh.ts` | `registrarDispensa(dados: NovaDispensa)` | `void` | Raíssa | Depende da pergunta 6 da pauta com a diretora de RH; se o RH não puder dispensar direto, sai do contrato |
-| `rh.ts` | `metasAtuais()` | `Metas` | Raíssa, Guilherme | Semana 2 |
-| `rh.ts` | `alterarMetas(horasTotal: number, horasSede: number)` | `void` | Raíssa | Semana 2 |
-| `rh.ts` | `percentualDaSemana(semana: string)` | `number` (0 a 100) | Raíssa | Semana 3 |
-| `rh.ts` | `resumoDaSemana(semana: string)` | `ResumoMembroSemana[]` | Raíssa | Semana 3 |
-| `rh.ts` | `abaixoDaMeta(semana: string)` | `ResumoMembroSemana[]` | Raíssa | Semana 3 |
-| `rh.ts` | `buscarRegistrosDoMembro(membroId: string, semana: string)` | `Registro[]` | Raíssa | A definir |
-| `rh.ts` | `editarRegistroDeMembro(id: string, dados: NovoRegistro)` | `Registro` | Raíssa | A definir |
-| `rh.ts` | `cancelarRegistroDeMembro(id: string)` | `void` | Raíssa | A definir |
+| `membros.ts` | `listarMembros()` | `Membro[]` | Johannes | Semana 2 |
+| `membros.ts` | `cadastrarMembro(dados: NovoMembro)` | `Membro` | Johannes | Semana 2 |
+| `membros.ts` | `desativarMembro(id: string)` | `void` | Johannes | Semana 2 |
+| `membros.ts` | `alterarPerfil(id: string, perfil: Perfil)` | `void` | Johannes | Semana 2 |
+| `rh.ts` | `registrarDispensa(dados: NovaDispensa)` | `void` | Johannes | Depende da pergunta 6 da pauta com a diretora de RH; se o RH não puder dispensar direto, sai do contrato |
+| `rh.ts` | `metasAtuais()` | `Metas` | Johannes, Guilherme | Semana 2 |
+| `rh.ts` | `alterarMetas(horasTotal: number, horasSede: number)` | `void` | Johannes | Semana 2 |
+| `rh.ts` | `percentualDaSemana(semana: string)` | `number` (0 a 100) | Johannes | Semana 3 |
+| `rh.ts` | `resumoDaSemana(semana: string)` | `ResumoMembroSemana[]` | Johannes | Semana 3 |
+| `rh.ts` | `abaixoDaMeta(semana: string)` | `ResumoMembroSemana[]` | Johannes | Semana 3 |
+| `rh.ts` | `buscarRegistrosDoMembro(membroId: string, semana: string)` | `Registro[]` | Johannes | A definir |
+| `rh.ts` | `editarRegistroDeMembro(id: string, dados: NovoRegistro)` | `Registro` | Johannes | A definir |
+| `rh.ts` | `cancelarRegistroDeMembro(id: string)` | `void` | Johannes | A definir |
 | `requerimentos.ts` | `enviarRequerimento(dados: NovoRequerimento)` | `Requerimento` | Guilherme | Semana 3 |
 | `requerimentos.ts` | `meusRequerimentos()` | `Requerimento[]` | Guilherme | Semana 3 |
-| `rh.ts` | `listarRequerimentos(situacao?: SituacaoRequerimento)` | `Requerimento[]` | Raíssa | Semana 3 |
-| `rh.ts` | `responderRequerimento(id: string, aprovar: boolean)` | `void` | Raíssa | Semana 3 |
-| `presenca.ts` | `quemEstaNaSede()` | `PresencaSede[]` | Guilherme, Raíssa | Semana 4 |
+| `rh.ts` | `listarRequerimentos(situacao?: SituacaoRequerimento)` | `Requerimento[]` | Johannes | Semana 3 |
+| `rh.ts` | `responderRequerimento(id: string, aprovar: boolean)` | `void` | Johannes | Semana 3 |
+| `presenca.ts` | `quemEstaNaSede()` | `PresencaSede[]` | Guilherme, Johannes | Semana 4 |
 | `presenca.ts` | `estouNaSede()` | `boolean` | Guilherme | Semana 4 |
 | `presenca.ts` | `marcarNaSede()` | `void` | Guilherme | Semana 4 |
 | `presenca.ts` | `desmarcarNaSede()` | `void` | Guilherme | Semana 4 |

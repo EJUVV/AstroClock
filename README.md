@@ -60,5 +60,5 @@ docs/              documentação
 | --- | --- |
 | Victor Gomes | Líder do projeto |
 | Bernardo | Banco de dados e camada de dados |
-| Raíssa | Painel do RH e identidade visual |
+| Johannes | Painel do RH e identidade visual |
 | Guilherme | Login e painel do membro |

@@ -81,7 +81,7 @@ Tarefas detalhadas em [`tarefas-semana-1.md`](tarefas-semana-1.md).
 | Pessoa | Entrega |
 | --- | --- |
 | Bernardo | Modelagem (inclui o esboço de `requerimentos` e `presenca_sede`), migrações de `membros`, `setores`, `metas`, `registros`, RLS de `membros`, login Google real, seed |
-| Raíssa | Protótipo das telas (com o Guilherme), base visual, painel do RH vazio com navegação |
+| Johannes | Protótipo das telas (com o Guilherme), base visual, painel do RH vazio com navegação |
 | Guilherme | Tela de login, `/inicio`, `RotaProtegida`, painel do membro vazio |
 | Victor | Validação do protótipo com o RH e a diretora; decidir hospedagem |
 
@@ -93,7 +93,7 @@ Tarefas detalhadas em [`tarefas-semana-1.md`](tarefas-semana-1.md).
 | --- | --- |
 | Bernardo | RLS de `registros`, `metas` e `setores`; prazos de 7 dias e sobreposição no banco; funções reais de registros, cronômetro (com encerramento após 10h), metas e membros; migrações de `requerimentos` e `presenca_sede` |
 | Guilherme | Formulário de registro manual (com o aviso "Não registre reuniões e eventos."), lista de registros da semana com editar e cancelar, cronômetro na tela |
-| Raíssa | Cadastro, lista e desativação de membros; alterar perfil e metas (só `diretor_rh`) |
+| Johannes | Cadastro, lista e desativação de membros; alterar perfil e metas (só `diretor_rh`) |
 | Victor | Site de desenvolvimento no ar na hospedagem escolhida; revisar PRs |
 
 **Demo (13/11):** registrar horas manualmente e pelo cronômetro, com dados reais no `horas-dev`.
@@ -106,7 +106,7 @@ Semana com feriado na sexta.
 | --- | --- |
 | Bernardo | Cálculo semanal no banco (progresso, percentual, resumo, abaixo da meta, 2+ semanas seguidas); revisão de cronômetro; requerimentos reais |
 | Guilherme | Painel do membro: barras sede e total, indicador de meta, barras de tempo, resumo, grade de semanas do mês, histórico; formulário de requerimento |
-| Raíssa | Painel do RH: % de cumprimento, quem ficou abaixo, destaque 2+ semanas, detalhe por membro (editar e cancelar com motivo), requerimentos (aprovar e reprovar), revisão de cronômetros |
+| Johannes | Painel do RH: % de cumprimento, quem ficou abaixo, destaque 2+ semanas, detalhe por membro (editar e cancelar com motivo), requerimentos (aprovar e reprovar), revisão de cronômetros |
 | Victor | Demo com o RH (19/11) |
 
 **Demo (19/11), com o RH:** uma semana inteira de horas aparecendo no painel do membro e no do RH.
@@ -119,7 +119,7 @@ Semana com feriado na sexta.
 | --- | --- |
 | Bernardo | Ranking mensal no banco; presença na sede real (atualizando em tempo real); e-mail do requerimento; migrações aplicadas no `horas-prod` |
 | Guilherme | Gráfico de horas por dia, posição no ranking, botão "estou na sede" com lista de quem está e o lembrete de desmarcar, PWA básico |
-| Raíssa | Ranking completo no painel do RH, quem está na sede no painel do RH |
+| Johannes | Ranking completo no painel do RH, quem está na sede no painel do RH |
 | Victor | Produção: hospedagem, login Google no `horas-prod` (passo M5 no prod), restaurar um backup no `horas-dev` com o Bernardo |
 
 **Demo (27/11):** o piloto completo, já em produção.
@@ -138,7 +138,7 @@ Coisas que não são tela nem banco, mas travam o piloto se ficarem para o fim:
 | O quê | Até quando | Por quê |
 | --- | --- | --- |
 | Conversa com a diretora de RH ([`pauta-diretora-rh.md`](pauta-diretora-rh.md)) | 29/10 | Requerimento e presença dependem das respostas |
-| Atualizar o contrato e as funções falsas (seção 8) | Antes do kickoff | Raíssa e Guilherme precisam das funções falsas para começar as telas novas |
+| Atualizar o contrato e as funções falsas (seção 8) | Antes do kickoff | Johannes e Guilherme precisam das funções falsas para começar as telas novas |
 | Decidir a hospedagem (Vercel ou Cloudflare Pages, ver `AGENTS.md`) | Semana 1 | Site de desenvolvimento no ar na semana 2 |
 | Escolher o serviço de e-mail do requerimento | Semana 2 | O Bernardo implementa na semana 4 |
 | Tarefas detalhadas das semanas 2, 3 e 4 | Antes de cada semana | Com a IA, no formato da semana 1 |
