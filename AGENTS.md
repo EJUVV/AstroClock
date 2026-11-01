@@ -20,7 +20,7 @@ Este arquivo vale para qualquer assistente de código (Claude Code, Copilot, Ant
 - Supabase: PostgreSQL, login com Google, Row Level Security (RLS)
 - Supabase CLI (dependência de desenvolvimento, rodar com `npx supabase ...`)
 - PWA básico (instalável) a partir da semana 4
-- Hospedagem: Vercel ou Cloudflare Pages (a definir)
+- Hospedagem: Vercel, em princípio; o plano será confirmado com o Rodrigo (Cloudflare Pages é a alternativa)
 
 ## Estrutura de pastas
 

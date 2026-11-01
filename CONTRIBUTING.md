@@ -1,6 +1,6 @@
 # Como trabalhamos
 
-Cada semana entrega uma fatia que atravessa o sistema inteiro: tela, função de dados e banco. Nada conta como pronto até estar na `main` e funcionando na demo presencial da sede.
+Cada semana entrega uma fatia que atravessa o sistema inteiro: tela, função de dados e banco. Nada conta como pronto até estar na `main` e funcionando.
 
 ## Do começo ao fim de uma tarefa
 
@@ -62,13 +62,13 @@ Sempre minúsculas, com hífen.
 - Regra de negócio com dúvida: consulte [`docs/regras-de-negocio.md`](docs/regras-de-negocio.md) ou pergunte no grupo. Nunca deixe a IA inventar.
 - Se a IA sugerir `supabase.from(...)` dentro de uma tela, recuse e use a função de dados correspondente.
 
-## Demo semanal na sede
+## Rotina da equipe
 
-No fim de cada semana, cada pessoa mostra presencialmente, no site rodando a partir da `main`, o que entregou (5 a 10 min por pessoa). Não vale mostrar o que está só na sua máquina.
+- **Reunião presencial toda quarta, depois das 11h, na sede.** Cada pessoa mostra o que já foi feito e o que falta. A primeira é em 04/11.
+- **Mini relatório diário para o Victor, pelo WhatsApp:** o que fez, o que vai fazer e se travou em algo. Duas ou três linhas bastam.
 
-## Prazos e atrasos
+## Atrasos
 
-- O PR da semana precisa estar aberto **até 2 dias antes da demo**.
 - **Travou?** Fale no grupo no mesmo dia.
-- **Não vai entregar?** Avise no grupo assim que perceber, no máximo na véspera do prazo do PR.
+- **Não vai entregar?** Avise no grupo assim que perceber.
 - Discussão técnica fica nos PRs, não no WhatsApp.

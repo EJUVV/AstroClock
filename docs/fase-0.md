@@ -310,7 +310,7 @@ O assistente pode gerar os textos dessas issues se o Victor pedir.
 - Convidar o Bernardo para a organização **"EJUVV Dev"** no Supabase.
 - Criar o grupo do WhatsApp.
 - Enviar a cada um o Guia geral e o guia individual, pedindo para lerem antes do kickoff.
-- Marcar o kickoff (1h, presencial na sede) e a primeira demo.
+- Marcar o kickoff (1h, presencial na sede). Feito em 30/10; a primeira reunião de quarta é em 04/11.
 
 ## M11 — Pronto para o kickoff
 

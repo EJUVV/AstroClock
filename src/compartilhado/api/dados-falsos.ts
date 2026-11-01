@@ -1,6 +1,8 @@
 // FALSO: trocar pela versão real (ver docs/arquitetura.md)
 // Dados em memória usados pelas funções falsas. Somem ao recarregar a página.
 import type {
+  HorasDoDia,
+  LinhaRanking,
   Local,
   Membro,
   Metas,
@@ -8,7 +10,9 @@ import type {
   Perfil,
   ProgressoSemana,
   Registro,
+  Requerimento,
   ResumoMembroSemana,
+  TipoRequerimento,
 } from '../tipos.ts'
 
 // ---------- Ajudantes ----------
@@ -190,6 +194,42 @@ export const dispensas: { membroId: string; semana: string; motivo: string }[] =
   { membroId: 'm1', semana: somarDias(segundaAtual, -14), motivo: 'Problema de saúde (conversado com o RH)' },
 ]
 
+function requerimentoFalso(
+  id: string,
+  membroId: string,
+  tipo: TipoRequerimento,
+  inicio: string,
+  fim: string,
+  motivo: string,
+  situacao: Requerimento['situacao'],
+  anexoNome: string | null = null,
+): Requerimento {
+  const nomeMembro = membros.find((m) => m.id === membroId)?.nome ?? ''
+  return { id, membroId, nomeMembro, tipo, inicio, fim, motivo, situacao, criadoEm: instante(segundaAtual, '08:00'), anexoNome }
+}
+
+export const requerimentos: Requerimento[] = [
+  // Bruno: só remoto aprovado na semana atual (meta de sede 0). Pega só parte da semana, mas vale para ela inteira.
+  requerimentoFalso('q1', 'm2', 'so_remoto', somarDias(segundaAtual, 2), somarDias(segundaAtual, 4), 'Viagem a trabalho', 'aprovado'),
+  // Ana: pendente para a semana seguinte.
+  requerimentoFalso('q2', 'm1', 'so_remoto', somarDias(segundaAtual, 7), somarDias(segundaAtual, 11), 'Obra perto de casa', 'pendente'),
+  // Eduarda: pendente, cobre duas semanas, com anexo.
+  requerimentoFalso('q3', 'm5', 'ausencia_total', somarDias(segundaAtual, 7), somarDias(segundaAtual, 18), 'Compromisso da faculdade', 'pendente', 'comprovante-falso.txt'),
+  // Henrique: reprovado (não muda a meta).
+  requerimentoFalso('q4', 'm8', 'ausencia_total', somarDias(segundaAtual, -7), somarDias(segundaAtual, -3), 'Sem motivo claro', 'reprovado'),
+]
+
+// Os arquivos ficam fora de Requerimento: a tela só recebe o nome e pede o link com linkDoAnexo().
+export const anexos = new Map<string, File>([
+  ['q3', new File(['Anexo de exemplo (dados falsos)'], 'comprovante-falso.txt', { type: 'text/plain' })],
+])
+
+// Quem está na sede agora: saida = null.
+export const presencas: { membroId: string; entrada: string; saida: string | null }[] = [
+  { membroId: 'm2', entrada: new Date(Date.now() - 2 * 3_600_000).toISOString(), saida: null },
+  { membroId: 'm3', entrada: new Date(Date.now() - 3_600_000).toISOString(), saida: null },
+]
+
 // ---------- Validação de registros (usada pelo membro e pelo RH) ----------
 
 // deQuem completa a mensagem de sobreposição: "seu" (membro) ou "deste membro" (RH).
@@ -232,13 +272,12 @@ function arredondar(horas: number): number {
   return Math.round(horas * 100) / 100
 }
 
-// Soma só registros não cancelados e já encerrados; a semana é a da data de início.
-export function horasDaSemana(membroId: string, semana: string): { horasSede: number; horasTotal: number } {
+// Soma só registros não cancelados, já encerrados e fora de revisão.
+function somarHoras(lista: Registro[]): { horasSede: number; horasTotal: number } {
   let sede = 0
   let total = 0
-  for (const r of registros) {
-    if (r.membroId !== membroId || r.cancelado || r.fim === null) continue
-    if (segundaDaSemana(dataEmBrasilia(r.inicio)) !== semana) continue
+  for (const r of lista) {
+    if (r.cancelado || r.precisaRevisao || r.fim === null) continue
     const horas = (Date.parse(r.fim) - Date.parse(r.inicio)) / 3_600_000
     total += horas
     if (r.local === 'sede') sede += horas
@@ -246,23 +285,82 @@ export function horasDaSemana(membroId: string, semana: string): { horasSede: nu
   return { horasSede: arredondar(sede), horasTotal: arredondar(total) }
 }
 
+// A semana é a da data de início.
+export function horasDaSemana(membroId: string, semana: string): { horasSede: number; horasTotal: number } {
+  return somarHoras(
+    registros.filter((r) => r.membroId === membroId && segundaDaSemana(dataEmBrasilia(r.inicio)) === semana),
+  )
+}
+
+export function horasDoDia(membroId: string, dia: string): HorasDoDia {
+  return { dia, ...somarHoras(registros.filter((r) => r.membroId === membroId && dataEmBrasilia(r.inicio) === dia)) }
+}
+
+// O requerimento vale para todas as semanas que ele toca, inteiras, mesmo pegando só parte delas.
+function temRequerimentoAprovado(membroId: string, semana: string, tipo: TipoRequerimento): boolean {
+  return requerimentos.some(
+    (q) =>
+      q.membroId === membroId &&
+      q.tipo === tipo &&
+      q.situacao === 'aprovado' &&
+      segundaDaSemana(q.inicio) <= semana &&
+      semana <= segundaDaSemana(q.fim),
+  )
+}
+
 export function estaDispensada(membroId: string, semana: string): boolean {
-  return dispensas.some((d) => d.membroId === membroId && d.semana === semana)
+  return (
+    dispensas.some((d) => d.membroId === membroId && d.semana === semana) ||
+    temRequerimentoAprovado(membroId, semana, 'ausencia_total')
+  )
 }
 
 export function progressoDoMembro(membroId: string, semana: string): ProgressoSemana {
   const { horasSede, horasTotal } = horasDaSemana(membroId, semana)
   const meta = metaDaSemana(semana)
   const dispensada = estaDispensada(membroId, semana)
+  const metaSede = temRequerimentoAprovado(membroId, semana, 'so_remoto') ? 0 : meta.horasSede
   return {
     semana,
     horasSede,
     horasTotal,
-    metaSede: meta.horasSede,
+    metaSede,
     metaTotal: meta.horasTotal,
-    cumpriu: !dispensada && horasTotal >= meta.horasTotal && horasSede >= meta.horasSede,
+    cumpriu: !dispensada && horasTotal >= meta.horasTotal && horasSede >= metaSede,
     dispensada,
   }
+}
+
+// Semanas cuja segunda-feira cai no mês ('AAAA-MM').
+export function semanasDoMes(mes: string): string[] {
+  const primeiroDia = `${mes}-01`
+  let segunda = segundaDaSemana(primeiroDia)
+  if (segunda < primeiroDia) segunda = somarDias(segunda, 7)
+  const semanas: string[] = []
+  for (; segunda.startsWith(mes); segunda = somarDias(segunda, 7)) semanas.push(segunda)
+  return semanas
+}
+
+// Ordem: horas totais, desempate por horas na sede, dispensados no fim.
+// A definir com a diretora de RH: aqui, "dispensado" é quem teve todas as semanas do mês dispensadas.
+export function calcularRanking(mes: string): LinhaRanking[] {
+  const semanas = semanasDoMes(mes)
+  const linhas = membros
+    .filter((m) => m.ativo)
+    .map((m) => {
+      const horas = semanas.map((s) => horasDaSemana(m.id, s))
+      return {
+        membro: copia(m),
+        horasTotal: arredondar(horas.reduce((soma, h) => soma + h.horasTotal, 0)),
+        horasSede: arredondar(horas.reduce((soma, h) => soma + h.horasSede, 0)),
+        dispensado: semanas.length > 0 && semanas.every((s) => estaDispensada(m.id, s)),
+      }
+    })
+    .sort(
+      (a, b) =>
+        Number(a.dispensado) - Number(b.dispensado) || b.horasTotal - a.horasTotal || b.horasSede - a.horasSede,
+    )
+  return linhas.map((linha, i) => ({ posicao: i + 1, ...linha }))
 }
 
 // Elegíveis: ativos e cadastrados antes da semana (a meta começa na semana seguinte ao cadastro).
