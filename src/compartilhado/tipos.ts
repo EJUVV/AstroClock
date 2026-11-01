@@ -67,3 +67,59 @@ export interface ResumoMembroSemana {
   cumpriu: boolean
   dispensada: boolean
 }
+
+export type TipoRequerimento = 'so_remoto' | 'ausencia_total'
+export type SituacaoRequerimento = 'pendente' | 'aprovado' | 'reprovado'
+
+export interface Requerimento {
+  id: string
+  membroId: string
+  nomeMembro: string
+  tipo: TipoRequerimento
+  inicio: string        // ISO date
+  fim: string           // ISO date
+  motivo: string
+  situacao: SituacaoRequerimento
+  criadoEm: string      // ISO datetime
+  anexoNome: string | null
+}
+
+export interface NovoRequerimento {
+  tipo: TipoRequerimento
+  inicio: string
+  fim: string
+  motivo: string
+  anexo?: File
+}
+
+export interface PresencaSede {
+  membroId: string
+  nome: string
+  desde: string         // ISO datetime
+}
+
+export interface MembroAbaixoSeguido {
+  membro: Membro
+  semanasSeguidas: number
+}
+
+export interface LinhaRanking {
+  posicao: number
+  membro: Membro
+  horasTotal: number
+  horasSede: number
+  dispensado: boolean
+}
+
+export interface PosicaoRanking {
+  posicaoEJ: number
+  totalEJ: number
+  posicaoSetor: number
+  totalSetor: number
+}
+
+export interface HorasDoDia {
+  dia: string           // ISO date
+  horasSede: number
+  horasTotal: number
+}

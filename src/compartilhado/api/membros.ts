@@ -43,3 +43,17 @@ export async function alterarPerfil(id: string, perfil: Perfil): Promise<void> {
   if (perfilFalso() !== 'diretor_rh') throw new Error('Só o diretor do RH pode alterar perfis')
   buscarMembro(id).perfil = perfil
 }
+
+export async function listarSetores(): Promise<string[]> {
+  await atraso()
+  return copia(setores)
+}
+
+// A versão real guarda a mudança em historico_setor.
+export async function alterarSetor(id: string, setor: string): Promise<void> {
+  await atraso()
+  const perfil = perfilFalso()
+  if (perfil !== 'rh' && perfil !== 'diretor_rh') throw new Error('Só o RH pode alterar o setor')
+  if (!setores.includes(setor)) throw new Error('Setor não encontrado')
+  buscarMembro(id).setor = setor
+}

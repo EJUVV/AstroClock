@@ -29,7 +29,6 @@ export async function buscarMeusRegistros(semana: string): Promise<Registro[]> {
 const PRAZO_MS = 7 * 24 * 3_600_000
 
 // O membro só lança (ou move um registro para) dias de até 7 dias atrás; antes disso, pede ao RH.
-// A confirmar com a diretoria: para mudar o limite, troque DIAS_PARA_LANCAR.
 const DIAS_PARA_LANCAR = 7
 
 function exigirDentroDoLimite(dados: NovoRegistro): void {
