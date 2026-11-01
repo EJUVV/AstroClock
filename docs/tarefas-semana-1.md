@@ -8,7 +8,8 @@ Lembretes para todos:
 
 - Telas nunca importam o `supabase`: só chamam as funções de `src/compartilhado/api/`. Hoje elas devolvem dados falsos; quando virarem reais, as telas não mudam.
 - Para testar os painéis com as funções falsas, mude o perfil no console do navegador: `localStorage.perfilFalso = 'membro'` (ou `'rh'`, `'diretor_rh'`, `'nenhum'`).
-- Uma tarefa = uma branch = um PR. O PR da semana fica aberto até 2 dias antes da demo.
+- Uma tarefa = uma branch = um PR.
+- Reunião presencial na quarta (04/11), depois das 11h, e mini relatório diário para o Victor no WhatsApp (ver [`CONTRIBUTING.md`](../CONTRIBUTING.md)).
 
 ---
 
@@ -19,7 +20,8 @@ Lembretes para todos:
 **O que fazer**
 - Revisar com o Victor o esboço da seção 5 do `arquitetura.md` (`membros`, `setores`, `metas`, `registros`): colunas, tipos e restrições.
 - Revisar também o esboço de `requerimentos` e `presenca_sede` (as migrações delas ficam para a semana 2), já com as respostas da diretora de RH registradas no `regras-de-negocio.md`. Atenção: a lista de quem está na sede precisa mostrar nomes, mas o membro só vê a própria linha de `membros`.
-- Lembrar que a meta de sede pode ser **0** (férias durante o piloto, seção 7 do [`planejamento-novembro.md`](planejamento-novembro.md)).
+- Lembrar que a meta de sede pode ser **0** e que o diretor do RH programa a semana em que cada meta começa (férias durante o piloto, seção 7 do [`planejamento-novembro.md`](planejamento-novembro.md)).
+- Prever o anexo do requerimento: armazenamento privado no Supabase, com acesso só de quem enviou e do RH (seção 5 do `arquitetura.md`).
 - Anotar no `arquitetura.md` o que mudar no esboço.
 
 **Como saber que terminou**
@@ -63,7 +65,8 @@ Lembretes para todos:
 ### B4. Login com Google real
 
 **O que fazer**
-- Com o Victor, ligar o provedor Google no `horas-dev` (passo a passo em "Login com Google (M5)" no [`andamento-fase-0.md`](andamento-fase-0.md)). O ID do cliente e a chave secreta estão com o Victor.
+- Com o Victor, ligar o provedor Google no `horas-dev` (passo a passo em "Login com Google (M5)" no [`andamento-fase-0.md`](andamento-fase-0.md)). O ID do cliente e a chave secreta estão com o Victor, que só acessa esses dados a partir de terça (03/11).
+- Os testes de login que já estão na sua máquina não estão no repositório: suba-os numa branch para o Victor revisar, seguindo esta tarefa.
 - Trocar as versões falsas de `entrarComGoogle()`, `sair()`, `meuPerfil()` e `meuNome()` em `src/compartilhado/api/auth.ts` pelas reais, seguindo a seção 3 do `arquitetura.md`, sem mudar nome, parâmetros ou retorno.
 - Tirar o comentário `// FALSO` do arquivo.
 
@@ -109,7 +112,7 @@ Lembretes para todos:
 
 **O que fazer**
 - Criar a base visual compartilhada (cores, fontes e componentes básicos) em `src/compartilhado/ui/`, a partir do protótipo.
-- Decidir com o Victor se o projeto usa shadcn/ui (decisão em aberto).
+- Decidir com o Victor se o projeto usa shadcn/ui (decisão em aberto, não é prioridade). Ainda não há referência visual definida: proponha uma no protótipo.
 
 **Como saber que terminou**
 - As outras telas conseguem usar os componentes de `src/compartilhado/ui/`.
@@ -214,3 +217,4 @@ Feito em 27/10/2026: segredo cadastrado e backup rodado com sucesso.
 - B1 (modelar as tabelas com o Bernardo) e G2 (em par com o Guilherme).
 - B4: ligar o provedor Google no Supabase dev com o Bernardo.
 - Revisar os PRs em até 2 dias; os de banco precisam da aprovação dele.
+- Conduzir a reunião de quarta (04/11) e acompanhar os mini relatórios diários.

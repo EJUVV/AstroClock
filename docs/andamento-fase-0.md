@@ -1,24 +1,23 @@
 # Andamento da Fase 0
 
-Retrato de onde a Fase 0 parou (atualizado em 28/10/2026). Ao retomar com uma IA, peça para ela ler este arquivo e o [`fase-0.md`](fase-0.md). Quando a Fase 0 terminar, este arquivo pode ser apagado (antes, passe a seção "Ambientes" para o `arquitetura.md` ou o `README.md`).
+Retrato de onde a Fase 0 parou (atualizado em 01/11/2026). Ao retomar com uma IA, peça para ela ler este arquivo e o [`fase-0.md`](fase-0.md). Quando a Fase 0 terminar, este arquivo pode ser apagado (antes, passe a seção "Ambientes" para o `arquitetura.md` ou o `README.md`).
 
 ## Próxima sessão: comece por aqui
 
-Onde paramos (28/10/2026): planejamento de novembro aprovado e escrito em [`planejamento-novembro.md`](planejamento-novembro.md) (prioridades P0/P1/P2, plano por semana, riscos). Decisão das férias durante o teste registrada no [`regras-de-negocio.md`](regras-de-negocio.md) (seção 1). Esboço de `requerimentos` e `presenca_sede` e as funções novas acrescentados ao [`arquitetura.md`](arquitetura.md). B1 atualizada.
-
-O Victor conversa com a diretora de RH em **29/10 à tarde** ([`pauta-diretora-rh.md`](pauta-diretora-rh.md), ordem sugerida no fim).
+Onde paramos (01/11/2026): o kickoff foi feito na reunião presencial de 30/10. As respostas do Victor estão no [`regras-de-negocio.md`](regras-de-negocio.md), o contrato está fechado no [`arquitetura.md`](arquitetura.md) e as funções falsas novas estão no código. O que sobrou para a Maria, diretora de RH, está no [`pauta-diretora-rh.md`](pauta-diretora-rh.md).
 
 ### Próximos passos com a IA (depois da conversa com a diretora)
 
-1. Passar as respostas da diretora para o `regras-de-negocio.md` e ajustar o esboço de `requerimentos` e `presenca_sede`.
-2. Completar o contrato (seção 8 do `planejamento-novembro.md`) e criar as versões falsas no código, incluindo meta de sede 0 em `alterarMetas`. Antes do kickoff.
-3. Escrever as tarefas detalhadas das semanas 2, 3 e 4 no formato do [`tarefas-semana-1.md`](tarefas-semana-1.md).
+1. Passar as respostas da diretora para o `regras-de-negocio.md` e ajustar o que mudar em `requerimentos` e `presenca_sede`.
+2. Escrever as tarefas detalhadas das semanas 2, 3 e 4 no formato do [`tarefas-semana-1.md`](tarefas-semana-1.md).
 
 ### Tarefas do Victor fora da IA
 
-- **M10:** convites no GitHub (write) e no Supabase (só o Bernardo, só "EJUVV Dev"), grupo do WhatsApp, tarefas no Notion, guias, marcar kickoff e primeira demo. O Victor já conversou um pouco com os membros; vai fazer depois de estruturar o planejamento.
+- **M10:** convites no GitHub (write) e no Supabase (só o Bernardo, só "EJUVV Dev"), grupo do WhatsApp (equipe, Rodrigo e Maria), tarefas no Notion e envio dos documentos. A primeira reunião de quarta é em 04/11.
 - **M11:** checklist final, assim que chamar a equipe para o grupo.
-- **Diretora de RH:** repassar o [`pauta-diretora-rh.md`](pauta-diretora-rh.md). Urgentes para o piloto: perguntas 3 a 7 (requerimento) e 15 (presença na sede).
+- **Diretora de RH:** repassar o [`pauta-diretora-rh.md`](pauta-diretora-rh.md). Urgentes para o piloto: perguntas 1 a 9.
+- **Rodrigo:** plano da Vercel, Hostinger e quem mexe no domínio `ejuvv.com`.
+- **Provedor Google no `horas-dev`:** o ID e a chave estão no notebook da EJUVV, acessível a partir de terça (03/11).
 - **Segredos:** o Victor optou por guardar o ID do cliente e a chave secreta do Google num bloco de notas no computador (a IA recomendou um gerenciador de senhas).
 
 ## Já feito (Claude Code)
@@ -119,7 +118,7 @@ No `horas-dev` (o prod fica para antes do piloto):
 
 - **Diretora de RH (27/10/2026):** respostas registradas no [`regras-de-negocio.md`](regras-de-negocio.md). O que ainda falta perguntar está em [`pauta-diretora-rh.md`](pauta-diretora-rh.md). Escopo do piloto decidido pelo Victor (seção 14 das regras). Requerimento de ausência e presença na sede mudam o esboço do banco (`dispensas`) no `arquitetura.md`: rever na B1, com o Bernardo.
 
-- **Equipe (28/10/2026):** Raíssa saiu do projeto por motivos externos. Johannes assume as mesmas frentes (identidade visual, base visual em `src/compartilhado/ui/`, protótipo com o Guilherme e painel do RH) e entra no kickoff, sem mudança no plano. Convite e guia individual (M10) vão para Johannes.
+- **Equipe (28/10/2026):** Raíssa saiu do projeto por motivos externos. Johannes assume as mesmas frentes (identidade visual, base visual em `src/compartilhado/ui/`, protótipo com o Guilherme e painel do RH), sem mudança no plano. Convite e guia individual (M10) vão para Johannes.
 
 ## Lembretes
 
