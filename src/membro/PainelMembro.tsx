@@ -83,7 +83,7 @@ function PainelMembroCelular({ nome, primeiroNome, ehRH }: { nome: string; prime
             end={fim}
             className={({ isActive }) =>
               cn(
-                'flex h-11 items-center justify-center gap-2 rounded-full px-3 text-sm font-semibold text-muted-foreground transition-all',
+                'flex h-11 items-center justify-center gap-2 rounded-full px-3 text-sm font-semibold text-muted-foreground transition-colors',
                 isActive ? 'bg-primary px-4 text-primary-foreground' : 'hover:text-foreground',
               )
             }
