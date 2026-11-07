@@ -66,7 +66,7 @@ function RequerimentosMembro() {
         )}
       </Carregavel>
 
-      <p className="text-sm text-muted-foreground">Você recebe um e-mail quando o diretor do RH aprovar ou reprovar o seu pedido.</p>
+      <p className="text-sm text-muted-foreground">Se o diretor do RH reprovar o seu pedido, você recebe um e-mail com o motivo.</p>
 
       <FormRequerimento
         aberto={aberto}

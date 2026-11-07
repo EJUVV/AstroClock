@@ -32,7 +32,7 @@ function RevisaoCronometros() {
   return (
     <>
       <p className="text-sm text-muted-foreground">
-        Qualquer pessoa do RH pode revisar. <strong className="text-foreground">Aprovar</strong> quando o trabalho foi feito de verdade (passa a
+        <strong className="text-foreground">Aprovar</strong> quando o trabalho foi feito de verdade (passa a
         contar na meta). <strong className="text-foreground">Reprovar</strong> cancela o registro.
       </p>
       <Carregavel

@@ -69,7 +69,8 @@ function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Suspense>
-      <PainelDemo />
+      {/* Painel de teste do protótipo: só em desenvolvimento ou num site de demonstração com VITE_MOSTRAR_DEMO=true. */}
+      {(import.meta.env.DEV || import.meta.env.VITE_MOSTRAR_DEMO === 'true') && <PainelDemo />}
     </BrowserRouter>
   )
 }
