@@ -65,7 +65,11 @@ function Menu({ itens, recolhido, onNavegar }: { itens: ItemMenu[]; recolhido: b
           <li key={para}>
             {recolhido ? (
               <Tooltip>
-                <TooltipTrigger asChild>{link}</TooltipTrigger>
+                {/* O span é o gatilho: com asChild direto no NavLink, o Tooltip juntava a classe dele com a
+                    função de classe do NavLink, e o link perdia o estilo e o ícone. */}
+                <TooltipTrigger asChild>
+                  <span className="block">{link}</span>
+                </TooltipTrigger>
                 <TooltipContent side="right">{rotulo}</TooltipContent>
               </Tooltip>
             ) : (
@@ -143,7 +147,7 @@ export function LayoutPainel({
             <Logo compacto={recolhido} />
           </Link>
         </div>
-        <nav aria-label={secao} className="flex flex-1 flex-col justify-between gap-6 overflow-y-auto">
+        <nav aria-label={secao} className="flex flex-1 flex-col justify-between gap-6 overflow-x-hidden overflow-y-auto [scrollbar-width:thin]">
           <div className="flex flex-col gap-2">
             {!recolhido && <p className="px-4 text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">{secao}</p>}
             <Menu itens={itens} recolhido={recolhido} />
@@ -151,7 +155,8 @@ export function LayoutPainel({
           <div className="flex flex-col gap-3">
             {rodapeMenu(recolhido)}
             <div className={cn('flex items-center gap-2', recolhido ? 'flex-col' : 'justify-between px-1')}>
-              <SeletorTema />
+              {/* Recolhido, a sidebar tem 56px úteis: o seletor fica em pé para caber. */}
+              <SeletorTema className={cn(recolhido && 'flex-col')} />
               <Button
                 variant="outline"
                 size="icon-sm"

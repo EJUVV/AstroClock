@@ -106,6 +106,7 @@
 
 /* Tema espacial da EJUVV: preto-violeta, roxos vivos e estrelas. É o padrão do site. */
 .dark {
+    color-scheme: dark; /* barras de rolagem e campos nativos escuros, sem faixa branca */
     --background: #06040f;
     --foreground: #f5f0ff;
     --card: rgb(30 20 64 / 0.55);
