@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { BellIcon, ClockIcon, FileTextIcon, LayoutDashboardIcon, MapPinIcon, SearchIcon, TargetIcon, TimerIcon, TrophyIcon, UsersIcon } from 'lucide-react'
 import { cronometrosEmRevisao, listarRequerimentos } from '@/compartilhado/api/rh'
-import { ehDiretor, veRequerimentos } from '@/compartilhado/perfis'
+import { veRequerimentos } from '@/compartilhado/perfis'
 import type { Membro, Perfil } from '@/compartilhado/tipos'
 import { BotaoSedeTopo, ProvedorPresenca } from '@/membro/usePresenca'
 import { LayoutPainel, type ItemMenu, type TituloPagina } from '@/compartilhado/ui/LayoutPainel'
@@ -40,7 +40,6 @@ const SECAO: Record<Perfil, string> = {
 
 function PainelRH() {
   const { perfil, eu } = useSessao()
-  const diretor = ehDiretor(perfil)
   const location = useLocation()
   const navigate = useNavigate()
   const [pendentes, setPendentes] = useState(0)
@@ -58,7 +57,7 @@ function PainelRH() {
     { para: '/rh/cronometros', rotulo: 'Revisão de cronômetros', icone: TimerIcon, contador: emRevisao },
     { para: '/rh/ranking', rotulo: 'Ranking', icone: TrophyIcon },
     ...(perfil === 'diretor_rh' ? [{ para: '/rh/metas', rotulo: 'Metas', icone: TargetIcon }] : []),
-    ...(diretor ? [{ para: '/rh/sede', rotulo: 'Sede', icone: MapPinIcon }] : []),
+    { para: '/rh/sede', rotulo: 'Sede', icone: MapPinIcon },
   ]
 
   return (
@@ -71,8 +70,7 @@ function PainelRH() {
       titulos={titulos(perfil, eu)}
       acoesTopo={
         <>
-          {/* Diretores não registram horas, mas podem avisar que estão na sede. */}
-          {diretor && <BotaoSedeTopo />}
+          <BotaoSedeTopo />
           <Button variant="outline" size="icon" className="hidden sm:flex" aria-label="Buscar membro" onClick={() => navigate('/rh/membros?busca=1')}>
             <SearchIcon />
           </Button>

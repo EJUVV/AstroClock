@@ -97,7 +97,7 @@ export default function LogoInfinito({ className = "" }: { className?: string })
               cy={e.y}
               r={e.r}
               fill="#f5f3ff"
-              className="lx-pisca"
+              className="lx-pisca lx-estrela"
               style={{ animationDuration: `${e.d}s`, animationDelay: `-${e.t}s` }}
             />
           ))}
@@ -121,7 +121,7 @@ export default function LogoInfinito({ className = "" }: { className?: string })
             ))}
           </g>
 
-          <ellipse cx="300" cy="210" rx="190" ry="114" fill="url(#lx-nucleo)" />
+          <ellipse cx="300" cy="210" rx="190" ry="114" fill="url(#lx-nucleo)" className="lx-nucleo" />
           <ellipse
             cx="300"
             cy="210"
@@ -151,10 +151,13 @@ export default function LogoInfinito({ className = "" }: { className?: string })
             </g>
           </g>
 
-          <rect width="600" height="420" filter="url(#lx-grao)" opacity="0.14" />
+          <rect width="600" height="420" filter="url(#lx-grao)" opacity="0.14" className="lx-grao" />
         </g>
       </svg>
       <style>{`
+        html:not(.dark) .lx-nucleo, html:not(.dark) .lx-grao { display: none; }
+        html:not(.dark) .lx-estrela { fill: #7c3aed; }
+        html:not(.dark) .lx-orbita { stroke: #8b5cf6; }
         .lx-respira { animation: lx-respira 4s ease-in-out infinite alternate; }
         .lx-pisca { opacity: .2; animation: lx-pisca 3s ease-in-out infinite; }
         .lx-disco { transform-origin: 300px 210px; animation: lx-inclina 14s ease-in-out infinite alternate; }
