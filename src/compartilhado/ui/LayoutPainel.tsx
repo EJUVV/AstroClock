@@ -134,7 +134,7 @@ export function LayoutPainel({
     <div className="flex min-h-svh">
       <aside
         className={cn(
-          'sticky top-0 hidden h-svh shrink-0 flex-col gap-6 border-r bg-sidebar p-4 transition-[width] lg:flex',
+          'sticky top-0 hidden h-svh shrink-0 flex-col gap-6 border-r bg-sidebar p-4 lg:flex',
           recolhido ? 'w-[88px]' : 'w-[268px]',
         )}
       >

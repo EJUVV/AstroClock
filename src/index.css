@@ -158,6 +158,25 @@
   html {
     @apply font-sans;
   }
+  /* O Tailwind 4 deixa botões com a seta comum; aqui volta a mãozinha em tudo que é clicável. */
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  [role="tab"],
+  [role="switch"],
+  [role="checkbox"],
+  [role="radio"],
+  [role="combobox"],
+  summary,
+  label[for],
+  input[type="checkbox"],
+  input[type="radio"],
+  select {
+    cursor: pointer;
+  }
+  button:disabled,
+  [aria-disabled="true"] {
+    cursor: not-allowed;
+  }
 }
 
 /* Hachura diagonal para barras fora da meta (estilo "Exceeded by 20%"). */
