@@ -1,5 +1,6 @@
 // FALSO: trocar pela versão real (ver docs/arquitetura.md)
 import type { NovoRequerimento, Requerimento } from '../tipos.ts'
+import { ehDiretor, veRequerimentos } from '../perfis.ts'
 import { anexos, atraso, copia, membroLogado, perfilFalso, requerimentos } from './dados-falsos.ts'
 
 const TIPOS_DE_ANEXO = ['application/pdf', 'image/jpeg', 'image/png']
@@ -13,6 +14,7 @@ function validarAnexo(anexo: File): void {
 export async function enviarRequerimento(dados: NovoRequerimento): Promise<Requerimento> {
   await atraso()
   const eu = membroLogado()
+  if (ehDiretor(eu.perfil)) throw new Error('Diretores não abrem requerimento, porque não têm meta')
   if (!dados.motivo.trim()) throw new Error('O motivo é obrigatório')
   if (!dados.inicio || !dados.fim) throw new Error('Escolha as datas')
   if (dados.fim < dados.inicio) throw new Error('O fim precisa ser depois do início')
@@ -28,6 +30,7 @@ export async function enviarRequerimento(dados: NovoRequerimento): Promise<Reque
     situacao: 'pendente',
     criadoEm: new Date().toISOString(),
     anexoNome: dados.anexo?.name ?? null,
+    motivoResposta: null,
   }
   requerimentos.push(novo)
   if (dados.anexo) anexos.set(novo.id, dados.anexo)
@@ -45,16 +48,16 @@ export async function meusRequerimentos(): Promise<Requerimento[]> {
   )
 }
 
-// Só quem enviou e o RH abrem o anexo. A versão real devolve um link temporário.
+// Só quem enviou, o RH e o presidente abrem o anexo. A versão real devolve um link temporário.
 export async function linkDoAnexo(id: string): Promise<string> {
   await atraso()
   const requerimento = requerimentos.find((q) => q.id === id)
   if (!requerimento) throw new Error('Requerimento não encontrado')
   const perfil = perfilFalso()
-  if (requerimento.membroId !== membroLogado().id && perfil !== 'rh' && perfil !== 'diretor_rh') {
+  if (requerimento.membroId !== membroLogado().id && !(perfil && veRequerimentos(perfil))) {
     throw new Error('Você não pode abrir este anexo')
   }
   const anexo = anexos.get(id)
-  if (!anexo) throw new Error('Este requerimento não tem anexo')
+  if (!anexo) throw new Error('Este requerimento não tem anexo (ele é apagado quando o requerimento é aprovado)')
   return URL.createObjectURL(anexo)
 }

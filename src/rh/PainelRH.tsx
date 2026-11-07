@@ -1,205 +1,112 @@
-import { useState, type CSSProperties, type ReactNode } from 'react'
-import { sair } from '../compartilhado/api/auth.ts'
+import { useEffect, useState } from 'react'
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { BellIcon, ClockIcon, FileTextIcon, LayoutDashboardIcon, MapPinIcon, SearchIcon, TargetIcon, TimerIcon, TrophyIcon, UsersIcon } from 'lucide-react'
+import { cronometrosEmRevisao, listarRequerimentos } from '@/compartilhado/api/rh'
+import { ehDiretor, veRequerimentos } from '@/compartilhado/perfis'
+import type { Membro, Perfil } from '@/compartilhado/tipos'
+import { BotaoSedeTopo, ProvedorPresenca } from '@/membro/usePresenca'
+import { LayoutPainel, type ItemMenu, type TituloPagina } from '@/compartilhado/ui/LayoutPainel'
+import { useSessao } from '@/compartilhado/ui/RotaProtegida'
+import { Button } from '@/compartilhado/ui/shadcn/button'
+import { Popover, PopoverContent, PopoverTrigger } from '@/compartilhado/ui/shadcn/popover'
 
-// EXEMPLO: dados fixos só para o protótipo. Na semana 3 vêm de percentualDaSemana(), abaixoDaMeta(), etc.
-const INDICADORES = [
-  { rotulo: 'Cumpriram a meta', valor: '78%', alerta: false, barra: 78 },
-  { rotulo: 'Abaixo da meta', valor: '14', alerta: false, barra: 0 },
-  { rotulo: 'Abaixo 2+ semanas seguidas', valor: '3', alerta: true, barra: 0 },
-  { rotulo: 'Cronômetros em revisão', valor: '2', alerta: false, barra: 0 },
-  { rotulo: 'Requerimentos pendentes', valor: '4', alerta: false, barra: 0 },
-]
-const ABAIXO = [
-  { id: 1, nome: 'Nome Sobrenome A', detalhe: 'Sede 2h/5h · Total 6h/10h', etiqueta: '3 semanas seguidas', grave: true },
-  { id: 2, nome: 'Nome Sobrenome B', detalhe: 'Sede 5h/5h · Total 8h/10h', etiqueta: 'Falta total', grave: false },
-  { id: 3, nome: 'Nome Sobrenome C', detalhe: 'Sede 1h/5h · Total 10h/10h', etiqueta: '2 semanas seguidas', grave: true },
-  { id: 4, nome: 'Nome Sobrenome D', detalhe: 'Sede 0h/5h · Total 4h/10h', etiqueta: 'Ainda não cumpriu', grave: false },
-]
-const REQUERIMENTOS = [
-  { id: 1, nome: 'Nome E', detalhe: 'Só remoto · 9 a 13 nov' },
-  { id: 2, nome: 'Nome F', detalhe: 'Ausência total · 16 a 27 nov' },
-]
-const RANKING = [
-  { nome: 'Nome G', horas: 42 },
-  { nome: 'Nome H', horas: 39 },
-  { nome: 'Nome I', horas: 37 },
-]
+// O diretor de setor vê só o próprio setor; o presidente e o RH veem a EJ toda.
+function titulos(perfil: Perfil, eu: Membro): TituloPagina[] {
+  const alvo = perfil === 'diretor_setor' ? `o setor ${eu.setor}` : 'a EJ'
+  const membros =
+    perfil === 'diretor_rh' ? 'Cadastre, encontre e desative membros.'
+    : perfil === 'rh' ? 'Encontre e desative membros.'
+    : perfil === 'diretor_setor' ? `Os membros de ${eu.setor}.`
+    : 'Encontre os membros da EJ.'
+  return [
+    { prefixo: '/rh/membros/', titulo: 'Detalhe do membro', subtitulo: 'Semanas, registros e requerimentos de uma pessoa.' },
+    { prefixo: '/rh/membros', titulo: 'Membros', subtitulo: membros },
+    { prefixo: '/rh/requerimentos', titulo: 'Requerimentos', subtitulo: 'Pedidos de só remoto e de ausência total.' },
+    { prefixo: '/rh/cronometros', titulo: 'Revisão de cronômetros', subtitulo: 'Cronômetros que pararam sozinhos após 10h.' },
+    { prefixo: '/rh/ranking', titulo: 'Ranking mensal', subtitulo: 'Horas totais, com desempate pelas horas na sede.' },
+    { prefixo: '/rh/metas', titulo: 'Metas', subtitulo: 'Meta semanal de horas, igual para todos.' },
+    { prefixo: '/rh/sede', titulo: 'Sede', subtitulo: 'Veja quem está lá agora e avise quando você chegar.' },
+    { prefixo: '/rh', titulo: 'Visão geral', subtitulo: `Como ${alvo} está indo na meta semanal.` },
+  ]
+}
 
-const ESTRELAS = Array.from({ length: 40 }, (_, i) => ({
-  x: (i * 37 + 11) % 100,
-  y: (i * 53 + 7) % 100,
-  r: 1 + (i % 3) * 0.6,
-  d: 3 + (i % 5),
-  t: (i * 0.37) % 4,
-}))
-
-const botaoBase =
-  'min-h-12 rounded-xl border px-4 font-semibold text-white transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#c084fc]'
-const botao = `${botaoBase} border-white/25 hover:bg-white/10`
-const botaoPrincipal = `${botaoBase} border-[#6d28d9] bg-[#6d28d9] hover:bg-[#7c3aed]`
-
-function Cartao({
-  titulo,
-  children,
-  className = '',
-}: {
-  titulo: string
-  children: ReactNode
-  className?: string
-}) {
-  return (
-    <section className={`rounded-2xl border border-white/15 bg-white/[0.04] p-5 backdrop-blur-sm ${className}`}>
-      <h2 className="mb-3 text-base font-semibold">{titulo}</h2>
-      {children}
-    </section>
-  )
+const SECAO: Record<Perfil, string> = {
+  membro: '',
+  rh: 'Painel do RH',
+  diretor_rh: 'Painel do RH',
+  presidente: 'Presidência',
+  diretor_setor: 'Painel do setor',
 }
 
 function PainelRH() {
-  // Só visual por enquanto: marca o requerimento como respondido na tela.
-  const [respostas, setRespostas] = useState<Record<number, 'aprovado' | 'reprovado'>>({})
+  const { perfil, eu } = useSessao()
+  const diretor = ehDiretor(perfil)
+  const location = useLocation()
+  const navigate = useNavigate()
+  const [pendentes, setPendentes] = useState(0)
+  const [emRevisao, setEmRevisao] = useState(0)
+
+  useEffect(() => {
+    if (veRequerimentos(perfil)) listarRequerimentos('pendente').then((l) => setPendentes(l.length)).catch(() => {})
+    cronometrosEmRevisao().then((l) => setEmRevisao(l.length)).catch(() => {})
+  }, [location.pathname, perfil])
+
+  const itens: ItemMenu[] = [
+    { para: '/rh', rotulo: 'Visão geral', icone: LayoutDashboardIcon, fim: true },
+    { para: '/rh/membros', rotulo: 'Membros', icone: UsersIcon },
+    ...(veRequerimentos(perfil) ? [{ para: '/rh/requerimentos', rotulo: 'Requerimentos', icone: FileTextIcon, contador: pendentes }] : []),
+    { para: '/rh/cronometros', rotulo: 'Revisão de cronômetros', icone: TimerIcon, contador: emRevisao },
+    { para: '/rh/ranking', rotulo: 'Ranking', icone: TrophyIcon },
+    ...(perfil === 'diretor_rh' ? [{ para: '/rh/metas', rotulo: 'Metas', icone: TargetIcon }] : []),
+    ...(diretor ? [{ para: '/rh/sede', rotulo: 'Sede', icone: MapPinIcon }] : []),
+  ]
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#05040a] text-white">
-      <style>{`
-        @keyframes pisca { 0%, 100% { opacity: .15 } 50% { opacity: .9 } }
-        .estrela { animation: pisca var(--d) ease-in-out infinite; }
-        @media (prefers-reduced-motion: reduce) { .estrela { animation: none; } }
-      `}</style>
-
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-        {ESTRELAS.map((e, i) => (
-          <span
-            key={i}
-            className="estrela absolute rounded-full bg-[#f5f3ff]"
-            style={
-              {
-                left: `${e.x}%`,
-                top: `${e.y}%`,
-                width: e.r,
-                height: e.r,
-                animationDelay: `-${e.t}s`,
-                '--d': `${e.d}s`,
-              } as CSSProperties
-            }
-          />
-        ))}
-        <div
-          className="absolute -right-40 -top-56 size-[620px] rounded-full"
-          style={{ background: 'radial-gradient(closest-side, rgba(124,58,237,0.45), transparent)' }}
-        />
-      </div>
-
-      <main className="relative mx-auto flex max-w-6xl flex-col gap-5 px-5 py-8 sm:px-7">
-        <header className="flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <p className="font-mono text-[11px] uppercase tracking-[0.3em] text-purple-300">
-              Painel do RH · AstroClock
-            </p>
-            <h1 className="mt-2 text-3xl font-light tracking-tight sm:text-4xl">
-              Semana de <span className="italic text-[#c084fc]">2 a 8 nov</span>
-            </h1>
-          </div>
-          <div className="flex gap-2">
-            <button type="button" className={botaoPrincipal}>
-              + Cadastrar membro
-            </button>
-            <button type="button" onClick={() => void sair()} className={botao}>
-              Sair
-            </button>
-          </div>
-        </header>
-
-        <section className="grid grid-cols-2 gap-4 lg:grid-cols-5">
-          {INDICADORES.map((i) => (
-            <div
-              key={i.rotulo}
-              className={`flex flex-col justify-between gap-2 rounded-2xl border p-4 backdrop-blur-sm ${i.alerta ? 'border-rose-400/70 bg-rose-400/10' : 'border-white/15 bg-white/[0.04]'}`}
-            >
-              <p className="text-sm text-white/75">{i.rotulo}</p>
-              <p className={`text-4xl font-light ${i.alerta ? 'text-rose-300' : ''}`}>{i.valor}</p>
-              {i.barra > 0 && (
-                <div className="h-1.5 overflow-hidden rounded-full bg-white/10">
-                  <div
-                    className="h-full rounded-full bg-gradient-to-r from-[#7c3aed] to-[#d8b4fe]"
-                    style={{ width: `${i.barra}%` }}
-                  />
-                </div>
-              )}
-            </div>
-          ))}
-        </section>
-
-        <div className="grid gap-4 lg:grid-cols-3">
-          <Cartao titulo="Quem ficou abaixo da meta (dados de exemplo)" className="lg:col-span-2">
-            {ABAIXO.map((m) => (
-              <div
-                key={m.id}
-                className="flex items-center justify-between gap-3 border-t border-white/10 py-3"
-              >
-                <div>
-                  <b className="font-semibold">{m.nome}</b>
-                  <p className="text-sm text-white/70">{m.detalhe}</p>
-                </div>
-                <span
-                  className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold ${m.grave ? 'bg-rose-400/15 text-rose-200' : 'bg-amber-300/15 text-amber-200'}`}
-                >
-                  {m.etiqueta}
-                </span>
-              </div>
-            ))}
-          </Cartao>
-
-          <div className="flex flex-col gap-4">
-            <Cartao titulo="Requerimentos">
-              {REQUERIMENTOS.map((r) => {
-                const resposta = respostas[r.id]
-                return (
-                  <div key={r.id} className="border-t border-white/10 py-3">
-                    <b className="font-semibold">{r.nome}</b>
-                    <p className="mb-2 text-sm text-white/70">{r.detalhe}</p>
-                    {resposta ? (
-                      <span
-                        className={`rounded-full px-2.5 py-1 text-xs font-semibold ${resposta === 'aprovado' ? 'bg-emerald-400/15 text-emerald-200' : 'bg-rose-400/15 text-rose-200'}`}
-                      >
-                        {resposta === 'aprovado' ? 'Aprovado' : 'Reprovado'}
-                      </span>
-                    ) : (
-                      <div className="flex gap-2">
-                        <button
-                          type="button"
-                          onClick={() => setRespostas({ ...respostas, [r.id]: 'aprovado' })}
-                          className={`${botaoPrincipal} min-h-11 flex-1`}
-                        >
-                          Aprovar
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setRespostas({ ...respostas, [r.id]: 'reprovado' })}
-                          className={`${botao} min-h-11 flex-1`}
-                        >
-                          Reprovar
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                )
-              })}
-            </Cartao>
-
-            <Cartao titulo="Ranking do mês">
-              {RANKING.map((r, i) => (
-                <div key={r.nome} className="flex items-center gap-3 py-1.5">
-                  <span className="w-5 font-mono text-[#d8b4fe]">{i + 1}</span>
-                  <span className="flex-1">{r.nome}</span>
-                  <span className="font-mono text-sm text-white/75">{r.horas}h</span>
-                </div>
-              ))}
-            </Cartao>
-          </div>
-        </div>
-      </main>
-    </div>
+    <ProvedorPresenca>
+    <LayoutPainel
+      secao={SECAO[perfil]}
+      inicio="/rh"
+      itens={itens}
+      itensRodape={perfil === 'rh' ? [{ para: '/membro', rotulo: 'Minhas horas', icone: ClockIcon }] : []}
+      titulos={titulos(perfil, eu)}
+      acoesTopo={
+        <>
+          {/* Diretores não registram horas, mas podem avisar que estão na sede. */}
+          {diretor && <BotaoSedeTopo />}
+          <Button variant="outline" size="icon" className="hidden sm:flex" aria-label="Buscar membro" onClick={() => navigate('/rh/membros?busca=1')}>
+            <SearchIcon />
+          </Button>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" size="icon" aria-label="Notificações" className="relative">
+                <BellIcon />
+                {pendentes + emRevisao > 0 && <span className="absolute top-2 right-2.5 size-2 rounded-full bg-perigo ring-2 ring-card" />}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent align="end" className="w-72 rounded-2xl">
+              <p className="mb-2 text-sm font-semibold">Pendências</p>
+              <ul className="flex flex-col gap-1 text-sm">
+                {veRequerimentos(perfil) && (
+                  <li>
+                    <Link to="/rh/requerimentos" className="flex items-center justify-between rounded-xl px-2 py-2 hover:bg-muted">
+                      Requerimentos pendentes <strong>{pendentes}</strong>
+                    </Link>
+                  </li>
+                )}
+                <li>
+                  <Link to="/rh/cronometros" className="flex items-center justify-between rounded-xl px-2 py-2 hover:bg-muted">
+                    Cronômetros em revisão <strong>{emRevisao}</strong>
+                  </Link>
+                </li>
+              </ul>
+            </PopoverContent>
+          </Popover>
+        </>
+      }
+    >
+      <Outlet />
+    </LayoutPainel>
+    </ProvedorPresenca>
   )
 }
 

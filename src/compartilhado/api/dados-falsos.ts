@@ -14,6 +14,7 @@ import type {
   ResumoMembroSemana,
   TipoRequerimento,
 } from '../tipos.ts'
+import { ehDiretor } from '../perfis.ts'
 
 // ---------- Ajudantes ----------
 
@@ -28,13 +29,16 @@ export function copia<T>(valor: T): T {
 const FUSO = 'America/Sao_Paulo'
 
 // Data ('AAAA-MM-DD') de um instante no horário de Brasília.
+// Criar o formatador é caro: ele é criado uma vez só.
+const formatoData = new Intl.DateTimeFormat('en-CA', {
+  timeZone: FUSO,
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+})
+
 export function dataEmBrasilia(instante: Date | string): string {
-  return new Intl.DateTimeFormat('en-CA', {
-    timeZone: FUSO,
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  }).format(new Date(instante))
+  return formatoData.format(new Date(instante))
 }
 
 export function somarDias(data: string, dias: number): string {
@@ -67,7 +71,7 @@ export function perfilFalso(): Perfil | null {
     // Sem acesso ao localStorage: usa o padrão.
   }
   if (valor === 'nenhum') return null
-  if (valor === 'rh' || valor === 'diretor_rh') return valor
+  if (valor === 'rh' || valor === 'diretor_rh' || valor === 'diretor_setor' || valor === 'presidente') return valor
   return 'membro'
 }
 
@@ -76,6 +80,8 @@ const membroPorPerfil: Record<Perfil, string> = {
   membro: 'm1',
   rh: 'm3',
   diretor_rh: 'm4',
+  diretor_setor: 'm47',
+  presidente: 'm46',
 }
 
 export function membroLogado(): Membro {
@@ -101,6 +107,9 @@ export const membros: Membro[] = [
   { id: 'm7', nome: 'Gabriela Nunes', email: 'gabriela.nunes@ejuvv.com', perfil: 'membro', setor: 'Projetos', ativo: false, dataEntrada: '2026-02-02' },
   { id: 'm8', nome: 'Henrique Costa', email: 'henrique.costa@ejuvv.com', perfil: 'membro', setor: 'Comercial', ativo: true, dataEntrada: '2026-04-06' },
   // Cadastrado nesta semana: a meta só começa a valer na semana seguinte.
+  // Diretores não contabilizam horas: ficam fora da meta, do ranking e das métricas.
+  { id: 'm46', nome: 'Paula Teixeira', email: 'paula.teixeira@ejuvv.com', perfil: 'presidente', setor: 'Gestão e Qualidade', ativo: true, dataEntrada: '2026-02-02' },
+  { id: 'm47', nome: 'Rafael Dias', email: 'rafael.dias@ejuvv.com', perfil: 'diretor_setor', setor: 'Projetos', ativo: true, dataEntrada: '2026-02-02' },
   { id: 'm9', nome: 'Igor Martins', email: 'igor.martins@ejuvv.com', perfil: 'membro', setor: 'Marketing', ativo: true, dataEntrada: segundaAtual },
 ]
 
@@ -159,10 +168,6 @@ export const registros: Registro[] = [
   reg('r16', 'm3', 0, 1, '09:00', '14:00', 'sede', 'Processo seletivo'),
   reg('r17', 'm3', 0, 3, '18:00', '23:00', 'online', 'Planilha de acompanhamento'),
 
-  // Diego (diretor_rh): abaixo (4h sede, 6h total).
-  reg('r18', 'm4', 0, 2, '09:00', '13:00', 'sede', 'Análise de indicadores'),
-  reg('r19', 'm4', 0, 3, '19:00', '21:00', 'online', 'Revisão de metas'),
-
   // Eduarda: abaixo nas duas metas (2h sede, 4h total).
   reg('r20', 'm5', 0, 0, '14:00', '16:00', 'sede', 'Criação de posts'),
   reg('r21', 'm5', 0, 1, '20:00', '22:00', 'online', 'Edição de vídeo'),
@@ -203,9 +208,10 @@ function requerimentoFalso(
   motivo: string,
   situacao: Requerimento['situacao'],
   anexoNome: string | null = null,
+  motivoResposta: string | null = null,
 ): Requerimento {
   const nomeMembro = membros.find((m) => m.id === membroId)?.nome ?? ''
-  return { id, membroId, nomeMembro, tipo, inicio, fim, motivo, situacao, criadoEm: instante(segundaAtual, '08:00'), anexoNome }
+  return { id, membroId, nomeMembro, tipo, inicio, fim, motivo, situacao, criadoEm: instante(segundaAtual, '08:00'), anexoNome, motivoResposta }
 }
 
 export const requerimentos: Requerimento[] = [
@@ -215,8 +221,8 @@ export const requerimentos: Requerimento[] = [
   requerimentoFalso('q2', 'm1', 'so_remoto', somarDias(segundaAtual, 7), somarDias(segundaAtual, 11), 'Obra perto de casa', 'pendente'),
   // Eduarda: pendente, cobre duas semanas, com anexo.
   requerimentoFalso('q3', 'm5', 'ausencia_total', somarDias(segundaAtual, 7), somarDias(segundaAtual, 18), 'Compromisso da faculdade', 'pendente', 'comprovante-falso.txt'),
-  // Henrique: reprovado (não muda a meta).
-  requerimentoFalso('q4', 'm8', 'ausencia_total', somarDias(segundaAtual, -7), somarDias(segundaAtual, -3), 'Sem motivo claro', 'reprovado'),
+  // Henrique: reprovado (não muda a meta). A reprovação sempre tem motivo.
+  requerimentoFalso('q4', 'm8', 'ausencia_total', somarDias(segundaAtual, -7), somarDias(segundaAtual, -3), 'Sem motivo claro', 'reprovado', null, 'Faltou explicar o que impede você de trabalhar nessa semana.'),
 ]
 
 // Os arquivos ficam fora de Requerimento: a tela só recebe o nome e pede o link com linkDoAnexo().
@@ -229,6 +235,138 @@ export const presencas: { membroId: string; entrada: string; saida: string | nul
   { membroId: 'm2', entrada: new Date(Date.now() - 2 * 3_600_000).toISOString(), saida: null },
   { membroId: 'm3', entrada: new Date(Date.now() - 3_600_000).toISOString(), saida: null },
 ]
+
+// ---------- Mais membros para o protótipo (gerados sempre iguais) ----------
+
+// Gerador pseudoaleatório com semente fixa: os dados não mudam ao recarregar.
+function gerador(semente: number): () => number {
+  let s = semente
+  return () => {
+    s = (s * 1_103_515_245 + 12_345) % 2_147_483_648
+    return s / 2_147_483_648
+  }
+}
+
+const NOMES_GERADOS = [
+  'João Pedro Carvalho', 'Mariana Ribeiro', 'Lucas Ferreira', 'Beatriz Gomes', 'Rafael Oliveira',
+  'Larissa Barbosa', 'Gustavo Teixeira', 'Camila Duarte', 'Thiago Moreira', 'Juliana Cardoso',
+  'Matheus Araújo', 'Letícia Castro', 'Vinícius Freitas', 'Isabela Correia', 'Pedro Henrique Dias',
+  'Amanda Monteiro', 'Caio Batista', 'Fernanda Lopes', 'Leonardo Vieira', 'Natália Rezende',
+  'André Fonseca', 'Bianca Moura', 'Daniel Azevedo', 'Gabriel Santana', 'Helena Campos',
+  'Rodrigo Xavier', 'Sofia Brandão', 'Otávio Cunha', 'Yasmin Peixoto', 'Arthur Machado',
+  'Lívia Tavares', 'Samuel Pacheco', 'Clara Siqueira', 'Enzo Antunes', 'Valentina Prado', 'Murilo Bastos',
+]
+
+const DESCRICOES = [
+  'Proposta comercial para a Padaria Dona Lúcia', 'Ajuste no site da EJ', 'Reunião de alinhamento com cliente (preparação)',
+  'Pesquisa de mercado para a Clínica Bem-Estar', 'Planilha de custos do projeto Horta Urbana', 'Roteiro de vídeo institucional',
+  'Diagnóstico financeiro da Loja Vila Verde', 'Mapeamento de processos internos', 'Criação de posts para o Instagram',
+  'Prospecção de clientes no LinkedIn', 'Relatório mensal de indicadores', 'Organização do processo seletivo',
+  'Plano de marketing para a Cafeteria Grão', 'Revisão do contrato padrão', 'Treinamento de novos membros',
+  'Protótipo do app do cliente', 'Benchmarking de empresas juniores', 'Atualização do manual de cultura',
+]
+
+// Perfil de cada membro gerado: quanto costuma fazer por semana.
+type Ritmo = 'bom' | 'irregular' | 'fraco'
+
+const sorteio = gerador(42)
+const setoresGerados = ['Projetos', 'Comercial', 'Marketing', 'Gestão e Qualidade', 'Projetos', 'Comercial', 'RH']
+
+NOMES_GERADOS.forEach((nome, i) => {
+  const [primeiro, ...resto] = nome
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .toLowerCase()
+    .split(' ')
+  membros.push({
+    id: `m${i + 10}`,
+    nome,
+    email: `${primeiro}.${resto[resto.length - 1]}@ejuvv.com`,
+    perfil: 'membro',
+    setor: setoresGerados[i % setoresGerados.length],
+    ativo: true,
+    // Entraram há cerca de 4 meses (o histórico gerado cobre esse período); os últimos 6, mais recentemente.
+    dataEntrada: somarDias(segundaAtual, i < 30 ? -7 * 17 : -7 * 9),
+  })
+})
+
+// Hoje, de 0 (segunda) a 6 (domingo): na semana atual só há registros de dias que já passaram.
+const hojeNaSemana = (new Date(`${dataEmBrasilia(new Date())}T00:00:00Z`).getUTCDay() + 6) % 7
+
+NOMES_GERADOS.forEach((_, i) => {
+  const membroId = `m${i + 10}`
+  const ritmo: Ritmo = i === 5 || i === 23 ? 'fraco' : i % 3 === 1 ? 'irregular' : 'bom'
+  for (let semanasAtras = 0; semanasAtras <= 16; semanasAtras++) {
+    // Os membros "fracos" cumpriam e passaram a ficar abaixo nas últimas 5 semanas.
+    const cumpre = ritmo === 'bom' ? sorteio() < 0.9 : ritmo === 'irregular' ? sorteio() < 0.55 : semanasAtras > 4
+    const blocos = cumpre ? [3, 3, 2.5, 2] : [2, 1.5, 1]
+    const sedeAte = cumpre ? 2 : sorteio() < 0.5 ? 1 : 0 // os primeiros blocos são na sede
+    blocos.forEach((horas, b) => {
+      const dia = (b * 2 + (i % 2)) % 6
+      if (semanasAtras === 0 && dia >= hojeNaSemana) return
+      const inicioMin = (cumpre && b < 2 ? 9 * 60 : 14 * 60) + ((i * 7) % 4) * 15
+      const fimMin = inicioMin + horas * 60
+      const hhmm = (min: number) => `${String(Math.floor(min / 60)).padStart(2, '0')}:${String(min % 60).padStart(2, '0')}`
+      registros.push(
+        reg(
+          `g${i}-${semanasAtras}-${b}`,
+          membroId,
+          semanasAtras,
+          dia,
+          hhmm(inicioMin),
+          hhmm(fimMin),
+          b < sedeAte ? 'sede' : 'online',
+          DESCRICOES[(i + b + semanasAtras) % DESCRICOES.length],
+          b === 3 && i % 4 === 0 ? { origem: 'cronometro' } : {},
+        ),
+      )
+    })
+  }
+})
+
+// Ana, Bruno e os outros membros fixos também têm histórico nas semanas mais antigas.
+for (const membroId of ['m2', 'm3', 'm6', 'm8']) {
+  for (let semanasAtras = 1; semanasAtras <= 16; semanasAtras++) {
+    registros.push(
+      reg(`h-${membroId}-${semanasAtras}-a`, membroId, semanasAtras, 1, '09:00', '14:00', 'sede', 'Atendimento na sede'),
+      reg(`h-${membroId}-${semanasAtras}-b`, membroId, semanasAtras, 3, '18:00', '23:30', 'online', 'Entregas da semana'),
+    )
+  }
+}
+// Eduarda: abaixo da meta há várias semanas seguidas (destaque no painel do RH).
+for (let semanasAtras = 1; semanasAtras <= 3; semanasAtras++) {
+  registros.push(reg(`h-m5-${semanasAtras}`, 'm5', semanasAtras, 2, '14:00', '17:00', 'online', 'Edição de vídeo'))
+}
+for (let semanasAtras = 4; semanasAtras <= 16; semanasAtras++) {
+  registros.push(
+    reg(`h-m5-${semanasAtras}-a`, 'm5', semanasAtras, 1, '09:00', '14:30', 'sede', 'Criação de posts'),
+    reg(`h-m5-${semanasAtras}-b`, 'm5', semanasAtras, 3, '18:00', '23:00', 'online', 'Edição de vídeo'),
+  )
+}
+for (const r of registros) if (!criadoEm.has(r.id)) criadoEm.set(r.id, Date.parse(r.inicio))
+
+requerimentos.push(
+  requerimentoFalso('q5', 'm14', 'so_remoto', somarDias(segundaAtual, -14), somarDias(segundaAtual, -10), 'Cirurgia de um familiar, preciso ficar em casa', 'aprovado'),
+  requerimentoFalso('q6', 'm21', 'ausencia_total', somarDias(segundaAtual, -21), somarDias(segundaAtual, -17), 'Intercâmbio de curta duração', 'aprovado'),
+  // Ana: só remoto aprovado há 4 semanas (o cartão da semana mostra "sede não exigida").
+  // Carla (rh): pendente. Só o diretor do RH responde.
+  requerimentoFalso('q8', 'm3', 'so_remoto', somarDias(segundaAtual, 14), somarDias(segundaAtual, 16), 'Congresso da faculdade em outra cidade', 'pendente'),
+  requerimentoFalso('q7', 'm1', 'so_remoto', somarDias(segundaAtual, -28), somarDias(segundaAtual, -25), 'Perna imobilizada, sem conseguir ir à sede', 'aprovado'),
+)
+
+// Exemplo de férias programadas pelo diretor (datas relativas à semana atual, para a demonstração).
+metas.push(
+  { horasTotal: 5, horasSede: 0, vigenteDesde: somarDias(segundaAtual, 7 * 7) },
+  { horasTotal: 10, horasSede: 5, vigenteDesde: somarDias(segundaAtual, 7 * 10) },
+)
+
+presencas.push(
+  ...['m10', 'm12', 'm16', 'm19', 'm23', 'm27'].map((membroId, i) => ({
+    membroId,
+    entrada: new Date(Date.now() - (i + 1) * 40 * 60_000).toISOString(),
+    saida: null,
+  })),
+)
 
 // ---------- Validação de registros (usada pelo membro e pelo RH) ----------
 
@@ -341,31 +479,28 @@ export function semanasDoMes(mes: string): string[] {
   return semanas
 }
 
-// Ordem: horas totais, desempate por horas na sede, dispensados no fim.
-// A definir com a diretora de RH: aqui, "dispensado" é quem teve todas as semanas do mês dispensadas.
+// Ordem: horas totais, desempate por horas na sede. Quem teve semana dispensada aparece normalmente,
+// com as horas que fez; dispensado só sinaliza que houve ao menos uma semana dispensada no mês.
 export function calcularRanking(mes: string): LinhaRanking[] {
   const semanas = semanasDoMes(mes)
   const linhas = membros
-    .filter((m) => m.ativo)
+    .filter((m) => m.ativo && !ehDiretor(m.perfil))
     .map((m) => {
       const horas = semanas.map((s) => horasDaSemana(m.id, s))
       return {
         membro: copia(m),
         horasTotal: arredondar(horas.reduce((soma, h) => soma + h.horasTotal, 0)),
         horasSede: arredondar(horas.reduce((soma, h) => soma + h.horasSede, 0)),
-        dispensado: semanas.length > 0 && semanas.every((s) => estaDispensada(m.id, s)),
+        dispensado: semanas.some((s) => estaDispensada(m.id, s)),
       }
     })
-    .sort(
-      (a, b) =>
-        Number(a.dispensado) - Number(b.dispensado) || b.horasTotal - a.horasTotal || b.horasSede - a.horasSede,
-    )
+    .sort((a, b) => b.horasTotal - a.horasTotal || b.horasSede - a.horasSede)
   return linhas.map((linha, i) => ({ posicao: i + 1, ...linha }))
 }
 
-// Elegíveis: ativos e cadastrados antes da semana (a meta começa na semana seguinte ao cadastro).
+// Elegíveis: ativos, que não são diretores e cadastrados antes da semana (a meta começa na semana seguinte ao cadastro).
 export function membrosElegiveis(semana: string): Membro[] {
-  return membros.filter((m) => m.ativo && m.dataEntrada < semana)
+  return membros.filter((m) => m.ativo && !ehDiretor(m.perfil) && m.dataEntrada < semana)
 }
 
 export function resumoDoMembro(membro: Membro, semana: string): ResumoMembroSemana {

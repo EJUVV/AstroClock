@@ -1,119 +1,76 @@
 import { useState } from 'react'
-import { entrarComGoogle } from '../compartilhado/api/auth.ts'
-import EtchedAccretion from './EtchedAccretion.tsx'
-import LogoInfinito from './LogoInfinito.tsx'
+import { ClockIcon, MapPinIcon, TrophyIcon } from 'lucide-react'
+import { entrarComGoogle } from '@/compartilhado/api/auth'
+import LogoInfinito from '@/compartilhado/ui/LogoInfinito'
+import { Button } from '@/compartilhado/ui/shadcn/button'
+import { SeletorTema } from '@/compartilhado/ui/tema'
 
-const CORES = {
-  glowColor: '#a855f7',
-  diskColor: '#7c3aed',
-  streakColor: '#e9d5ff',
-  crimson: 0.3,
+function IconeGoogle() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path fill="#4285F4" d="M22.6 12.2c0-.8-.1-1.5-.2-2.2H12v4.2h5.9a5 5 0 0 1-2.2 3.3v2.7h3.6c2.1-1.9 3.3-4.8 3.3-8Z" />
+      <path fill="#34A853" d="M12 23c3 0 5.5-1 7.3-2.7l-3.6-2.7c-1 .7-2.2 1.1-3.7 1.1-2.9 0-5.3-1.9-6.2-4.5H2.1v2.8A11 11 0 0 0 12 23Z" />
+      <path fill="#FBBC05" d="M5.8 14.2a6.6 6.6 0 0 1 0-4.3V7H2.1a11 11 0 0 0 0 9.9l3.7-2.8Z" />
+      <path fill="#EA4335" d="M12 5.4c1.6 0 3.1.6 4.2 1.7l3.2-3.2A11 11 0 0 0 2.1 7l3.7 2.9C6.7 7.3 9.1 5.4 12 5.4Z" />
+    </svg>
+  )
 }
-const SEGURAR_MS = 2000
-const SAIDA_MS = 1000
 
-type Fase = 'intro' | 'saindo' | 'login'
+const DESTAQUES = [
+  { icone: ClockIcon, texto: 'Cronômetro ou lançamento manual' },
+  { icone: MapPinIcon, texto: 'Veja quem está na sede agora' },
+  { icone: TrophyIcon, texto: 'Acompanhe sua meta da semana' },
+]
 
 function TelaLogin() {
-  const [fase, setFase] = useState<Fase>('intro')
-  const [segurando, setSegurando] = useState(false)
   const [erro, setErro] = useState<string | null>(null)
-
-  function terminarIntro() {
-    if (fase !== 'intro') return
-    setFase('saindo')
-    setTimeout(() => setFase('login'), SAIDA_MS)
-  }
+  const [entrando, setEntrando] = useState(false)
 
   function entrar() {
     setErro(null)
-    entrarComGoogle().catch((e: Error) => setErro(e.message))
-  }
-
-  if (fase !== 'login') {
-    const saindo = fase === 'saindo'
-    return (
-      <div className="relative w-full overflow-hidden bg-black">
-        <div
-          style={{
-            transform: saindo ? 'scale(1.12)' : 'scale(1)',
-            transition: 'transform 1.2s ease-in',
-          }}
-        >
-          <EtchedAccretion params={CORES}>
-            <div
-              className="flex h-full touch-none select-none flex-col items-center justify-end p-6 pb-14 text-center text-white sm:p-10 sm:pb-16"
-              style={{ opacity: saindo ? 0 : 1, transition: 'opacity 0.5s ease' }}
-              onPointerDown={() => setSegurando(true)}
-              onPointerUp={() => setSegurando(false)}
-              onPointerLeave={() => setSegurando(false)}
-              onPointerCancel={() => setSegurando(false)}
-            >
-              <h1 className="text-4xl font-light leading-[1.05] tracking-tight sm:text-6xl">
-                Astro<span className="italic text-[#a855f7]">Clock</span>
-              </h1>
-              <p className="mt-3 text-white/65">o ponto digital da EJUVV</p>
-              <p className="mt-8 font-mono text-[11px] uppercase tracking-[0.3em] text-white/60">
-                segure para entrar
-              </p>
-              <div className="mt-3 h-0.5 w-48 bg-white/15">
-                <div
-                  className="h-0.5 bg-[#a855f7]"
-                  style={{
-                    width: segurando ? '100%' : '0%',
-                    transition: segurando ? `width ${SEGURAR_MS}ms linear` : 'width 0.4s ease-out',
-                  }}
-                  onTransitionEnd={(e) => {
-                    if (segurando && e.propertyName === 'width') terminarIntro()
-                  }}
-                />
-              </div>
-            </div>
-            <div
-              className="pointer-events-none absolute inset-0 bg-black"
-              style={{ opacity: saindo ? 1 : 0, transition: `opacity ${SAIDA_MS}ms ease-in-out` }}
-            />
-          </EtchedAccretion>
-        </div>
-      </div>
-    )
+    setEntrando(true)
+    entrarComGoogle().catch((e: Error) => {
+      setErro(e.message)
+      setEntrando(false)
+    })
   }
 
   return (
-    <main
-      className="flex min-h-svh flex-col items-center justify-between bg-[#05040a] px-7 py-12 text-center text-white"
-      style={{ animation: 'entrar 1s ease-out' }}
-    >
-      <style>{`@keyframes entrar { from { opacity: 0; } to { opacity: 1; } }`}</style>
-
-      <p className="font-mono text-[11px] uppercase tracking-[0.3em] text-purple-300/80">
-        EJUVV · controle de horas
-      </p>
-
-      <div className="w-full max-w-sm">
-        <LogoInfinito className="mx-auto -mb-4 w-full max-w-md" />
-        <h1 className="text-5xl font-light tracking-tight">
-          Astro<span className="italic text-[#a855f7]">Clock</span>
-        </h1>
-        <p className="mt-4 text-lg leading-relaxed text-white/65">
-          Registre suas horas na EJUVV e acompanhe a meta da semana.
-        </p>
-      </div>
-
-      <div className="flex w-full max-w-sm flex-col gap-3">
-        <button
-          type="button"
-          onClick={entrar}
-          className="min-h-14 rounded-2xl bg-[#f3e8ff] font-semibold text-[#1a1033] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#a855f7]"
-        >
-          Entrar com Google
-        </button>
-        {erro && (
-          <p role="alert" className="text-center text-sm text-[#FFB4B4]">
-            {erro}
-          </p>
-        )}
-        <p className="text-center text-sm text-white/65">Use sua conta @ejuvv.com. Sem senha nova.</p>
+    <main className="relative flex min-h-svh items-center justify-center p-4">
+      <SeletorTema className="absolute top-4 right-4" />
+      <div className="grid w-full max-w-4xl overflow-hidden rounded-[32px] border bg-card shadow-[0_8px_40px_rgb(91_63_217/0.08)] md:grid-cols-2">
+        <section className="flex flex-col gap-8 p-8 sm:p-10">
+          <LogoInfinito className="-mx-8 -mt-10 -mb-12 w-[320px] max-w-none" />
+          <div className="flex flex-col gap-3">
+            <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Suas horas na EJ, sem complicação.</h1>
+            <p className="text-muted-foreground">Registre o que você fez, acompanhe a meta da semana e veja quem está na sede.</p>
+          </div>
+          <div className="flex flex-col gap-3">
+            <Button size="lg" variant="outline" className="w-full" onClick={entrar} disabled={entrando}>
+              <IconeGoogle />
+              {entrando ? 'Entrando...' : 'Entrar com Google'}
+            </Button>
+            <p className="text-center text-sm text-muted-foreground">
+              Use sua conta <span className="font-semibold text-foreground">@ejuvv.com</span>
+            </p>
+            {erro && <p className="text-center text-sm text-perigo">{erro}</p>}
+          </div>
+        </section>
+        <section className="cartao-roxo relative hidden flex-col justify-end gap-4 overflow-hidden p-10 md:flex">
+          <div className="absolute -top-16 -right-16 size-64 rounded-full border-[28px] border-white/10" />
+          <div className="absolute top-24 right-20 size-6 rounded-full bg-white/30" />
+          <p className="text-sm font-medium text-white/70">EJUVV · Controle de horas</p>
+          <ul className="flex flex-col gap-3">
+            {DESTAQUES.map(({ icone: Icone, texto }) => (
+              <li key={texto} className="flex items-center gap-3 rounded-2xl bg-white/12 px-4 py-3 text-sm font-medium backdrop-blur">
+                <span className="flex size-8 items-center justify-center rounded-[12px] bg-white/20">
+                  <Icone className="size-4" />
+                </span>
+                {texto}
+              </li>
+            ))}
+          </ul>
+        </section>
       </div>
     </main>
   )
