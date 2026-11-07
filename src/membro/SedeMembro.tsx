@@ -1,3 +1,4 @@
+import { useLocation } from 'react-router-dom'
 import { MapPinIcon, MapPinOffIcon } from 'lucide-react'
 import { quemEstaNaSede } from '@/compartilhado/api/presenca'
 import { horaDe } from '@/compartilhado/datas'
@@ -10,10 +11,12 @@ import { usePresenca } from './usePresenca'
 function SedeMembro() {
   const { naSede, enviando, alternar } = usePresenca()
   const carga = useCarregar(() => quemEstaNaSede(), [naSede])
+  // No painel do RH, o topo já mostra o título em todos os tamanhos de tela.
+  const noPainelRH = useLocation().pathname.startsWith('/rh')
 
   return (
     <>
-      <div className="lg:hidden">
+      <div className={noPainelRH ? 'hidden' : 'lg:hidden'}>
         <h1 className="text-2xl font-bold tracking-tight">Sede</h1>
         <p className="text-sm text-muted-foreground">Veja quem está lá agora e avise quando você chegar.</p>
       </div>

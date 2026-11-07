@@ -51,7 +51,9 @@ export function ItemRegistro({
         {registro.local === 'sede' ? <BuildingIcon className="size-5" /> : <LaptopIcon className="size-5" />}
       </span>
       <div className="min-w-0 flex-1">
-        <p className={cn('truncate font-semibold', cancelado && 'line-through')}>{registro.descricao}</p>
+        <p className={cn('line-clamp-3 font-semibold break-words', cancelado && 'line-through')} title={registro.descricao}>
+          {registro.descricao}
+        </p>
         <p className={cn('text-xs text-muted-foreground', cancelado && 'line-through')}>
           {diaSemanaMes(dataEmBrasilia(registro.inicio))} · {horaDe(registro.inicio)}–{registro.fim ? horaDe(registro.fim) : 'agora'} ·{' '}
           {registro.local === 'sede' ? 'Sede' : 'Online'}

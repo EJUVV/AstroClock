@@ -131,9 +131,10 @@ function RequerimentosRH() {
           const respondidos = lista.filter((q) => q.situacao !== 'pendente')
           return (
             <Tabs defaultValue="pendentes" className="gap-4">
-              <TabsList>
-                <TabsTrigger value="pendentes">Pendentes ({pendentes.length})</TabsTrigger>
-                <TabsTrigger value="respondidos">Respondidos ({respondidos.length})</TabsTrigger>
+              {/* Abas com cerca de 44px de altura, boas para o dedo; no celular, as duas abas dividem a largura. */}
+              <TabsList className="w-full group-data-horizontal/tabs:h-12 sm:w-fit">
+                <TabsTrigger value="pendentes" className="px-3">Pendentes ({pendentes.length})</TabsTrigger>
+                <TabsTrigger value="respondidos" className="px-3">Respondidos ({respondidos.length})</TabsTrigger>
               </TabsList>
               <TabsContent value="pendentes">
                 {pendentes.length === 0 ? (
