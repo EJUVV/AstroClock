@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { lazy, Suspense, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import {
   ArrowRightIcon,
@@ -26,13 +26,12 @@ import { listarMembros, listarSetores } from '@/compartilhado/api/membros'
 import { veRequerimentos } from '@/compartilhado/perfis'
 import type { Perfil } from '@/compartilhado/tipos'
 import { diaMes, formatarHoras, rotuloSemana, semanaAtual, somarDias } from '@/compartilhado/datas'
-import { AreaChartCard } from '@/compartilhado/ui/AreaChartCard'
 import { AvatarMembro } from '@/compartilhado/ui/AvatarMembro'
 import { Carregavel, useCarregar } from '@/compartilhado/ui/demo'
-import { DonutCard } from '@/compartilhado/ui/DonutCard'
 import { Horas } from '@/compartilhado/ui/Horas'
 import { KpiCard } from '@/compartilhado/ui/KpiCard'
 import { useSessao } from '@/compartilhado/ui/RotaProtegida'
+import { useEhDesktop } from '@/compartilhado/ui/useEhDesktop'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/compartilhado/ui/shadcn/select'
 import { Button } from '@/compartilhado/ui/shadcn/button'
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from '@/compartilhado/ui/shadcn/card'
@@ -41,6 +40,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { StatusPill } from '@/compartilhado/ui/StatusPill'
 import { cn } from '@/compartilhado/ui/utils'
 import { SeletorSemana } from './SeletorSemana'
+
+// Os gráficos (recharts) são o pacote mais pesado do site: só são baixados no computador, quando aparecem.
+const AreaChartCard = lazy(() => import('@/compartilhado/ui/AreaChartCard').then((m) => ({ default: m.AreaChartCard })))
+const DonutCard = lazy(() => import('@/compartilhado/ui/DonutCard').then((m) => ({ default: m.DonutCard })))
+const esqueletoGrafico = <Skeleton className="h-80 rounded-[24px]" />
 
 const SEMANAS_NO_GRAFICO = 8
 
@@ -105,6 +109,7 @@ function variacaoDeHoras(atual: number, anterior: number) {
 
 function VisaoGeral() {
   const { perfil } = useSessao()
+  const ehDesktop = useEhDesktop()
   const navigate = useNavigate()
   // Padrão: a última semana encerrada. A semana atual ainda está em andamento.
   const [semana, setSemana] = useState(somarDias(semanaAtual(), -7))
@@ -238,37 +243,43 @@ function VisaoGeral() {
       </div>
 
       {/* Gráficos: só no computador. No celular, o painel fica com KPIs, pendências e a lista. */}
-      <div className="hidden gap-4 lg:grid lg:grid-cols-1 xl:grid-cols-[1fr_360px]">
-        <Carregavel carga={serie} esqueleto={<Skeleton className="h-80 rounded-[24px]" />}>
-          {(dados) => (
-            <AreaChartCard
-              titulo="% que cumpriu a meta, por semana"
-              descricao={`Últimas ${SEMANAS_NO_GRAFICO} semanas até ${rotuloSemana(semana)}`}
-              dados={dados}
-              formatar={(v) => `${Math.round(v)}%`}
-              rotuloSerie="Período atual"
-              rotuloComparacao={`${SEMANAS_NO_GRAFICO} semanas anteriores`}
-              destaque={dados.length - 1}
-              dominio={[0, 100]}
-            />
-          )}
-        </Carregavel>
-        <Carregavel carga={resumo} esqueleto={<Skeleton className="h-80 rounded-[24px]" />}>
-          {(r) => (
-            <DonutCard
-              titulo="Situação da semana"
-              descricao="Membros elegíveis"
-              fatias={[
-                { nome: 'Cumpriu', valor: r.cumpriu, cor: 'var(--sede)' },
-                { nome: 'Abaixo', valor: r.abaixo, cor: 'var(--online)' },
-                { nome: 'Dispensado', valor: r.dispensados, cor: 'var(--muted-foreground)' },
-              ]}
-              valorCentro={`${Math.round(r.pct)}%`}
-              rotuloCentro="cumpriram"
-            />
-          )}
-        </Carregavel>
-      </div>
+      {ehDesktop && (
+        <div className="grid gap-4 xl:grid-cols-[1fr_360px]">
+          <Carregavel carga={serie} esqueleto={esqueletoGrafico}>
+            {(dados) => (
+              <Suspense fallback={esqueletoGrafico}>
+                <AreaChartCard
+                  titulo="% que cumpriu a meta, por semana"
+                  descricao={`Últimas ${SEMANAS_NO_GRAFICO} semanas até ${rotuloSemana(semana)}`}
+                  dados={dados}
+                  formatar={(v) => `${Math.round(v)}%`}
+                  rotuloSerie="Período atual"
+                  rotuloComparacao={`${SEMANAS_NO_GRAFICO} semanas anteriores`}
+                  destaque={dados.length - 1}
+                  dominio={[0, 100]}
+                />
+              </Suspense>
+            )}
+          </Carregavel>
+          <Carregavel carga={resumo} esqueleto={esqueletoGrafico}>
+            {(r) => (
+              <Suspense fallback={esqueletoGrafico}>
+                <DonutCard
+                  titulo="Situação da semana"
+                  descricao="Membros elegíveis"
+                  fatias={[
+                    { nome: 'Cumpriu', valor: r.cumpriu, cor: 'var(--sede)' },
+                    { nome: 'Abaixo', valor: r.abaixo, cor: 'var(--online)' },
+                    { nome: 'Dispensado', valor: r.dispensados, cor: 'var(--muted-foreground)' },
+                  ]}
+                  valorCentro={`${Math.round(r.pct)}%`}
+                  rotuloCentro="cumpriram"
+                />
+              </Suspense>
+            )}
+          </Carregavel>
+        </div>
+      )}
 
       <Card>
         <CardHeader>
