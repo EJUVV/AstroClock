@@ -1,17 +1,25 @@
-import { useState } from 'react'
+import { lazy, Suspense, useState } from 'react'
 import { FileTextIcon, PlusIcon } from 'lucide-react'
 import { toast } from 'sonner'
 import { enviarRequerimento, meusRequerimentos } from '@/compartilhado/api/requerimentos'
 import { Carregavel, useCarregar } from '@/compartilhado/ui/demo'
 import { Button } from '@/compartilhado/ui/shadcn/button'
 import { Skeleton } from '@/compartilhado/ui/shadcn/skeleton'
-import { FormRequerimento } from './FormRequerimento'
 import { ItemRequerimento } from '@/compartilhado/ui/ItemRequerimento'
+
+// O formulário traz o calendário e o date-fns (cerca de 70 kB): só é baixado na primeira vez que abre.
+const FormRequerimento = lazy(() => import('./FormRequerimento').then((m) => ({ default: m.FormRequerimento })))
 
 function RequerimentosMembro() {
   const [versao, setVersao] = useState(0)
   const carga = useCarregar(() => meusRequerimentos(), [versao])
   const [aberto, setAberto] = useState(false)
+  // Depois de aberto uma vez, o formulário fica montado, para a animação de fechar funcionar.
+  const [jaAbriu, setJaAbriu] = useState(false)
+  function abrir() {
+    setJaAbriu(true)
+    setAberto(true)
+  }
 
   return (
     <>
@@ -21,7 +29,7 @@ function RequerimentosMembro() {
           <h1 className="text-2xl font-bold tracking-tight">Requerimentos</h1>
           <p className="text-sm text-muted-foreground">Peça para ficar só remoto ou ausente.</p>
         </div>
-        <Button onClick={() => setAberto(true)}>
+        <Button onClick={abrir}>
           <PlusIcon data-icon="inline-start" /> Novo
         </Button>
       </div>
@@ -50,7 +58,7 @@ function RequerimentosMembro() {
           titulo: 'Você ainda não fez nenhum requerimento',
           descricao: 'Se algo na semana te impede de ir à sede ou de trabalhar, avise o RH por aqui.',
           acao: (
-            <Button onClick={() => setAberto(true)}>
+            <Button onClick={abrir}>
               <FileTextIcon data-icon="inline-start" /> Fazer requerimento
             </Button>
           ),
@@ -68,15 +76,19 @@ function RequerimentosMembro() {
 
       <p className="text-sm text-muted-foreground">Se o diretor do RH reprovar o seu pedido, você recebe um e-mail com o motivo.</p>
 
-      <FormRequerimento
-        aberto={aberto}
-        onAbertoChange={setAberto}
-        onEnviar={async (dados) => {
-          await enviarRequerimento(dados)
-          toast.success('Requerimento enviado', { description: 'O RH foi avisado por e-mail.' })
-          setVersao((v) => v + 1)
-        }}
-      />
+      {jaAbriu && (
+        <Suspense fallback={null}>
+          <FormRequerimento
+            aberto={aberto}
+            onAbertoChange={setAberto}
+            onEnviar={async (dados) => {
+              await enviarRequerimento(dados)
+              toast.success('Requerimento enviado', { description: 'O RH foi avisado por e-mail.' })
+              setVersao((v) => v + 1)
+            }}
+          />
+        </Suspense>
+      )}
     </>
   )
 }
