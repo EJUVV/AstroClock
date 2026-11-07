@@ -142,12 +142,13 @@ function DetalheMembro() {
       <Card>
         <CardHeader>
           <CardTitle className="text-lg">Registros</CardTitle>
-          <CardDescription>
+          <CardDescription className="max-sm:col-span-full max-sm:row-start-2">
             {podeCorrigir
               ? 'O RH pode editar, cancelar e lançar horas de qualquer data. Toda alteração pede um motivo.'
               : 'Você vê os registros, mas só o RH corrige.'}
           </CardDescription>
-          <CardAction className="flex items-center gap-2">
+          {/* No celular, o seletor de semana e o botão descem para uma linha própria, abaixo do texto. */}
+          <CardAction className="col-span-full col-start-1 row-span-1 row-start-3 mt-2 flex flex-wrap items-center gap-2 justify-self-start sm:col-span-1 sm:col-start-2 sm:row-span-2 sm:row-start-1 sm:mt-0 sm:justify-self-end">
             <div className="flex items-center gap-1 rounded-full border p-1">
               <Button variant="ghost" size="icon-sm" aria-label="Semana anterior" onClick={() => setSemana(somarDias(semana, -7))}>
                 <ChevronLeftIcon />

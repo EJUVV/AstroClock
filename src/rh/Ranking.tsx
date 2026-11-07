@@ -94,11 +94,18 @@ function Ranking() {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead className="w-16">Posição</TableHead>
+                        {/* No celular: posição curta, sem avatar e com as horas na sede embaixo do total, para caber sem rolar. */}
+                        <TableHead className="w-10 sm:w-16">
+                          <span className="sm:hidden">#</span>
+                          <span className="hidden sm:inline">Posição</span>
+                        </TableHead>
                         <TableHead>Membro</TableHead>
                         <TableHead className="hidden md:table-cell">Setor</TableHead>
-                        <TableHead className="text-right">Horas totais</TableHead>
-                        <TableHead className="text-right">Na sede</TableHead>
+                        <TableHead className="text-right">
+                          <span className="sm:hidden">Horas</span>
+                          <span className="hidden sm:inline">Horas totais</span>
+                        </TableHead>
+                        <TableHead className="hidden text-right sm:table-cell">Na sede</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -114,8 +121,8 @@ function Ranking() {
                             )}
                           </TableCell>
                           <TableCell>
-                            <span className="flex items-center gap-3">
-                              <AvatarMembro nome={l.membro.nome} className="size-8" />
+                            <span className="flex flex-wrap items-center gap-x-3 gap-y-1 whitespace-normal">
+                              <AvatarMembro nome={l.membro.nome} className="size-8 max-sm:hidden" />
                               <span className="font-semibold">{l.membro.nome}</span>
                               {l.dispensado && <StatusPill tom="neutro">semana dispensada</StatusPill>}
                             </span>
@@ -123,8 +130,11 @@ function Ranking() {
                           <TableCell className="hidden text-muted-foreground md:table-cell">{l.membro.setor}</TableCell>
                           <TableCell className="text-right">
                             <Horas valor={l.horasTotal} />
+                            <span className="block text-xs text-muted-foreground sm:hidden">
+                              <Horas valor={l.horasSede} /> na sede
+                            </span>
                           </TableCell>
-                          <TableCell className="text-right text-muted-foreground">
+                          <TableCell className="hidden text-right text-muted-foreground sm:table-cell">
                             <Horas valor={l.horasSede} className="font-semibold" />
                           </TableCell>
                         </TableRow>
