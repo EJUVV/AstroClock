@@ -8,10 +8,10 @@ Atualizada em 07/11/2026. As perguntas foram renumeradas.
 
 ### Requerimento de ausência
 
-1. O membro é avisado quando o RH aprova ou reprova? Por e-mail ou só no sistema?
+1. O membro também é avisado quando o requerimento é aprovado? (Na reprovação, ele já recebe o motivo por e-mail.)
 2. O RH pode dispensar alguém direto, sem o membro abrir requerimento?
 3. O anexo (atestado, comprovante) é obrigatório em algum caso?
-4. Por quanto tempo o anexo fica guardado? Ele pode conter dado de saúde.
+4. Por quanto tempo fica guardado o anexo de um requerimento reprovado? (No aprovado, ele é apagado.)
 
 ### Correção de horas
 
