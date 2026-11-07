@@ -175,11 +175,12 @@ export function LayoutPainel({
           <Button variant="outline" size="icon" className="lg:hidden" aria-label="Abrir menu" onClick={() => setMenuAberto(true)}>
             <MenuIcon />
           </Button>
-          <div className="min-w-0 flex-1">
-            <h1 className="truncate text-2xl font-bold tracking-tight lg:text-3xl">{pagina.titulo}</h1>
+          {/* No celular, o título ganha uma linha só dele, abaixo do menu e das ações, para não virar "Requerim...". */}
+          <div className="order-last min-w-0 basis-full sm:order-none sm:flex-1 sm:basis-auto">
+            <h1 className="text-2xl font-bold tracking-tight text-balance sm:truncate lg:text-3xl">{pagina.titulo}</h1>
             <p className="hidden text-sm text-muted-foreground sm:block">{pagina.subtitulo}</p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="ml-auto flex items-center gap-2 sm:ml-0">
             {acoesTopo}
             <div className="flex items-center gap-2.5 rounded-full border bg-card py-1 pr-4 pl-1">
               <AvatarMembro nome={eu.nome} className="size-9" />
