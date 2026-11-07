@@ -120,7 +120,7 @@ export interface PosicaoRanking {
   totalSetor: number
 }
 
-// Médias por membro na semana (regras-de-negocio.md, seção 11). A diária divide pelos 5 dias úteis.
+// Médias por membro na semana (regras-de-negocio.md, seção 8). A diária divide pelos 5 dias úteis.
 export interface MediasDaSemana {
   mediaTotal: number
   mediaSede: number
