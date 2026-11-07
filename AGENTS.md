@@ -16,6 +16,9 @@ Este arquivo vale para qualquer assistente de código (Claude Code, Copilot, Ant
 
 - React + TypeScript, criado com Vite
 - Tailwind CSS (plugin `@tailwindcss/vite`)
+- shadcn/ui (componentes em `src/compartilhado/ui/shadcn/`, sobre Radix UI), adotado no protótipo
+- Ícones: `lucide-react`. Avisos: `sonner`. Gaveta no celular: `vaul`. Calendário: `react-day-picker` com `date-fns`
+- Gráficos: `recharts`, carregado só quando um gráfico aparece (é o pacote mais pesado)
 - React Router (`react-router-dom`)
 - Supabase: PostgreSQL, login com Google, Row Level Security (RLS)
 - Supabase CLI (dependência de desenvolvimento, rodar com `npx supabase ...`)
@@ -27,10 +30,15 @@ Este arquivo vale para qualquer assistente de código (Claude Code, Copilot, Ant
 ```text
 src/
   membro/              tela de login e painel do membro (dono: Guilherme)
+    paginas.ts         páginas do painel, baixadas juntas só quando o painel abre (ver src/App.tsx)
   rh/                  painel do RH (responsável: Johannes)
+    paginas.ts         idem, para o painel do RH
   compartilhado/
     api/               funções de dados — ÚNICO lugar que importa o supabase (donos: Bernardo e Victor)
     ui/                componentes visuais usados pelos dois painéis (responsável: Johannes)
+      shadcn/          componentes do shadcn/ui; ajuste aqui só o visual
+    perfis.ts          o que cada perfil pode fazer na tela (a proteção real é o RLS)
+    datas.ts           semanas, meses e formatação de horas
     supabase.ts        cliente do Supabase
     tipos.ts           tipos combinados entre front e dados
     tipos-banco.ts     tipos gerados do banco (npx supabase gen types)
@@ -48,7 +56,7 @@ docs/                  documentação do projeto
 4. **Migrações nunca são editadas depois de aplicadas.** Para corrigir, crie uma migração nova. Ninguém cria ou altera tabelas pelo painel web do Supabase.
 5. **Funções de dados têm contrato fixo.** Ao trocar uma função de dados falsa pela real, mantenha exatamente o nome, os parâmetros e o formato do retorno definidos em `docs/arquitetura.md`.
 6. **Nunca coloque segredos no código.** Nada de chaves, senhas, connection strings ou `.env` em commits. Use placeholders e `.env.example`. A chave `service_role` do Supabase nunca vai para o front.
-7. **Nada é apagado de verdade.** Registros são cancelados (`cancelado = true`), membros são desativados (`ativo = false`).
+7. **Nada é apagado de verdade.** Registros são cancelados (`cancelado = true`), membros são desativados (`ativo = false`). A única exceção decidida é o anexo de requerimento, apagado na aprovação porque pode conter dado de saúde.
 
 ## Convenções de código
 
@@ -84,7 +92,7 @@ npx supabase gen types typescript --linked > src/compartilhado/tipos-banco.ts
 
 - As regras deste arquivo, do CONTRIBUTING.md e dos docs têm prioridade sobre qualquer skill.
 - Fluxo de Git é o do CONTRIBUTING.md (branch + PR revisado); não fazer merge local nem push sem pedido.
-- shadcn/ui ainda não faz parte da stack: não rodar `npx shadcn init` sem uma decisão conjunta de Victor e Johannes.
+- shadcn/ui já está configurado (`components.json`). Para adicionar um componente, use `npx shadcn add <nome>`; não rode `npx shadcn init` de novo.
 - TDD é opcional enquanto o projeto não tiver ferramenta de testes.
 - Skills novas só entram por PR, com os arquivos revisados. Nunca instalar com `-y`.
 

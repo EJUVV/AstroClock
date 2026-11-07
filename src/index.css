@@ -1,3 +1,214 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@fontsource-variable/plus-jakarta-sans";
+
+@custom-variant dark (&:is(.dark *));
 /* As skills em .claude/ têm exemplos com classes do Tailwind que não são do site. */
 @source not "../.claude";
+
+@theme inline {
+    --font-heading: var(--font-sans);
+    --font-sans: 'Plus Jakarta Sans Variable', ui-sans-serif, system-ui, sans-serif;
+    --color-sede: var(--sede);
+    --color-online: var(--online);
+    --color-roxo-escuro: var(--roxo-escuro);
+    --color-sucesso: var(--sucesso);
+    --color-sucesso-fundo: var(--sucesso-fundo);
+    --color-alerta: var(--alerta);
+    --color-alerta-fundo: var(--alerta-fundo);
+    --color-perigo: var(--perigo);
+    --color-perigo-fundo: var(--perigo-fundo);
+    --color-sidebar-ring: var(--sidebar-ring);
+    --color-sidebar-border: var(--sidebar-border);
+    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+    --color-sidebar-accent: var(--sidebar-accent);
+    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+    --color-sidebar-primary: var(--sidebar-primary);
+    --color-sidebar-foreground: var(--sidebar-foreground);
+    --color-sidebar: var(--sidebar);
+    --color-chart-5: var(--chart-5);
+    --color-chart-4: var(--chart-4);
+    --color-chart-3: var(--chart-3);
+    --color-chart-2: var(--chart-2);
+    --color-chart-1: var(--chart-1);
+    --color-ring: var(--ring);
+    --color-input: var(--input);
+    --color-border: var(--border);
+    --color-destructive: var(--destructive);
+    --color-accent-foreground: var(--accent-foreground);
+    --color-accent: var(--accent);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-muted: var(--muted);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-secondary: var(--secondary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-primary: var(--primary);
+    --color-popover-foreground: var(--popover-foreground);
+    --color-popover: var(--popover);
+    --color-card-foreground: var(--card-foreground);
+    --color-card: var(--card);
+    --color-foreground: var(--foreground);
+    --color-background: var(--background);
+    --radius-sm: calc(var(--radius) * 0.6);
+    --radius-md: calc(var(--radius) * 0.8);
+    --radius-lg: var(--radius);
+    --radius-xl: calc(var(--radius) * 1.4);
+    --radius-2xl: calc(var(--radius) * 1.8);
+    --radius-3xl: calc(var(--radius) * 2.2);
+    --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+/* Tema claro: lavanda, roxo e lilás. */
+:root {
+    --radius: 0.75rem;
+    --background: #f4f2fd;
+    --foreground: #1e1b39;
+    --card: #ffffff;
+    --card-foreground: #1e1b39;
+    --popover: #ffffff;
+    --popover-foreground: #1e1b39;
+    --primary: #7b5cf5;
+    --primary-foreground: #ffffff;
+    --roxo-escuro: #5b3fd9;
+    --secondary: #efeaff;
+    --secondary-foreground: #5b3fd9;
+    --muted: #f4f2fd;
+    --muted-foreground: #6e6a86;
+    --accent: #efeaff;
+    --accent-foreground: #5b3fd9;
+    --destructive: #dc2626;
+    --border: #ece9f7;
+    --input: #e3dff3;
+    --ring: #7b5cf5;
+    --sede: #7b5cf5;
+    --online: #c9bcff;
+    --sucesso: #16a34a;
+    --sucesso-fundo: #dcfce7;
+    --alerta: #b45309;
+    --alerta-fundo: #fef3c7;
+    --perigo: #dc2626;
+    --perigo-fundo: #fee2e2;
+    --chart-1: #7b5cf5;
+    --chart-2: #c9bcff;
+    --chart-3: #5b3fd9;
+    --chart-4: #16a34a;
+    --chart-5: #dc2626;
+    --sidebar: #ffffff;
+    --sidebar-foreground: #1e1b39;
+    --sidebar-primary: #7b5cf5;
+    --sidebar-primary-foreground: #ffffff;
+    --sidebar-accent: #efeaff;
+    --sidebar-accent-foreground: #5b3fd9;
+    --sidebar-border: #ece9f7;
+    --sidebar-ring: #7b5cf5;
+}
+
+/* Tema espacial da EJUVV: preto-violeta, roxos vivos e estrelas. É o padrão do site. */
+.dark {
+    color-scheme: dark; /* barras de rolagem e campos nativos escuros, sem faixa branca */
+    --background: #06040f;
+    --foreground: #f5f0ff;
+    --card: rgb(30 20 64 / 0.55);
+    --card-foreground: #f5f0ff;
+    --popover: #150e30;
+    --popover-foreground: #f5f0ff;
+    --primary: #a66bff;
+    --primary-foreground: #0b0618;
+    --roxo-escuro: #d8b4fe;
+    --secondary: #261a52;
+    --secondary-foreground: #d8b4fe;
+    --muted: rgb(255 255 255 / 0.06);
+    --muted-foreground: #aaa0c8;
+    --accent: #261a52;
+    --accent-foreground: #d8b4fe;
+    --destructive: #f87171;
+    --border: rgb(255 255 255 / 0.11);
+    --input: rgb(255 255 255 / 0.16);
+    --ring: #a66bff;
+    --sede: #a66bff;
+    --online: #5b3fa8;
+    --sucesso: #4ade80;
+    --sucesso-fundo: rgb(22 163 74 / 0.18);
+    --alerta: #fbbf24;
+    --alerta-fundo: rgb(180 83 9 / 0.22);
+    --perigo: #f87171;
+    --perigo-fundo: rgb(220 38 38 / 0.2);
+    --chart-1: #a66bff;
+    --chart-2: #5b3fa8;
+    --chart-3: #d8b4fe;
+    --chart-4: #4ade80;
+    --chart-5: #f87171;
+    --sidebar: rgb(12 8 30 / 0.72);
+    --sidebar-foreground: #f5f0ff;
+    --sidebar-primary: #a66bff;
+    --sidebar-primary-foreground: #0b0618;
+    --sidebar-accent: #261a52;
+    --sidebar-accent-foreground: #d8b4fe;
+    --sidebar-border: rgb(255 255 255 / 0.1);
+    --sidebar-ring: #a66bff;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+  html {
+    @apply font-sans;
+  }
+  /* O Tailwind 4 deixa botões com a seta comum; aqui volta a mãozinha em tudo que é clicável. */
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  [role="tab"],
+  [role="switch"],
+  [role="checkbox"],
+  [role="radio"],
+  [role="combobox"],
+  summary,
+  label[for],
+  input[type="checkbox"],
+  input[type="radio"],
+  select {
+    cursor: pointer;
+  }
+  button:disabled,
+  [aria-disabled="true"] {
+    cursor: not-allowed;
+  }
+}
+
+/* Hachura diagonal para barras fora da meta (estilo "Exceeded by 20%"). */
+@utility hachura {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    color-mix(in oklab, currentColor 55%, transparent) 0 3px,
+    transparent 3px 7px
+  );
+}
+
+/* Cartão de destaque (cronômetro), inspirado nos cartões de crédito. */
+@utility cartao-roxo {
+  background-image: linear-gradient(135deg, #7b5cf5 0%, #9b7bff 100%);
+  color: #ffffff;
+}
+
+/* ---- Galáxia (só no tema escuro): brilho roxo no topo e estrelas piscando ---- */
+.dark body {
+    background: transparent;
+}
+html.dark {
+    background:
+        radial-gradient(ellipse 70% 45% at 50% -8%, rgb(124 58 237 / 0.38), transparent 70%),
+        radial-gradient(ellipse 45% 35% at 100% 105%, rgb(88 28 135 / 0.35), transparent 70%),
+        #06040f;
+    background-attachment: fixed;
+}
+
+/* Cartão de destaque no tema escuro: roxo profundo com brilho. */
+.dark .cartao-roxo {
+    background-image: linear-gradient(135deg, #5b21b6 0%, #3b138f 60%, #2a0f78 100%);
+    box-shadow: 0 0 48px rgb(124 58 237 / 0.35), inset 0 1px 0 rgb(255 255 255 / 0.18);
+}

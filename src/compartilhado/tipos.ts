@@ -1,4 +1,4 @@
-export type Perfil = 'membro' | 'rh' | 'diretor_rh'
+export type Perfil = 'membro' | 'rh' | 'diretor_rh' | 'diretor_setor' | 'presidente'
 export type Local = 'sede' | 'online'
 export type Origem = 'manual' | 'cronometro'
 
@@ -82,6 +82,7 @@ export interface Requerimento {
   situacao: SituacaoRequerimento
   criadoEm: string      // ISO datetime
   anexoNome: string | null
+  motivoResposta: string | null // motivo da reprovação, que vai no e-mail para o membro
 }
 
 export interface NovoRequerimento {
@@ -95,6 +96,7 @@ export interface NovoRequerimento {
 export interface PresencaSede {
   membroId: string
   nome: string
+  setor: string
   desde: string         // ISO datetime
 }
 
@@ -116,6 +118,13 @@ export interface PosicaoRanking {
   totalEJ: number
   posicaoSetor: number
   totalSetor: number
+}
+
+// Médias por membro na semana (regras-de-negocio.md, seção 8). A diária divide pelos 5 dias úteis.
+export interface MediasDaSemana {
+  mediaTotal: number
+  mediaSede: number
+  mediaDiaria: number
 }
 
 export interface HorasDoDia {

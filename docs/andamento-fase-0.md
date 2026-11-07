@@ -15,7 +15,7 @@ Onde paramos (01/11/2026): o kickoff foi feito na reunião presencial de 30/10. 
 
 - **M10:** convites no GitHub (write) e no Supabase (só o Bernardo, só "EJUVV Dev"), grupo do WhatsApp (equipe, Rodrigo e Maria), tarefas no Notion e envio dos documentos. A primeira reunião de quarta é em 04/11.
 - **M11:** checklist final, assim que chamar a equipe para o grupo.
-- **Diretora de RH:** repassar o [`pauta-diretora-rh.md`](pauta-diretora-rh.md). Urgentes para o piloto: perguntas 1 a 9.
+- **Diretora de RH:** repassar o [`pauta-diretora-rh.md`](pauta-diretora-rh.md). Urgentes para o piloto: perguntas 1 a 8.
 - **Rodrigo:** plano da Vercel, Hostinger e quem mexe no domínio `ejuvv.com`.
 - **Provedor Google no `horas-dev`:** o ID e a chave estão no notebook da EJUVV, acessível a partir de terça (03/11).
 - **Segredos:** o Victor optou por guardar o ID do cliente e a chave secreta do Google num bloco de notas no computador (a IA recomendou um gerenciador de senhas).

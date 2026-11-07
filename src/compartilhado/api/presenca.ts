@@ -14,6 +14,7 @@ export async function quemEstaNaSede(): Promise<PresencaSede[]> {
     .map((p) => ({
       membroId: p.membroId,
       nome: membros.find((m) => m.id === p.membroId)?.nome ?? '',
+      setor: membros.find((m) => m.id === p.membroId)?.setor ?? '',
       desde: p.entrada,
     }))
     .sort((a, b) => a.nome.localeCompare(b.nome))

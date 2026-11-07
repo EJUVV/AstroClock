@@ -1,5 +1,6 @@
 // FALSO: trocar pela versão real (ver docs/arquitetura.md)
 import type { Local, Registro } from '../tipos.ts'
+import { ehDiretor } from '../perfis.ts'
 import { atraso, copia, membroLogado, registros } from './dados-falsos.ts'
 
 const LIMITE_MS = 10 * 3_600_000 // encerra sozinho após 10h
@@ -22,6 +23,7 @@ export async function cronometroAtivo(): Promise<Registro | null> {
 
 export async function iniciarCronometro(local: Local, descricao: string): Promise<Registro> {
   await atraso()
+  if (ehDiretor(membroLogado().perfil)) throw new Error('Diretores não contabilizam horas')
   const membroId = membroLogado().id
   if (ativoDoMembro(membroId)) throw new Error('Você já tem um cronômetro ativo')
   if (!descricao.trim()) throw new Error('A descrição é obrigatória')

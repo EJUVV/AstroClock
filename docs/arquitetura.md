@@ -28,8 +28,8 @@ Como o sistema é organizado, como o login funciona, o esboço do banco e o cont
 | --- | --- | --- |
 | `/` | Login (botão "Entrar com Google") | Público |
 | `/inicio` | Retorno do login: chama `meuPerfil()` e redireciona | Logado |
-| `/membro` | Painel do membro | Perfil `membro` (RH também pode registrar as próprias horas — ver seção 4) |
-| `/rh` | Painel do RH | Perfis `rh` e `diretor_rh` |
+| `/membro` | Painel do membro | Perfis com meta: `membro` e `rh` |
+| `/rh` | Painel do RH | `rh`, `diretor_rh`, `diretor_setor` e `presidente` |
 
 Rotas protegidas usam um componente `RotaProtegida` que consulta `meuPerfil()`. Isso é experiência; a proteção real é o RLS.
 
@@ -41,7 +41,7 @@ Rotas protegidas usam um componente `RotaProtegida` que consulta `meuPerfil()`. 
 4. A pessoa volta em `/inicio`, já logada. A tela chama `meuPerfil()`:
    - `null` → `sair()` e mostra "Acesso negado. Procure o RH."
    - `'membro'` → `/membro`
-   - `'rh'` ou `'diretor_rh'` → `/rh`
+   - qualquer outro perfil (`rh`, `diretor_rh`, `diretor_setor`, `presidente`) → `/rh`
 
 **Quem pode entrar:** o Google diz *quem* é a pessoa; a tabela `membros` diz *se* ela pode entrar e com qual perfil; o RLS garante isso dentro do banco. Uma conta Google não cadastrada consegue sessão, mas não vê nenhum dado.
 
@@ -69,24 +69,36 @@ Esboço inicial, refinado pelo Bernardo na semana 1. Nomes em snake_case.
 
 | Tabela | Colunas principais | Membro vê | RH vê |
 | --- | --- | --- | --- |
-| `membros` | `id`, `nome`, `email` (único, @ejuvv.com), `perfil` (`membro`/`rh`/`diretor_rh`), `setor_id`, `ativo`, `data_entrada` | Só a própria linha | Todas |
+| `membros` | `id`, `nome`, `email` (único, @ejuvv.com), `perfil` (`membro`/`rh`/`diretor_rh`/`diretor_setor`/`presidente`), `setor_id`, `ativo`, `data_entrada` | Só a própria linha | Todas (o `diretor_setor`, só as do próprio setor) |
 | `setores` | `id`, `nome`, `ativo` | Todos | Todos (RH edita) |
-| `registros` | `id`, `membro_id`, `inicio`, `fim` (null = cronômetro ativo), `local` (`sede`/`online`), `descricao`, `origem` (`manual`/`cronometro`), `cancelado`, `precisa_revisao`, `criado_em`, `atualizado_em` | Só os próprios | Todos |
+| `registros` | `id`, `membro_id`, `inicio`, `fim` (null = cronômetro ativo), `local` (`sede`/`online`), `descricao`, `origem` (`manual`/`cronometro`), `cancelado`, `precisa_revisao`, `criado_em`, `atualizado_em` | Só os próprios | Todos (o `diretor_setor`, só os do próprio setor) |
 | `metas` | `id`, `horas_total`, `horas_sede` (pode ser 0), `vigente_desde` (segunda-feira escolhida pelo diretor, sempre futura), `alterado_por` | Todas | Todas (só `diretor_rh` cria) |
-| `requerimentos` | `id`, `membro_id`, `tipo` (`so_remoto`/`ausencia_total`), `data_inicio`, `data_fim`, `motivo`, `situacao` (`pendente`/`aprovado`/`reprovado`), `anexo_caminho`, `anexo_nome`, `criado_em`, `respondido_por`, `respondido_em` | Os próprios (e cria) | Todos (aprova ou reprova) |
+| `requerimentos` | `id`, `membro_id`, `tipo` (`so_remoto`/`ausencia_total`), `data_inicio`, `data_fim`, `motivo`, `situacao` (`pendente`/`aprovado`/`reprovado`), `anexo_caminho`, `anexo_nome`, `motivo_resposta`, `criado_em`, `respondido_por`, `respondido_em` | Os próprios (e cria) | `rh`, `diretor_rh` e `presidente` veem todos; só `diretor_rh` responde. O `diretor_setor` não vê |
 | `presenca_sede` | `id`, `membro_id`, `entrada`, `saida` (null = está na sede agora) | Quem está na sede agora (só o nome); marca e desmarca só a própria | Todas |
 | `historico_setor` | `id`, `membro_id`, `setor_id`, `desde` | O próprio | Todos |
 | `auditoria` | `id`, `tabela`, `registro_id`, `acao`, `quem`, `quando`, `antes`, `depois` | Não | Todas |
 
-**Requerimento de ausência** (seção 7 do `regras-de-negocio.md`): substitui a antiga tabela `dispensas`. Só requerimento `aprovado` muda a meta: `so_remoto` zera a exigência de sede; `ausencia_total` dispensa a semana. Vale para **todas as semanas que as datas tocam, inteiras**, da segunda de `data_inicio` à segunda de `data_fim`. O e-mail vai para todos os membros ativos com perfil `rh` ou `diretor_rh`. Ainda depende da diretora de RH ([`pauta-diretora-rh.md`](pauta-diretora-rh.md)): aviso ao membro e dispensa direta pelo RH.
+**Requerimento de ausência** (seção 7 do `regras-de-negocio.md`): substitui a antiga tabela `dispensas`. Só requerimento `aprovado` muda a meta: `so_remoto` zera a exigência de sede; `ausencia_total` dispensa a semana. Vale para **todas as semanas que as datas tocam, inteiras**, da segunda de `data_inicio` à segunda de `data_fim`. O e-mail vai para todos os membros ativos com perfil `rh` ou `diretor_rh`. Só o `diretor_rh` responde. A reprovação grava `motivo_resposta` e manda e-mail ao membro. A aprovação **apaga o anexo** do Storage e limpa `anexo_caminho`. Ainda depende da diretora de RH ([`pauta-diretora-rh.md`](pauta-diretora-rh.md)): aviso ao membro na aprovação e dispensa direta pelo RH.
 
-**Anexo do requerimento:** arquivo em um bucket **privado** do Supabase Storage, com regras de acesso só para quem enviou e para o RH. A tela abre o arquivo por link temporário (`linkDoAnexo`). Limite técnico inicial: PDF, JPG ou PNG, até 5 MB. **O backup diário só copia o banco, não os arquivos**: é preciso incluir o bucket no backup antes de abrir o anexo em produção.
+**Anexo do requerimento:** arquivo em um bucket **privado** do Supabase Storage, com regras de acesso só para quem enviou, para `rh`, `diretor_rh` e `presidente`. A tela abre o arquivo por link temporário (`linkDoAnexo`). Limite técnico inicial: PDF, JPG ou PNG, até 5 MB. **O backup diário só copia o banco, não os arquivos**: é preciso incluir o bucket no backup antes de abrir o anexo em produção.
 
-**Presença na sede** (seção 13 do `regras-de-negocio.md`): não registra horas. Índice único parcial: uma única linha com `saida is null` por membro. Como o membro só vê a própria linha de `membros`, a lista de quem está na sede precisa de uma visão ou função que exponha só o nome. O sistema desmarca sozinho quem esquecer (tarefa agendada no banco); o horário ainda depende da diretora de RH.
+**Presença na sede** (seção 13 do `regras-de-negocio.md`): não registra horas. Índice único parcial: uma única linha com `saida is null` por membro. Como o membro só vê a própria linha de `membros`, a lista de quem está na sede precisa de uma visão ou função que exponha só o nome e o setor. O sistema desmarca sozinho quem esquecer (tarefa agendada no banco); o horário ainda depende da diretora de RH.
 
-Funções auxiliares previstas no banco: `meu_id()`, `eh_rh()`, `meu_perfil()` (todas `security definer`, filtrando pelo e-mail de `auth.jwt()` e `ativo = true`).
+Funções auxiliares previstas no banco: `meu_id()`, `meu_perfil()`, `meu_setor_id()` e `eh_rh()` (`rh` ou `diretor_rh`), todas `security definer`, filtrando pelo e-mail de `auth.jwt()` e `ativo = true`.
 
-Restrições previstas: exclusion constraint em `registros` contra sobreposição por `membro_id` (ignorando cancelados); índice único parcial garantindo um único registro com `fim is null` por membro.
+**Perfis no RLS** (seção 5 do `regras-de-negocio.md`):
+
+| Perfil | Vê membros e registros | Altera |
+| --- | --- | --- |
+| `membro` | Só os próprios | Os próprios registros (prazo de 7 dias) |
+| `rh` | Todos | Registros de qualquer um (com motivo), desativar membro, mudar setor |
+| `diretor_rh` | Todos | Tudo do `rh` + cadastrar membro, alterar perfil, metas, responder requerimento |
+| `diretor_setor` | Só os do próprio setor | Nada de outros membros |
+| `presidente` | Todos, inclusive requerimentos e anexos | Nada de outros membros |
+
+Só `membro` e `rh` têm registros de horas e requerimentos: os diretores e o presidente não têm meta.
+
+Restrições previstas: exclusion constraint em `registros` contra sobreposição por `membro_id` (ignorando cancelados); índice único parcial garantindo um único registro com `fim is null` por membro; índice único parcial garantindo no máximo um `diretor_setor` ativo por `setor_id`.
 
 **Registro que passa da meia-noite:** vira duas linhas em `registros`, uma para cada dia. `criarRegistro()`, `editarRegistro()` e `pararCronometro()` devolvem a **primeira parte**, e a tela recarrega a lista depois de salvar. As funções falsas ainda não fazem a divisão.
 
@@ -95,7 +107,7 @@ Restrições previstas: exclusion constraint em `registros` contra sobreposiçã
 Os tipos compartilhados ficam em `src/compartilhado/tipos.ts`:
 
 ```ts
-export type Perfil = 'membro' | 'rh' | 'diretor_rh'
+export type Perfil = 'membro' | 'rh' | 'diretor_rh' | 'diretor_setor' | 'presidente'
 export type Local = 'sede' | 'online'
 export type Origem = 'manual' | 'cronometro'
 
@@ -179,6 +191,7 @@ export interface Requerimento {
   situacao: SituacaoRequerimento
   criadoEm: string      // ISO datetime
   anexoNome: string | null
+  motivoResposta: string | null // motivo da reprovação, que vai no e-mail para o membro
 }
 
 export interface NovoRequerimento {
@@ -192,6 +205,7 @@ export interface NovoRequerimento {
 export interface PresencaSede {
   membroId: string
   nome: string
+  setor: string
   desde: string         // ISO datetime
 }
 
@@ -215,6 +229,13 @@ export interface PosicaoRanking {
   totalSetor: number
 }
 
+// Médias por membro na semana. A diária divide pelos 5 dias úteis.
+export interface MediasDaSemana {
+  mediaTotal: number
+  mediaSede: number
+  mediaDiaria: number
+}
+
 export interface HorasDoDia {
   dia: string           // ISO date
   horasSede: number
@@ -232,6 +253,7 @@ Funções (todas `async`; em erro, lançam `Error` com mensagem em português pr
 | `auth.ts` | `sair()` | `void` | Todos | Semana 1 |
 | `auth.ts` | `meuPerfil()` | `Perfil \| null` | Guilherme, Johannes | Semana 1 |
 | `auth.ts` | `meuNome()` | `string` | Guilherme, Johannes | Semana 1 |
+| `auth.ts` | `meusDados()` | `Membro` | Guilherme, Johannes | Semana 1 |
 | `registros.ts` | `buscarMeusRegistros(semana: string)` | `Registro[]` | Guilherme | Meio da semana 2 |
 | `registros.ts` | `criarRegistro(dados: NovoRegistro)` | `Registro` | Guilherme | Meio da semana 2 |
 | `registros.ts` | `editarRegistro(id: string, dados: NovoRegistro)` | `Registro` | Guilherme | Semana 2 |
@@ -253,25 +275,30 @@ Funções (todas `async`; em erro, lançam `Error` com mensagem em português pr
 | `rh.ts` | `metasAtuais()` | `Metas` | Johannes, Guilherme | Semana 2 |
 | `rh.ts` | `listarMetas()` | `Metas[]` | Johannes | Semana 2 |
 | `rh.ts` | `alterarMetas(horasTotal: number, horasSede: number, vigenteDesde: string)` | `void` | Johannes | Semana 2 |
-| `rh.ts` | `percentualDaSemana(semana: string)` | `number` (0 a 100) | Johannes | Semana 3 |
-| `rh.ts` | `resumoDaSemana(semana: string)` | `ResumoMembroSemana[]` | Johannes | Semana 3 |
-| `rh.ts` | `abaixoDaMeta(semana: string)` | `ResumoMembroSemana[]` | Johannes | Semana 3 |
+| `rh.ts` | `percentualDaSemana(semana: string, setor?: string)` | `number` (0 a 100) | Johannes | Semana 3 |
+| `rh.ts` | `resumoDaSemana(semana: string, setor?: string)` | `ResumoMembroSemana[]` | Johannes | Semana 3 |
+| `rh.ts` | `abaixoDaMeta(semana: string, setor?: string)` | `ResumoMembroSemana[]` | Johannes | Semana 3 |
+| `rh.ts` | `mediasDaSemana(semana: string, setor?: string)` | `MediasDaSemana` | Johannes | Semana 3 |
+| `rh.ts` | `progressoDeMembro(membroId: string, semana: string)` | `ProgressoSemana` | Johannes | Semana 3 |
 | `rh.ts` | `semanasSeguidasAbaixo(semana: string)` | `MembroAbaixoSeguido[]` | Johannes | Semana 3 |
 | `rh.ts` | `cronometrosEmRevisao()` | `Registro[]` | Johannes | Semana 3 |
 | `rh.ts` | `revisarCronometro(id: string, aprovar: boolean)` | `void` | Johannes | Semana 3 |
 | `rh.ts` | `rankingDoMes(mes: string)` | `LinhaRanking[]` | Johannes | Semana 4 |
 | `rh.ts` | `buscarRegistrosDoMembro(membroId: string, semana: string)` | `Registro[]` | Johannes | A definir |
+| `rh.ts` | `criarRegistroDeMembro(membroId: string, dados: NovoRegistro, motivo: string)` | `Registro` | Johannes | A definir |
 | `rh.ts` | `editarRegistroDeMembro(id: string, dados: NovoRegistro, motivo: string)` | `Registro` | Johannes | A definir |
 | `rh.ts` | `cancelarRegistroDeMembro(id: string, motivo: string)` | `void` | Johannes | A definir |
 | `requerimentos.ts` | `enviarRequerimento(dados: NovoRequerimento)` | `Requerimento` | Guilherme | Semana 3 |
 | `requerimentos.ts` | `meusRequerimentos()` | `Requerimento[]` | Guilherme | Semana 3 |
 | `requerimentos.ts` | `linkDoAnexo(id: string)` | `string` | Guilherme, Johannes | Semana 4 |
 | `rh.ts` | `listarRequerimentos(situacao?: SituacaoRequerimento)` | `Requerimento[]` | Johannes | Semana 3 |
-| `rh.ts` | `responderRequerimento(id: string, aprovar: boolean)` | `void` | Johannes | Semana 3 |
+| `rh.ts` | `responderRequerimento(id: string, aprovar: boolean, motivo?: string)` | `void` | Johannes | Semana 3 |
 | `presenca.ts` | `quemEstaNaSede()` | `PresencaSede[]` | Guilherme, Johannes | Semana 4 |
 | `presenca.ts` | `estouNaSede()` | `boolean` | Guilherme | Semana 4 |
 | `presenca.ts` | `marcarNaSede()` | `void` | Guilherme | Semana 4 |
 | `presenca.ts` | `desmarcarNaSede()` | `void` | Guilherme | Semana 4 |
+
+Sem `setor`, as funções do painel do RH consideram a EJ toda. Para o `diretor_setor`, elas sempre ficam no setor dele, mesmo que a tela peça outro. `motivo` em `responderRequerimento` é obrigatório na reprovação.
 
 Semanas e meses são passados como strings ISO: semana = data da segunda-feira (`'2026-11-02'`), mês = `'2026-11'`.
 

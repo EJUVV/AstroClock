@@ -1,5 +1,6 @@
 // FALSO: trocar pela versão real (ver docs/arquitetura.md)
 import type { NovoRegistro, Registro } from '../tipos.ts'
+import { ehDiretor } from '../perfis.ts'
 import {
   aplicarEdicao,
   atraso,
@@ -52,6 +53,7 @@ function meuRegistroEditavel(id: string): Registro {
 
 export async function criarRegistro(dados: NovoRegistro): Promise<Registro> {
   await atraso()
+  if (ehDiretor(membroLogado().perfil)) throw new Error('Diretores não contabilizam horas')
   const membroId = membroLogado().id
   validarRegistro(membroId, dados)
   exigirDentroDoLimite(dados)

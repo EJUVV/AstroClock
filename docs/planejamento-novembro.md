@@ -38,7 +38,7 @@ Aprovado pelo Victor em 28/10/2026 e atualizado em 01/11/2026, com a reunião de
 
 Precisa estar pronto até 04/12.
 
-- Login com Google e perfis (`membro`, `rh`, `diretor_rh`), acesso negado para quem não está cadastrado.
+- Login com Google e os 5 perfis (`membro`, `rh`, `diretor_rh`, `diretor_setor`, `presidente`), acesso negado para quem não está cadastrado.
 - Cadastro de membros e setores pelo RH (o RH precisa cadastrar a EJ inteira antes do teste).
 - Registro manual com prazos de 7 dias, sobreposição bloqueada e virada da meia-noite.
 - Cronômetro, incluindo o encerramento automático após 10h e a **revisão pelo RH** (sem a revisão, os registros encerrados sozinhos ficam presos sem contar na meta).

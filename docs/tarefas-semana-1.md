@@ -7,7 +7,7 @@ Antes de começar qualquer tarefa, leia o [`CONTRIBUTING.md`](../CONTRIBUTING.md
 Lembretes para todos:
 
 - Telas nunca importam o `supabase`: só chamam as funções de `src/compartilhado/api/`. Hoje elas devolvem dados falsos; quando virarem reais, as telas não mudam.
-- Para testar os painéis com as funções falsas, mude o perfil no console do navegador: `localStorage.perfilFalso = 'membro'` (ou `'rh'`, `'diretor_rh'`, `'nenhum'`).
+- Para testar os painéis com as funções falsas, mude o perfil no console do navegador: `localStorage.perfilFalso = 'membro'` (ou `'rh'`, `'diretor_rh'`, `'diretor_setor'`, `'presidente'`, `'nenhum'`). No `npm run dev`, o botão de frasco no canto da tela faz o mesmo.
 - Uma tarefa = uma branch = um PR.
 - Reunião presencial na quarta (04/11), depois das 11h, e mini relatório diário para o Victor no WhatsApp (ver [`CONTRIBUTING.md`](../CONTRIBUTING.md)).
 
@@ -15,13 +15,17 @@ Lembretes para todos:
 
 ## Bernardo (banco e login)
 
+**Atualizado em 07/11:** a conversa com a diretora de RH trouxe **5 perfis** (`membro`, `rh`, `diretor_rh`, `diretor_setor`, `presidente`), diretores sem meta e novas regras de requerimento. As regras estão na seção 5 do `regras-de-negocio.md`, e o RLS por perfil na seção 5 do `arquitetura.md`. Prazo de todas as tarefas abaixo: **08/11**.
+
 ### B1. Modelar as tabelas iniciais (com o Victor)
 
 **O que fazer**
 - Revisar com o Victor o esboço da seção 5 do `arquitetura.md` (`membros`, `setores`, `metas`, `registros`): colunas, tipos e restrições.
 - Revisar também o esboço de `requerimentos` e `presenca_sede` (as migrações delas ficam para a semana 2), já com as respostas da diretora de RH registradas no `regras-de-negocio.md`. Atenção: a lista de quem está na sede precisa mostrar nomes, mas o membro só vê a própria linha de `membros`.
 - Lembrar que a meta de sede pode ser **0** e que o diretor do RH programa a semana em que cada meta começa (férias durante o piloto, seção 7 do [`planejamento-novembro.md`](planejamento-novembro.md)).
-- Prever o anexo do requerimento: armazenamento privado no Supabase, com acesso só de quem enviou e do RH (seção 5 do `arquitetura.md`).
+- Prever o anexo do requerimento: armazenamento privado no Supabase, com acesso só de quem enviou, do RH e do presidente, apagado na aprovação (seção 5 do `arquitetura.md`).
+- `membros.perfil` com 5 valores e no máximo um `diretor_setor` ativo por setor. Só `membro` e `rh` têm meta e registros de horas.
+- `requerimentos.motivo_resposta` para o motivo da reprovação.
 - Anotar no `arquitetura.md` o que mudar no esboço.
 
 **Como saber que terminou**
@@ -36,6 +40,7 @@ Lembretes para todos:
 **O que fazer**
 - Criar as migrações com `npx supabase migration new <nome>`, seguindo o que foi fechado na B1.
 - Incluir as restrições previstas em `registros` (seção 5 do `arquitetura.md`): sem sobreposição por membro (ignorando cancelados) e um único cronômetro ativo (`fim is null`) por membro.
+- Em `membros`: `perfil` com os 5 valores e índice único parcial com no máximo um `diretor_setor` ativo por `setor_id`.
 - Ativar RLS em todas as tabelas novas.
 - Dar `grant` nas tabelas que o site usa: no Supabase, "expose new tables" está desligado; sem o `grant`, o site recebe "permission denied".
 - Aplicar no `horas-dev` (dados do ambiente no [`andamento-fase-0.md`](andamento-fase-0.md#ambientes)).
@@ -49,14 +54,15 @@ Lembretes para todos:
 - B1.
 - Convite para a organização "EJUVV Dev" no Supabase (Victor).
 
-### B3. RLS de `membros` e funções `meu_id`, `eh_rh` e `meu_perfil`
+### B3. RLS de `membros` e funções `meu_id`, `eh_rh`, `meu_perfil` e `meu_setor_id`
 
 **O que fazer**
-- Criar as funções `meu_id()`, `eh_rh()` e `meu_perfil()`: `security definer`, filtrando pelo e-mail de `auth.jwt()` e `ativo = true` (seção 5 do `arquitetura.md`).
-- Regras de RLS de `membros`: o membro vê só a própria linha; o RH vê todas.
+- Criar as funções `meu_id()`, `eh_rh()` (`rh` ou `diretor_rh`), `meu_perfil()` e `meu_setor_id()`: `security definer`, filtrando pelo e-mail de `auth.jwt()` e `ativo = true` (seção 5 do `arquitetura.md`).
+- Regras de RLS de `membros`: o `membro` vê só a própria linha; `rh`, `diretor_rh` e `presidente` veem todas; o `diretor_setor` vê a própria e as do próprio setor.
+- Só o `diretor_rh` cadastra membros e altera perfis. Desativar e mudar setor: `rh` e `diretor_rh`.
 
 **Como saber que terminou**
-- Regras testadas pelos dois lados: um membro comum vê só a própria linha; alguém do RH vê todas; uma conta fora da tabela não vê nada.
+- Regras testadas com cada perfil: um membro comum vê só a própria linha; alguém do RH e o presidente veem todas; um diretor de setor vê só o próprio setor; uma conta fora da tabela não vê nada.
 - PR aprovado pelo Victor.
 
 **Depende de**
@@ -74,6 +80,8 @@ Lembretes para todos:
 - Com uma conta `@ejuvv.com` cadastrada em `membros`, "Entrar com Google" leva ao painel certo do perfil dela.
 - Com uma conta não cadastrada, aparece "Acesso negado. Procure o RH."
 - "Sair" volta para a tela de login.
+- Os 5 perfis caem no painel certo: `membro` em `/membro`, os outros em `/rh`.
+- Depois de fechar e abrir o navegador, a pessoa continua logada, no computador, no Android e no iPhone.
 
 **Depende de**
 - B3.
@@ -82,7 +90,7 @@ Lembretes para todos:
 ### B5. Seed inicial e tipos gerados
 
 **O que fazer**
-- Preencher `supabase/seed.sql` com dados falsos para o `horas-dev` (setores, membros com os três perfis, metas). O seed nunca vai para produção.
+- Preencher `supabase/seed.sql` com dados falsos para o `horas-dev` (setores, membros com os 5 perfis, um `diretor_setor` com membros no mesmo setor, metas; diretores sem registros de horas). O seed nunca vai para produção.
 - Gerar os tipos do banco com o Supabase CLI e incluir no PR (local do arquivo: combinar com o Victor).
 
 **Como saber que terminou**
@@ -154,11 +162,11 @@ Lembretes para todos:
 **O que fazer**
 - Refazer `src/membro/Inicio.tsx` seguindo a seção 3 do `arquitetura.md`: mostrar "Carregando...", chamar `meuPerfil()` e redirecionar.
   - `'membro'` → `/membro`
-  - `'rh'` ou `'diretor_rh'` → `/rh`
+  - `'rh'`, `'diretor_rh'`, `'diretor_setor'` ou `'presidente'` → `/rh`
   - `null` → "Acesso negado. Procure o RH." com botão "Voltar" que chama `sair()`
 
 **Como saber que terminou**
-- Os 4 valores de `localStorage.perfilFalso` levam ao lugar certo.
+- Os 6 valores de `localStorage.perfilFalso` (os 5 perfis e `'nenhum'`) levam ao lugar certo.
 
 **Depende de**
 - Nada.
@@ -167,8 +175,8 @@ Lembretes para todos:
 
 **O que fazer**
 - Criar o componente `RotaProtegida`, que consulta `meuPerfil()` e só deixa entrar quem tem o perfil certo (seção 2 do `arquitetura.md`).
-  - `/rh`: só `rh` e `diretor_rh`.
-  - `/membro`: o RH também tem tudo do membro (`regras-de-negocio.md`), então também pode entrar.
+  - `/rh`: `rh`, `diretor_rh`, `diretor_setor` e `presidente`.
+  - `/membro`: só quem tem meta, ou seja, `membro` e `rh`.
 - Usar o componente nas rotas `/membro` e `/rh` em `src/App.tsx`.
 - Lembrete: isso é experiência; a proteção real é o RLS (B3).
 
