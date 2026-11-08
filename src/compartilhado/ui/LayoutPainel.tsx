@@ -4,6 +4,7 @@ import { LifeBuoyIcon, LogOutIcon, MenuIcon, PanelLeftCloseIcon, PanelLeftOpenIc
 import { toast } from 'sonner'
 import { sair } from '@/compartilhado/api/auth'
 import { AvatarMembro } from '@/compartilhado/ui/AvatarMembro'
+import { BotaoInstalarApp } from '@/compartilhado/ui/instalarApp'
 import { Logo } from '@/compartilhado/ui/Logo'
 import { useSessao } from '@/compartilhado/ui/RotaProtegida'
 import { Button } from '@/compartilhado/ui/shadcn/button'
@@ -109,6 +110,7 @@ export function LayoutPainel({
   const rodapeMenu = (recolher: boolean, onNavegar?: () => void) => (
     <div className="flex flex-col gap-1">
       {itensRodape.length > 0 && <Menu itens={itensRodape} recolhido={recolher} onNavegar={onNavegar} />}
+      <BotaoInstalarApp compacto={recolher} />
       <button
         type="button"
         className={cn(

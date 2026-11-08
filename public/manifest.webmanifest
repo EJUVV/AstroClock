@@ -1,4 +1,5 @@
 {
+  "id": "/",
   "name": "AstroClock — EJUVV",
   "short_name": "AstroClock",
   "description": "Controle de horas dos membros da EJUVV.",
@@ -6,12 +7,16 @@
   "start_url": "/inicio",
   "scope": "/",
   "display": "standalone",
-  "background_color": "#F4F2FD",
-  "theme_color": "#7B5CF5",
+  "background_color": "#06040f",
+  "theme_color": "#06040f",
   "icons": [
     { "src": "/icone-192.png", "sizes": "192x192", "type": "image/png" },
     { "src": "/icone-512.png", "sizes": "512x512", "type": "image/png" },
     { "src": "/icone-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
     { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ],
+  "shortcuts": [
+    { "name": "Registrar horas", "url": "/membro/registros", "icons": [{ "src": "/icone-192.png", "sizes": "192x192" }] },
+    { "name": "Estou na sede", "url": "/membro/sede", "icons": [{ "src": "/icone-192.png", "sizes": "192x192" }] }
   ]
 }

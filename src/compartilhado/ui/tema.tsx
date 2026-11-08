@@ -24,6 +24,9 @@ export function ProvedorTema({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', tema === 'escuro')
+    // Barra do navegador no celular e da janela do app instalado na cor do fundo.
+    const fundo = getComputedStyle(document.documentElement).getPropertyValue('--background').trim()
+    if (fundo) document.querySelector('meta[name="theme-color"]')?.setAttribute('content', fundo)
   }, [tema])
 
   const trocar = useCallback((novo: Tema) => {

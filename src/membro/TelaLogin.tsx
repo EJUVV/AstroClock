@@ -4,6 +4,7 @@ import { entrarComGoogle } from '@/compartilhado/api/auth'
 import LogoInfinito from '@/compartilhado/ui/LogoInfinito'
 import { Button } from '@/compartilhado/ui/shadcn/button'
 import { SeletorTema } from '@/compartilhado/ui/tema'
+import { BotaoInstalarApp } from '@/compartilhado/ui/instalarApp'
 
 function IconeGoogle() {
   return (
@@ -54,6 +55,7 @@ function TelaLogin() {
               Use sua conta <span className="font-semibold text-foreground">@ejuvv.com</span>
             </p>
             {erro && <p className="text-center text-sm text-perigo">{erro}</p>}
+            <BotaoInstalarApp className="self-center" />
           </div>
         </section>
         <section className="cartao-roxo relative hidden flex-col justify-end gap-4 overflow-hidden p-10 md:flex">

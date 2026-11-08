@@ -7,6 +7,7 @@ import { LogoIcone } from '@/compartilhado/ui/Logo'
 import { useSessao } from '@/compartilhado/ui/RotaProtegida'
 import { Button } from '@/compartilhado/ui/shadcn/button'
 import { SeletorTema } from '@/compartilhado/ui/tema'
+import { BotaoInstalarApp } from '@/compartilhado/ui/instalarApp'
 import { useEhDesktop } from '@/compartilhado/ui/useEhDesktop'
 import { cn } from '@/compartilhado/ui/utils'
 import { BotaoSedeTopo, ProvedorPresenca } from './usePresenca'
@@ -97,8 +98,11 @@ function PainelMembroCelular({ nome, primeiroNome, ehRH }: { nome: string; prime
           </NavLink>
         ))}
       </nav>
-      <div className="mt-6 flex items-center justify-center gap-2 text-xs text-muted-foreground sm:hidden">
-        <LogoIcone className="size-5" /> AstroClock · <SeletorTema />
+      <div className="mt-6 flex flex-col items-center gap-2 text-xs text-muted-foreground sm:hidden">
+        <BotaoInstalarApp />
+        <span className="flex items-center gap-2">
+          <LogoIcone className="size-5" /> AstroClock · <SeletorTema />
+        </span>
       </div>
     </div>
   )
