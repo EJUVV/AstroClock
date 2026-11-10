@@ -5,7 +5,6 @@ import type {
   MediasDaSemana,
   MembroAbaixoSeguido,
   Metas,
-  NovaDispensa,
   NovoRegistro,
   ProgressoSemana,
   Registro,
@@ -16,13 +15,12 @@ import type {
 import { corrigeRegistros, temPainelRH, veRequerimentos } from '../perfis.ts'
 import {
   anexos,
+  apagarAnexosVencidos,
   aplicarEdicao,
   atraso,
   calcularRanking,
   copia,
   dataEmBrasilia,
-  dispensas,
-  estaDispensada,
   membros,
   membroLogado,
   membrosElegiveis,
@@ -32,6 +30,7 @@ import {
   progressoDoMembro,
   registros,
   requerimentos,
+  respondidoEm,
   resumoDoMembro,
   segundaDaSemana,
   semanaAtual,
@@ -173,7 +172,7 @@ export async function semanasSeguidasAbaixo(semana: string): Promise<MembroAbaix
   return lista.sort((a, b) => b.semanasSeguidas - a.semanasSeguidas || a.membro.nome.localeCompare(b.membro.nome))
 }
 
-// O diretor de setor vê só o ranking do próprio setor (ainda em aberto com a diretora de RH).
+// O diretor de setor vê só o ranking do próprio setor; rh, diretor_rh e presidente veem a EJ toda.
 export async function rankingDoMes(mes: string): Promise<LinhaRanking[]> {
   await atraso()
   exigirRH('ver o ranking completo')
@@ -188,6 +187,7 @@ export async function listarRequerimentos(situacao?: SituacaoRequerimento): Prom
   await atraso()
   const perfil = perfilFalso()
   if (!perfil || !veRequerimentos(perfil)) throw new Error('Você não pode ver os requerimentos')
+  apagarAnexosVencidos()
   return copia(
     requerimentos
       .filter((q) => !situacao || q.situacao === situacao)
@@ -195,7 +195,7 @@ export async function listarRequerimentos(situacao?: SituacaoRequerimento): Prom
   )
 }
 
-// Só o diretor do RH responde. A reprovação exige motivo, que vai no e-mail para o membro.
+// Só o diretor do RH responde. O membro recebe e-mail nos dois casos; a reprovação exige motivo, que vai no e-mail.
 // Na aprovação, o anexo é apagado (pode ter dado de saúde); na reprovação, fica guardado por um mês.
 export async function responderRequerimento(id: string, aprovar: boolean, motivo = ''): Promise<void> {
   await atraso()
@@ -206,20 +206,11 @@ export async function responderRequerimento(id: string, aprovar: boolean, motivo
   if (requerimento.situacao !== 'pendente') throw new Error('Este requerimento já foi respondido')
   requerimento.situacao = aprovar ? 'aprovado' : 'reprovado'
   requerimento.motivoResposta = aprovar ? null : motivo.trim()
+  respondidoEm.set(id, Date.now())
   if (aprovar) {
     anexos.delete(id)
     requerimento.anexoNome = null
   }
-}
-
-export async function registrarDispensa(dados: NovaDispensa): Promise<void> {
-  await atraso()
-  if (!dados.motivo.trim()) throw new Error('O motivo é obrigatório')
-  if (!membros.some((m) => m.id === dados.membroId)) throw new Error('Membro não encontrado')
-  if (estaDispensada(dados.membroId, dados.semana)) {
-    throw new Error('Esta semana já está dispensada para este membro')
-  }
-  dispensas.push({ membroId: dados.membroId, semana: dados.semana, motivo: dados.motivo.trim() })
 }
 
 export async function metasAtuais(): Promise<Metas> {

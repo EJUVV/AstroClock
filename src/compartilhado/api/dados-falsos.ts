@@ -194,11 +194,6 @@ export const criadoEm = new Map<string, number>(registros.map((r) => [r.id, Date
 
 export const metas: Metas[] =[{ horasTotal: 10, horasSede: 5, vigenteDesde: '2026-02-02' }]
 
-export const dispensas: { membroId: string; semana: string; motivo: string }[] = [
-  { membroId: 'm6', semana: segundaAtual, motivo: 'Semana de provas (conversado com o RH)' },
-  { membroId: 'm1', semana: somarDias(segundaAtual, -14), motivo: 'Problema de saúde (conversado com o RH)' },
-]
-
 function requerimentoFalso(
   id: string,
   membroId: string,
@@ -222,12 +217,37 @@ export const requerimentos: Requerimento[] = [
   // Eduarda: pendente, cobre duas semanas, com anexo.
   requerimentoFalso('q3', 'm5', 'ausencia_total', somarDias(segundaAtual, 7), somarDias(segundaAtual, 18), 'Compromisso da faculdade', 'pendente', 'comprovante-falso.txt'),
   // Henrique: reprovado (não muda a meta). A reprovação sempre tem motivo.
-  requerimentoFalso('q4', 'm8', 'ausencia_total', somarDias(segundaAtual, -7), somarDias(segundaAtual, -3), 'Sem motivo claro', 'reprovado', null, 'Faltou explicar o que impede você de trabalhar nessa semana.'),
+  requerimentoFalso('q4', 'm8', 'ausencia_total', somarDias(segundaAtual, -7), somarDias(segundaAtual, -3), 'Sem motivo claro', 'reprovado', 'comprovante-q4.txt', 'Faltou explicar o que impede você de trabalhar nessa semana.'),
+  // Ausência total aprovada: a semana fica dispensada. O RH não dispensa direto, só por requerimento.
+  requerimentoFalso('q5', 'm6', 'ausencia_total', segundaAtual, somarDias(segundaAtual, 4), 'Semana de provas', 'aprovado'),
+  requerimentoFalso('q6', 'm1', 'ausencia_total', somarDias(segundaAtual, -14), somarDias(segundaAtual, -10), 'Problema de saúde', 'aprovado'),
 ]
+
+// Quando cada requerimento foi respondido (o tipo Requerimento não expõe esse campo).
+export const respondidoEm = new Map<string, number>([
+  ['q1', Date.parse(instante(segundaAtual, '09:00'))],
+  ['q4', Date.parse(instante(somarDias(segundaAtual, -8), '18:00'))],
+  ['q5', Date.parse(instante(somarDias(segundaAtual, -2), '10:00'))],
+  ['q6', Date.parse(instante(somarDias(segundaAtual, -15), '10:00'))],
+])
+
+const UM_MES_MS = 30 * 24 * 3_600_000
+
+// O anexo de um requerimento reprovado fica guardado por um mês; depois, é apagado.
+export function apagarAnexosVencidos(): void {
+  for (const q of requerimentos) {
+    const respondido = respondidoEm.get(q.id)
+    if (q.situacao === 'reprovado' && q.anexoNome && respondido !== undefined && Date.now() - respondido > UM_MES_MS) {
+      anexos.delete(q.id)
+      q.anexoNome = null
+    }
+  }
+}
 
 // Os arquivos ficam fora de Requerimento: a tela só recebe o nome e pede o link com linkDoAnexo().
 export const anexos = new Map<string, File>([
   ['q3', new File(['Anexo de exemplo (dados falsos)'], 'comprovante-falso.txt', { type: 'text/plain' })],
+  ['q4', new File(['Anexo de exemplo (dados falsos)'], 'comprovante-q4.txt', { type: 'text/plain' })],
 ])
 
 // Quem está na sede agora: saida = null.
@@ -368,6 +388,15 @@ presencas.push(
   })),
 )
 
+// Quem esqueceu de desmarcar sai sozinho à meia-noite (horário de Brasília) do dia em que entrou.
+export function desmarcarQuemFicouDeOntem(): void {
+  const hoje = dataEmBrasilia(new Date())
+  for (const p of presencas) {
+    const dia = dataEmBrasilia(p.entrada)
+    if (p.saida === null && dia < hoje) p.saida = instante(somarDias(dia, 1), '00:00')
+  }
+}
+
 // ---------- Validação de registros (usada pelo membro e pelo RH) ----------
 
 // deQuem completa a mensagem de sobreposição: "seu" (membro) ou "deste membro" (RH).
@@ -446,11 +475,9 @@ function temRequerimentoAprovado(membroId: string, semana: string, tipo: TipoReq
   )
 }
 
+// A semana só fica dispensada por requerimento de ausência total aprovado.
 export function estaDispensada(membroId: string, semana: string): boolean {
-  return (
-    dispensas.some((d) => d.membroId === membroId && d.semana === semana) ||
-    temRequerimentoAprovado(membroId, semana, 'ausencia_total')
-  )
+  return temRequerimentoAprovado(membroId, semana, 'ausencia_total')
 }
 
 export function progressoDoMembro(membroId: string, semana: string): ProgressoSemana {

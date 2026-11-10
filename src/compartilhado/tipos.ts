@@ -54,12 +54,6 @@ export interface NovoMembro {
   dataEntrada: string
 }
 
-export interface NovaDispensa {
-  membroId: string
-  semana: string
-  motivo: string
-}
-
 export interface ResumoMembroSemana {
   membro: Membro
   horasSede: number

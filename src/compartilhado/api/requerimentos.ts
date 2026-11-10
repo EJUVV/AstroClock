@@ -1,7 +1,7 @@
 // FALSO: trocar pela versão real (ver docs/arquitetura.md)
 import type { NovoRequerimento, Requerimento } from '../tipos.ts'
 import { ehDiretor, veRequerimentos } from '../perfis.ts'
-import { anexos, atraso, copia, membroLogado, perfilFalso, requerimentos } from './dados-falsos.ts'
+import { anexos, apagarAnexosVencidos, atraso, copia, membroLogado, perfilFalso, requerimentos } from './dados-falsos.ts'
 
 const TIPOS_DE_ANEXO = ['application/pdf', 'image/jpeg', 'image/png']
 const TAMANHO_MAXIMO_DO_ANEXO = 5 * 1024 * 1024 // 5 MB
@@ -41,6 +41,7 @@ export async function enviarRequerimento(dados: NovoRequerimento): Promise<Reque
 export async function meusRequerimentos(): Promise<Requerimento[]> {
   await atraso()
   const membroId = membroLogado().id
+  apagarAnexosVencidos()
   return copia(
     requerimentos
       .filter((q) => q.membroId === membroId)
@@ -57,7 +58,8 @@ export async function linkDoAnexo(id: string): Promise<string> {
   if (requerimento.membroId !== membroLogado().id && !(perfil && veRequerimentos(perfil))) {
     throw new Error('Você não pode abrir este anexo')
   }
+  apagarAnexosVencidos()
   const anexo = anexos.get(id)
-  if (!anexo) throw new Error('Este requerimento não tem anexo (ele é apagado quando o requerimento é aprovado)')
+  if (!anexo) throw new Error('Este requerimento não tem anexo (ele é apagado na aprovação, ou um mês depois da reprovação)')
   return URL.createObjectURL(anexo)
 }

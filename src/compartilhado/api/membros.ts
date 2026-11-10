@@ -52,6 +52,10 @@ export async function alterarPerfil(id: string, perfil: Perfil): Promise<void> {
   if (perfil === 'diretor_setor' && membros.some((m) => m.id !== id && m.ativo && m.perfil === 'diretor_setor' && m.setor === membro.setor)) {
     throw new Error(`${membro.setor} já tem um diretor de setor`)
   }
+  // A EJ tem um único diretor do RH e um único presidente.
+  if ((perfil === 'diretor_rh' || perfil === 'presidente') && membros.some((m) => m.id !== id && m.ativo && m.perfil === perfil)) {
+    throw new Error(perfil === 'presidente' ? 'A EJ já tem um presidente' : 'A EJ já tem um diretor do RH')
+  }
   membro.perfil = perfil
 }
 

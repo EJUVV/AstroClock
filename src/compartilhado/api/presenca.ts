@@ -1,14 +1,16 @@
 // FALSO: trocar pela versão real (ver docs/arquitetura.md)
 import type { PresencaSede } from '../tipos.ts'
-import { atraso, membroLogado, membros, presencas } from './dados-falsos.ts'
+import { atraso, desmarcarQuemFicouDeOntem, membroLogado, membros, presencas } from './dados-falsos.ts'
 
 function minhaPresenca(membroId: string) {
+  desmarcarQuemFicouDeOntem()
   return presencas.find((p) => p.membroId === membroId && p.saida === null)
 }
 
 // Não registra horas: só informa quem está na sede agora.
 export async function quemEstaNaSede(): Promise<PresencaSede[]> {
   await atraso()
+  desmarcarQuemFicouDeOntem()
   return presencas
     .filter((p) => p.saida === null)
     .map((p) => ({
