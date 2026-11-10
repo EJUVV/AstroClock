@@ -54,10 +54,10 @@ Lembretes para todos:
 - B1.
 - Convite para a organização "EJUVV Dev" no Supabase (Victor).
 
-### B3. RLS de `membros` e funções `meu_id`, `eh_rh`, `meu_perfil` e `meu_setor_id`
+### B3. RLS de `membros` e funções `meu_id`, `eh_rh`, `meu_perfil` e `setor_que_dirijo`
 
 **O que fazer**
-- Criar as funções `meu_id()`, `eh_rh()` (`rh` ou `diretor_rh`), `meu_perfil()` e `meu_setor_id()`: `security definer`, filtrando pelo e-mail de `auth.jwt()` e `ativo = true` (seção 5 do `arquitetura.md`).
+- Criar as funções `meu_id()`, `eh_rh()` (`rh` ou `diretor_rh`), `meu_perfil()` e `setor_que_dirijo()` (no plano, `meu_setor_id`): `security definer`, filtrando pelo e-mail de `auth.jwt()` e `ativo = true` (seção 5 do `arquitetura.md`).
 - Regras de RLS de `membros`: o `membro` vê só a própria linha; `rh`, `diretor_rh` e `presidente` veem todas; o `diretor_setor` vê a própria e as do próprio setor.
 - Só o `diretor_rh` cadastra membros e altera perfis. Desativar e mudar setor: `rh` e `diretor_rh`.
 

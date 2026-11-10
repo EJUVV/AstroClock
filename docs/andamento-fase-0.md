@@ -22,10 +22,11 @@ Onde paramos (10/11/2026, semana 2): **o login com Google funciona de verdade no
 
 ### Próximos passos
 
-1. Victor abre o PR da `feat/login-google` (revisão do Bernardo, dono do login, e do Guilherme, dono do `TelaLogin.tsx`).
-2. Bernardo: B6 e B7 até 11/11. Sem elas, as telas continuam com dados falsos.
-3. Depois da B7: Guilherme e Johannes trocam as funções falsas pelas reais (G6 e J5).
-4. Victor decide o que adianta das semanas 3 e 4; depois disso, as tarefas vão para o Notion.
+O login real já está na `main` (PR #3, juntado em 10/11/2026).
+
+1. Bernardo: B6 e B7 até 11/11. Sem elas, as telas continuam com dados falsos.
+2. Depois da B7: Guilherme e Johannes trocam as funções falsas pelas reais (G6 e J5).
+3. Victor decide o que adianta das semanas 3 e 4; depois disso, as tarefas vão para o Notion.
 
 ### Tarefas do Victor fora da IA
 
@@ -83,11 +84,11 @@ Nada desta seção é segredo. Senhas, chaves secretas e connection strings fica
 
 ### Supabase
 
-Os dois projetos estão na conta `@ejuvv.com` da diretoria de projetos, plano gratuito, região **South America (São Paulo)**.
+Os dois projetos estão na conta `@ejuvv.com` da diretoria de projetos, plano gratuito, **na mesma organização** (decisão de 10/11/2026). Regiões, conferidas em 10/11/2026: `horas-dev` no leste dos EUA (`us-east-1`) e `horas-prod` no oeste dos EUA (`us-west-2`).
 
 | | Dev | Prod |
 | --- | --- | --- |
-| Organização | EJUVV Dev | EJUVV Prod |
+| Organização | EJUVV Dev | EJUVV Dev (a mesma) |
 | Projeto | `horas-dev` | `horas-prod` |
 | Ref | `cwvnzzqpqohvqjzigalu` | `zetjgqdagnlkodbexnoe` |
 | URL da API | `https://cwvnzzqpqohvqjzigalu.supabase.co` | `https://zetjgqdagnlkodbexnoe.supabase.co` |

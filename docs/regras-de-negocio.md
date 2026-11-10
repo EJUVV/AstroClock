@@ -21,9 +21,8 @@ Itens marcados com **[PENDENTE]** ainda não foram decididos. Itens marcados com
 
 ### Férias [FASE 2]
 
-- O RH cadastra no sistema as datas de início e fim de cada período de férias.
+- **Só o diretor do RH** cadastra no sistema as datas de início e fim de cada período de férias.
 - Durante as férias, a meta é de **5h no total**, e **não há exigência de horas na sede** (as horas contam como remotas).
-- **Só o diretor do RH** cadastra as datas de férias.
 - **Semana parcialmente em férias** (ex.: as férias começam numa quarta): vale a **meta de férias** na semana inteira. Respondido pelo líder do projeto em 09/11/2026.
 
 ### Férias durante o piloto
@@ -77,8 +76,8 @@ Definido com a diretora de RH em 07/11/2026.
 | Perfil | Tem meta | Pode |
 | --- | --- | --- |
 | `membro` | Sim | Registrar e ver as próprias horas e o próprio progresso |
-| `rh` | Sim | Tudo do membro + painel do RH: ver todos os membros, desativar membros e mudar de setor, ver requerimentos e anexos, revisar cronômetros, lançar, alterar e cancelar registros de outros membros (com motivo), cadastrar férias |
-| `diretor_rh` | Não | Painel do RH com tudo do `rh` + **cadastrar membros**, **alterar perfis**, **alterar as metas** e **responder requerimentos** |
+| `rh` | Sim | Tudo do membro + painel do RH: ver todos os membros, desativar membros e mudar de setor, ver requerimentos e anexos, revisar cronômetros, lançar, alterar e cancelar registros de outros membros (com motivo) |
+| `diretor_rh` | Não | Painel do RH com tudo do `rh` + **cadastrar membros**, **alterar perfis**, **alterar as metas**, **cadastrar as férias** e **responder requerimentos** |
 | `diretor_setor` | Não | Painel do RH **só com os membros do próprio setor**: acompanhar horas, metas e quem ficou abaixo. Não vê requerimentos nem anexos e não corrige registros |
 | `presidente` | Não | Painel do RH com **todos os membros**, inclusive requerimentos e anexos. Não corrige registros |
 

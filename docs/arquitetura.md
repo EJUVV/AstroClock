@@ -55,8 +55,11 @@ Rotas protegidas usam um componente `RotaProtegida` que consulta `meuPerfil()`. 
 | --- | --- | --- |
 | Uso | Desenvolvimento e testes | Sistema real |
 | Dados | Falsos (`supabase/seed.sql`) | Reais |
-| Acesso | Bernardo e Victor | Só Victor (até o piloto) |
-| Organização no Supabase | "EJUVV Dev" | "EJUVV Prod" |
+| Quem mexe | Bernardo e Victor; Guilherme e Johannes a partir da semana 2 | Só o Victor (regra da equipe) |
+| Organização no Supabase | "EJUVV Dev" | "EJUVV Dev" (a mesma) |
+| Região | Leste dos EUA (`us-east-1`) | Oeste dos EUA (`us-west-2`) |
+
+**Decisão de 10/11/2026:** os dois projetos ficam na mesma organização, de propósito. Por isso, quem é convidado para a organização também **consegue** abrir a produção: não há bloqueio técnico. Aplicar migrações e mexer no `horas-prod` continua sendo só do Victor, por regra da equipe.
 
 A mesma estrutura (migrações) é aplicada nos dois. O seed nunca vai para produção.
 
@@ -83,7 +86,7 @@ Esboço inicial, refinado pelo Bernardo na semana 1. Nomes em snake_case.
 | `metas` | `id`, `horas_total`, `horas_sede` (pode ser 0), `vigente_desde` (segunda-feira escolhida pelo diretor, sempre futura), `alterado_por` | Todas | Todas (só `diretor_rh` cria) |
 | `requerimentos` | `id`, `membro_id`, `tipo` (`so_remoto`/`ausencia_total`), `data_inicio`, `data_fim`, `motivo`, `situacao` (`pendente`/`aprovado`/`reprovado`), `anexo_caminho`, `anexo_nome`, `motivo_resposta`, `criado_em`, `respondido_por`, `respondido_em` | Os próprios (e cria) | `rh`, `diretor_rh` e `presidente` veem todos; só `diretor_rh` responde. O `diretor_setor` não vê |
 | `presenca_sede` | `id`, `membro_id`, `entrada`, `saida` (null = está na sede agora) | Quem está na sede agora (só o nome); marca e desmarca só a própria | Todas |
-| `historico_setor` | `id`, `membro_id`, `setor_id`, `desde` | O próprio | Todos |
+| `historico_setor` | `id`, `membro_id`, `setor_anterior_id`, `setor_novo_id`, `alterado_em`, `alterado_por` (o banco grava sozinho quando `membros.setor_id` muda; o site só lê) | O próprio | `rh`, `diretor_rh` e `presidente` |
 | `auditoria` | `id`, `tabela`, `registro_id`, `acao`, `quem`, `quando`, `antes`, `depois` | Não | Todas |
 
 **Requerimento de ausência** (seção 7 do `regras-de-negocio.md`): substitui a antiga tabela `dispensas`. Só requerimento `aprovado` muda a meta: `so_remoto` zera a exigência de sede; `ausencia_total` dispensa a semana. Vale para **todas as semanas que as datas tocam, inteiras**, da segunda de `data_inicio` à segunda de `data_fim`. O e-mail vai para todos os membros ativos com perfil `rh` ou `diretor_rh`. Só o `diretor_rh` responde. A reprovação grava `motivo_resposta` e manda e-mail ao membro. A aprovação **apaga o anexo** do Storage e limpa `anexo_caminho`. Ainda depende da diretora de RH ([`pauta-diretora-rh.md`](pauta-diretora-rh.md)): aviso ao membro na aprovação e dispensa direta pelo RH.
@@ -92,7 +95,21 @@ Esboço inicial, refinado pelo Bernardo na semana 1. Nomes em snake_case.
 
 **Presença na sede** (seção 13 do `regras-de-negocio.md`): não registra horas. Índice único parcial: uma única linha com `saida is null` por membro. Como o membro só vê a própria linha de `membros`, a lista de quem está na sede precisa de uma visão ou função que exponha só o nome e o setor. O sistema desmarca sozinho quem esquecer (tarefa agendada no banco); o horário ainda depende da diretora de RH.
 
-Funções auxiliares previstas no banco: `meu_id()`, `meu_perfil()`, `meu_setor_id()` e `eh_rh()` (`rh` ou `diretor_rh`), todas `security definer`, filtrando pelo e-mail de `auth.jwt()` e `ativo = true`.
+Funções auxiliares que já existem no `horas-dev` (conferido em 10/11/2026), todas filtrando pelo e-mail de `auth.jwt()` e `ativo = true`:
+
+| Função | O que devolve |
+| --- | --- |
+| `meu_id()` | O `id` do membro logado |
+| `meu_perfil()` | O perfil do membro logado (usada pelo `auth.ts`) |
+| `meus_dados()` | Nome, e-mail, perfil, setor, ativo e data de entrada (usada pelo `auth.ts`) |
+| `eh_rh()` | Se o perfil é `rh` ou `diretor_rh` |
+| `eh_diretor_rh()` | Se o perfil é `diretor_rh` |
+| `ve_tudo()` | Se o perfil é `rh`, `diretor_rh` ou `presidente` (veem a EJ toda) |
+| `setor_que_dirijo()` | O setor do `diretor_setor` logado (no plano, se chamava `meu_setor_id`) |
+| `perfil_tem_meta(perfil)` | Se o perfil tem meta (`membro` e `rh`) |
+| `elegivel_na_semana(...)` | Se o membro conta na meta daquela semana |
+
+Também existe a visão `lista_de_metas`, para ler o histórico de metas. A tabela `dispensas` ainda existe no `horas-dev`, mas sai na B7.
 
 **Perfis no RLS** (seção 5 do `regras-de-negocio.md`):
 
