@@ -25,7 +25,7 @@ Pré-requisitos: Node.js 22 ou superior e Git.
    ```bash
    cp .env.example .env.local
    ```
-   Preencha `VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY` com os valores do projeto **horas-dev** (peça ao Victor). Enquanto as funções de dados forem falsas, o site roda mesmo sem esses valores.
+   Preencha `VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY` com os valores do projeto **horas-dev** (peça ao Victor). O login é real (Google): sem esses valores, não dá para entrar. Para testar só as telas, sem Google e trocando de perfil pelo botão de frasco, coloque `VITE_LOGIN_FALSO=true`.
 4. Rode o projeto:
    ```bash
    npm run dev

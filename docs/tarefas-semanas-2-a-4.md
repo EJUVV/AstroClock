@@ -27,7 +27,7 @@ As tarefas desta semana já estão no Notion (Quadro de Sprints, projeto AstroCl
 
 | Tarefa | Pessoa | Prazo | Situação em 10/11 |
 | --- | --- | --- | --- |
-| B4. Login com Google real | Feito pela IA com o Victor; Bernardo revisa o PR | 11/11 | Em teste |
+| B4. Login com Google real | Feito pela IA com o Victor; Bernardo revisa o PR | 11/11 | Feito e testado; falta o PR |
 | B6. Banco do `horas-dev` em migração e no GitHub (`supabase db pull`, seed) | Bernardo | 11/11 | A fazer |
 | B7. Destravar `registros` e `metas` para o site (RLS de `registros`, `grant insert` em `metas`, remover `dispensas`, revogar `rls_auto_enable`) | Bernardo | 11/11 | A fazer |
 | G5. Registro que passa da meia-noite | Guilherme | 15/11 | A fazer |
@@ -297,9 +297,9 @@ Semana curta: 20/11 (sexta) é feriado. Reunião em 18/11 e validação com o RH
 #### V7. Produção no ar
 
 **O que fazer**
-- Hospedagem confirmada com o Rodrigo (Vercel ou Cloudflare Pages).
+- Hospedagem: **Vercel** (decidido em 10/11/2026). Configurar o projeto de produção e o domínio com o Rodrigo.
 - Login com Google no `horas-prod`: passo M5 do `andamento-fase-0.md` no prod, com a URL do site em produção nas Redirect URLs.
-- Variáveis do site em produção apontando para o `horas-prod`, **sem** `VITE_MOSTRAR_DEMO` e **sem** `VITE_LOGIN_FALSO`.
+- Variáveis do site em produção apontando para o `horas-prod`, **sem** `VITE_MOSTRAR_DEMO` e **sem** `VITE_LOGIN_FALSO`. Hoje o projeto `astro-clock` da Vercel tem as duas ligadas (é o site de protótipo): a produção precisa de um projeto separado, ou de tirar as duas no dia da virada.
 - Restaurar um backup no `horas-dev` com o Bernardo, para provar que o backup funciona.
 
 **Como saber que terminou**
