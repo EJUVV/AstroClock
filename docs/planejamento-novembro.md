@@ -74,7 +74,7 @@ Relatório semanal automático com nota; cadastro de períodos de férias, feria
 
 **Atualizado em 09/11/2026:** as telas de Guilherme e Johannes das semanas 1 a 4 ficaram prontas no protótipo (com dados falsos) até 07/11. Para tirar carga do Bernardo, a partir da semana 2 **Guilherme e Johannes trocam as funções falsas pelas reais** das telas que fizeram, e assumem o e-mail e o anexo. O Bernardo fica com o núcleo do banco: tabelas, RLS, cálculos em SQL, login real, tarefas automáticas e produção. As tabelas abaixo já mostram essa divisão. Tarefas e prazos atualizados ficam no Notion.
 
-Cada semana lista o que cada pessoa entrega. As tarefas detalhadas (formato do [`tarefas-semana-1.md`](tarefas-semana-1.md)) das semanas 2, 3 e 4 são escritas depois da conversa com a diretora de RH, porque o requerimento e a presença ainda têm perguntas abertas.
+Cada semana lista o que cada pessoa entrega. As tarefas detalhadas das semanas 2, 3 e 4 estão em [`tarefas-semanas-2-a-4.md`](tarefas-semanas-2-a-4.md) (escritas em 10/11/2026, depois da conversa com a diretora de RH).
 
 ### Semana 1 (03/11 a 06/11) — Base
 
@@ -140,9 +140,9 @@ Coisas que não são tela nem banco, mas travam o piloto se ficarem para o fim:
 | O quê | Até quando | Por quê |
 | --- | --- | --- |
 | Conversa com a diretora de RH ([`pauta-diretora-rh.md`](pauta-diretora-rh.md)) | Até 06/11 | Aviso ao membro, dispensa direta e anexo ainda têm perguntas abertas |
-| Confirmar com o Rodrigo o plano da Vercel e o que fazer com a Hostinger | Semana 1 | Site de desenvolvimento no ar na semana 2 |
+| Confirmar com o Rodrigo o plano da Vercel e o que fazer com a Hostinger | Feito (10/11): produção na **Vercel**; a Hostinger fica como possibilidade para depois | Site de desenvolvimento no ar na semana 2 |
 | Confirmar o serviço de e-mail (recomendado: Resend, plano grátis) e quem mexe no domínio `ejuvv.com` | Semana 2 | O Bernardo implementa na semana 4 |
-| Tarefas detalhadas das semanas 2, 3 e 4 | Antes de cada semana | Com a IA, no formato da semana 1 |
+| Tarefas detalhadas das semanas 2, 3 e 4 | Feito (10/11): [`tarefas-semanas-2-a-4.md`](tarefas-semanas-2-a-4.md) | Com a IA, no formato da semana 1 |
 | Login Google no `horas-prod` | Semana 4 | Mesmo passo da M5, no prod, com a URL do site em produção |
 
 ## 7. Férias durante o teste

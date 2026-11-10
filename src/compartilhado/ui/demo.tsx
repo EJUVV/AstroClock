@@ -1,6 +1,7 @@
 // Só do protótipo: força o estado das telas (carregando, erro, vazio) e troca o perfil falso.
 import { createContext, useCallback, useContext, useEffect, useState, type DependencyList, type ReactNode } from 'react'
 import { FlaskConicalIcon } from 'lucide-react'
+import { loginFalso } from '@/compartilhado/api/auth'
 import { Button } from '@/compartilhado/ui/shadcn/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/compartilhado/ui/shadcn/popover'
 import { ToggleGroup, ToggleGroupItem } from '@/compartilhado/ui/shadcn/toggle-group'
@@ -143,16 +144,19 @@ export function PainelDemo() {
         </Button>
       </PopoverTrigger>
       <PopoverContent side="top" align="start" className="flex w-80 flex-col gap-4 rounded-2xl">
-        <div className="flex flex-col gap-2">
-          <p className="text-xs font-semibold text-muted-foreground uppercase">Perfil (protótipo)</p>
-          <ToggleGroup type="single" size="sm" spacing={1} value={perfil} onValueChange={trocarPerfil} className="flex-wrap">
-            {PERFIS.map((p) => (
-              <ToggleGroupItem key={p.valor} value={p.valor}>
-                {p.rotulo}
-              </ToggleGroupItem>
-            ))}
-          </ToggleGroup>
-        </div>
+        {/* Com o login real, o perfil vem da conta Google: trocar aqui não teria efeito. */}
+        {loginFalso && (
+          <div className="flex flex-col gap-2">
+            <p className="text-xs font-semibold text-muted-foreground uppercase">Perfil (protótipo)</p>
+            <ToggleGroup type="single" size="sm" spacing={1} value={perfil} onValueChange={trocarPerfil} className="flex-wrap">
+              {PERFIS.map((p) => (
+                <ToggleGroupItem key={p.valor} value={p.valor}>
+                  {p.rotulo}
+                </ToggleGroupItem>
+              ))}
+            </ToggleGroup>
+          </div>
+        )}
         <div className="flex flex-col gap-2">
           <p className="text-xs font-semibold text-muted-foreground uppercase">Estado das telas</p>
           <ToggleGroup

@@ -70,6 +70,8 @@ Lembretes para todos:
 
 ### B4. Login com Google real
 
+**Feito em 10/11/2026** pela IA com o Victor (branch `feat/login-google`), para destravar a semana 2. O Bernardo revisa o PR. Detalhes no [`andamento-fase-0.md`](andamento-fase-0.md).
+
 **O que fazer**
 - Com o Victor, ligar o provedor Google no `horas-dev` (passo a passo em "Login com Google (M5)" no [`andamento-fase-0.md`](andamento-fase-0.md)). O ID do cliente e a chave secreta estão com o Victor, que só acessa esses dados a partir de terça (03/11).
 - Os testes de login que já estão na sua máquina não estão no repositório: suba-os numa branch para o Victor revisar, seguindo esta tarefa.

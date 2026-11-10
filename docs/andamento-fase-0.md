@@ -1,23 +1,37 @@
 # Andamento da Fase 0
 
-Retrato de onde a Fase 0 parou (atualizado em 01/11/2026). Ao retomar com uma IA, peça para ela ler este arquivo e o [`fase-0.md`](fase-0.md). Quando a Fase 0 terminar, este arquivo pode ser apagado (antes, passe a seção "Ambientes" para o `arquitetura.md` ou o `README.md`).
+Retrato de onde a Fase 0 parou (atualizado em 10/11/2026). Ao retomar com uma IA, peça para ela ler este arquivo e o [`fase-0.md`](fase-0.md). Quando a Fase 0 terminar, este arquivo pode ser apagado (antes, passe a seção "Ambientes" para o `arquitetura.md` ou o `README.md`).
 
 ## Próxima sessão: comece por aqui
 
-Onde paramos (01/11/2026): o kickoff foi feito na reunião presencial de 30/10. As respostas do Victor estão no [`regras-de-negocio.md`](regras-de-negocio.md), o contrato está fechado no [`arquitetura.md`](arquitetura.md) e as funções falsas novas estão no código. O que sobrou para a Maria, diretora de RH, está no [`pauta-diretora-rh.md`](pauta-diretora-rh.md).
+Onde paramos (10/11/2026, semana 2): **o login com Google funciona de verdade no `horas-dev`.** O Victor entrou com a própria conta e caiu no painel do RH como `diretor_rh`. As regras estão fechadas no [`regras-de-negocio.md`](regras-de-negocio.md) (a diretora de RH já alinhou tudo), e as tarefas das semanas 2 a 4 estão em [`tarefas-semanas-2-a-4.md`](tarefas-semanas-2-a-4.md).
 
-### Próximos passos com a IA (depois da conversa com a diretora)
+### Feito em 10/11/2026 (Claude Code com o Victor)
 
-1. Passar as respostas da diretora para o `regras-de-negocio.md` e ajustar o que mudar em `requerimentos` e `presenca_sede`.
-2. Escrever as tarefas detalhadas das semanas 2, 3 e 4 no formato do [`tarefas-semana-1.md`](tarefas-semana-1.md).
+- Conexões conferidas: Supabase (`horas-dev` e `horas-prod`), Notion (Central Ejuvv) e Vercel (time ejuvv, projeto `astro-clock`, com acesso liberado ao time).
+- **Login real (B4)**, branch `feat/login-google`: `auth.ts` real, login falso movido para `auth-falso.ts` e ligado só com `VITE_LOGIN_FALSO=true`. A tela de login destrava o botão "Entrando..." quando a pessoa volta do Google pelo botão "voltar" do navegador.
+- Provedor Google ligado no `horas-dev` (M5) e e-mail provisório `troque.victor@ejuvv.com` trocado pelo do Victor no seed do banco.
+- Variável `VITE_LOGIN_FALSO=true` criada na Vercel (preview e production), para o site de protótipo continuar com a troca de perfil depois do merge.
+- Tarefas das semanas 2 a 4 escritas em [`tarefas-semanas-2-a-4.md`](tarefas-semanas-2-a-4.md). A semana 2 já estava no Notion; as semanas 3 e 4 ainda serão ajustadas pelo Victor antes de ir para o Notion.
+
+### Como está o `horas-dev` (10/11/2026)
+
+- Já existem `membros`, `setores`, `metas`, `registros`, `historico_setor` e `dispensas`, com RLS e as funções `meu_id`, `meu_perfil`, `meus_dados`, `eh_rh`, etc. Seed com 20 membros (5 perfis) e 115 registros.
+- **Tudo foi criado pelo painel, sem migração:** `supabase/migrations/` está vazia. É a B6 do Bernardo.
+- `registros` ainda não tem regras de acesso, `metas` não aceita insert e `dispensas` precisa sair: é a B7 do Bernardo.
+
+### Próximos passos
+
+1. Victor abre o PR da `feat/login-google` (revisão do Bernardo, dono do login, e do Guilherme, dono do `TelaLogin.tsx`).
+2. Bernardo: B6 e B7 até 11/11. Sem elas, as telas continuam com dados falsos.
+3. Depois da B7: Guilherme e Johannes trocam as funções falsas pelas reais (G6 e J5).
+4. Victor decide o que adianta das semanas 3 e 4; depois disso, as tarefas vão para o Notion.
 
 ### Tarefas do Victor fora da IA
 
-- **M10:** convites no GitHub (write) e no Supabase (só o Bernardo, só "EJUVV Dev"), grupo do WhatsApp (equipe, Rodrigo e Maria), tarefas no Notion e envio dos documentos. A primeira reunião de quarta é em 04/11.
-- **M11:** checklist final, assim que chamar a equipe para o grupo.
-- **Diretora de RH:** repassar o [`pauta-diretora-rh.md`](pauta-diretora-rh.md). Não há mais perguntas urgentes: só falta a proposta de gráficos e relatórios, para depois do piloto.
-- **Rodrigo:** plano da Vercel, Hostinger e quem mexe no domínio `ejuvv.com`.
-- **Provedor Google no `horas-dev`:** o ID e a chave estão no notebook da EJUVV, acessível a partir de terça (03/11).
+- **V4:** convidar Guilherme e Johannes para a organização "EJUVV Dev" no Supabase (até 11/11).
+- **V5:** criar a conta do serviço de e-mail (recomendado: Resend) e alinhar com o Rodrigo quem mexe no domínio `ejuvv.com` (semana 3).
+- **Hospedagem:** decidido em 10/11/2026 que a produção fica na **Vercel** (a Hostinger fica como possibilidade para depois).
 - **Segredos:** o Victor optou por guardar o ID do cliente e a chave secreta do Google num bloco de notas no computador (a IA recomendou um gerenciador de senhas).
 
 ## Já feito (Claude Code)
@@ -55,7 +69,7 @@ Teste de clone limpo seguindo o README: 9 de 9 verificações OK no navegador, 0
 | M2 | `horas-dev` e `horas-prod` no Supabase | Feito (27/10). Ver "Ambientes" |
 | M3 | `.env.local` com URL e chave pública do `horas-dev` | Feito (27/10) |
 | M4 | Projeto e Client ID OAuth no Google Cloud (tipo Interno) | Feito (27/10). Ver "Ambientes" |
-| M5 | Provedor Google no Supabase dev | Semana 1, com o Bernardo. Ver "Login com Google (M5)" |
+| M5 | Provedor Google no Supabase dev | Feito (10/11), login testado com a conta do Victor. Ver "Login com Google (M5)" |
 | M6 | `git push` e CI passando no GitHub | Feito (27/10): CI verde |
 | M7 | Segredo `SUPABASE_PROD_DB_URL` e backup rodado uma vez | Feito (27/10): backup verde, artefato gerado |
 | M8 | Proteção da `main` | Decidido (27/10): sem proteção. Ver "Decisões tomadas" |
@@ -103,7 +117,15 @@ Para o Bernardo (semana 1):
 No `horas-dev` (o prod fica para antes do piloto):
 
 1. Authentication → Sign In / Providers → Google: ligar e colar o ID do cliente e a chave secreta.
-2. Authentication → URL Configuration: Site URL `http://localhost:5173`; Redirect URLs `http://localhost:5173/inicio`.
+2. Authentication → URL Configuration: Site URL `http://localhost:5173`; Redirect URLs `http://localhost:5173/inicio` e `https://*-ejuvv.vercel.app/inicio` (prévias da Vercel).
+3. Clicar em **Save** em cada tela. Para conferir: `<VITE_SUPABASE_URL>/auth/v1/settings` (com a chave pública no cabeçalho `apikey`) mostra `"google": true`.
+
+Feito no `horas-dev` em 10/11/2026. Erros que apareceram no caminho:
+
+- `Unsupported provider: provider is not enabled`: o Google ainda não estava ligado (ou faltou o Save).
+- "Acesso negado. Procure o RH." logo depois de escolher a conta: o login funcionou, mas o e-mail não está em `membros` (ou está com `ativo = false`).
+
+No `horas-prod` (semana 4, V7), repetir com a URL do site de produção no lugar do `localhost`.
 
 ### GitHub
 

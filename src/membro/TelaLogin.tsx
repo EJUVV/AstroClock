@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ClockIcon, MapPinIcon, TrophyIcon } from 'lucide-react'
 import { entrarComGoogle } from '@/compartilhado/api/auth'
 import LogoInfinito from '@/compartilhado/ui/LogoInfinito'
@@ -26,6 +26,16 @@ const DESTAQUES = [
 function TelaLogin() {
   const [erro, setErro] = useState<string | null>(null)
   const [entrando, setEntrando] = useState(false)
+
+  // Ao voltar do Google pelo botão "voltar", o navegador restaura a página como estava,
+  // com o botão travado em "Entrando...". Destrava quando a página volta assim.
+  useEffect(() => {
+    function aoVoltar(e: PageTransitionEvent) {
+      if (e.persisted) setEntrando(false)
+    }
+    window.addEventListener('pageshow', aoVoltar)
+    return () => window.removeEventListener('pageshow', aoVoltar)
+  }, [])
 
   function entrar() {
     setErro(null)

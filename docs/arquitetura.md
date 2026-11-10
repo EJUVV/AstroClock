@@ -45,6 +45,10 @@ Rotas protegidas usam um componente `RotaProtegida` que consulta `meuPerfil()`. 
 
 **Quem pode entrar:** o Google diz *quem* é a pessoa; a tabela `membros` diz *se* ela pode entrar e com qual perfil; o RLS garante isso dentro do banco. Uma conta Google não cadastrada consegue sessão, mas não vê nenhum dado.
 
+**Como está no código (desde 10/11/2026):** `src/compartilhado/api/auth.ts` é real. `meuPerfil()` lê a sessão e chama a função `meu_perfil()` do banco; `meusDados()` e `meuNome()` chamam `meus_dados()`. O login pede só contas `@ejuvv.com` (`hd: 'ejuvv.com'`) e sempre deixa escolher a conta. Enquanto as outras funções de `api/` forem falsas, `meuPerfil()` grava o perfil real em `localStorage.perfilFalso`, para os dados falsos combinarem com o painel em que a pessoa entrou.
+
+**Login de demonstração:** com `VITE_LOGIN_FALSO=true`, o `auth.ts` usa o `auth-falso.ts` (sem Google; perfil escolhido no botão de frasco). Serve só para o site de protótipo na Vercel. **Nunca no site de produção.**
+
 ## 4. Ambientes
 
 | | `horas-dev` | `horas-prod` |
@@ -61,7 +65,11 @@ Variáveis de ambiente do front (`.env.local`, nunca commitado):
 ```bash
 VITE_SUPABASE_URL=
 VITE_SUPABASE_ANON_KEY=
+VITE_MOSTRAR_DEMO=   # true: botão de frasco num site publicado (no npm run dev ele sempre aparece)
+VITE_LOGIN_FALSO=    # true: login de demonstração, sem Google
 ```
+
+Na Vercel (projeto `astro-clock`, time ejuvv), o site de protótipo usa `VITE_MOSTRAR_DEMO=true` e `VITE_LOGIN_FALSO=true` (criada em 10/11/2026). O site de produção do piloto terá as duas vazias e as chaves do `horas-prod`.
 
 ## 5. Esboço do banco
 
