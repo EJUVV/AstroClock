@@ -4,7 +4,7 @@ Fonte única das regras do sistema. Código, banco e telas seguem este documento
 
 Itens marcados com **[PENDENTE]** ainda não foram decididos. Itens marcados com **[FASE 2]** são regras decididas, mas que só serão implementadas depois do piloto (ver seção 14).
 
-Última revisão: 07/11/2026, com as regras da conversa com a diretora de RH (perfis de diretor e presidente, requerimento e anexo). As respostas anteriores dela são de 27/10/2026.
+Última revisão: 09/11/2026 (respostas do líder do projeto sobre férias, ranking, selos, presença e retenção). Antes, 07/11/2026, com as regras da conversa com a diretora de RH (perfis de diretor e presidente, requerimento e anexo). As respostas anteriores dela são de 27/10/2026.
 
 ## 1. Meta semanal
 
@@ -23,8 +23,8 @@ Itens marcados com **[PENDENTE]** ainda não foram decididos. Itens marcados com
 
 - O RH cadastra no sistema as datas de início e fim de cada período de férias.
 - Durante as férias, a meta é de **5h no total**, e **não há exigência de horas na sede** (as horas contam como remotas).
-- [PENDENTE] Se as datas de férias são cadastradas por qualquer pessoa do RH ou só pelo diretor do RH (as metas normais só o diretor altera).
-- [PENDENTE] Semana parcialmente em férias (ex.: as férias começam numa quarta): qual meta vale nessa semana.
+- **Só o diretor do RH** cadastra as datas de férias.
+- **Semana parcialmente em férias** (ex.: as férias começam numa quarta): vale a **meta de férias** na semana inteira. Respondido pelo líder do projeto em 09/11/2026.
 
 ### Férias durante o piloto
 
@@ -33,7 +33,7 @@ Decidido pelo líder do projeto em 28/10/2026 e confirmado em 01/11/2026, enquan
 - O **diretor do RH especifica, semana a semana, qual é a meta**: **5h no total e 0h na sede** a partir da semana em que as férias começam e, depois, 10h e 5h a partir da semana da volta. As duas mudanças podem ser programadas de uma vez, com antecedência.
 - Como toda alteração de meta, vale **para todos**.
 - Por isso, a meta de sede pode ser **0**.
-- As datas das férias deste fim de ano ainda serão definidas.
+- Férias deste fim de ano: **dezembro e janeiro**, por padrão. As datas podem ser ajustadas pelo diretor do RH.
 
 ## 2. Registros de horas
 
@@ -52,7 +52,7 @@ Decidido pelo líder do projeto em 28/10/2026 e confirmado em 01/11/2026, enquan
 - O membro pode **editar e cancelar** um registro até **7 dias depois de criá-lo** (a contagem começa no momento em que o registro foi feito).
 - O membro só pode **lançar** horas de até **7 dias atrás** (ex.: em 26/10, de 19/10 em diante). Para datas anteriores, procura o RH. Confirmado pela diretoria de RH em 27/10/2026.
 - Depois de 7 dias, **só o RH** pode alterar.
-- Quando o RH altera ou cancela um registro de outra pessoa, **o motivo é obrigatório**. O membro **não é avisado**.
+- Quando o RH altera ou cancela um registro de outra pessoa, **o motivo é obrigatório**. O membro **não é avisado** (confirmado em 09/11/2026).
 - O RH também pode **lançar horas para outro membro**, inclusive de mais de 7 dias atrás, com **motivo obrigatório**.
 - "RH" aqui são os perfis `rh` e `diretor_rh`. O `presidente` e o `diretor_setor` não lançam, alteram nem cancelam registros de outras pessoas.
 - Garantido no banco, não só na tela.
@@ -68,7 +68,7 @@ Decidido pelo líder do projeto em 28/10/2026 e confirmado em 01/11/2026, enquan
   - **aprovado** (o trabalho foi realmente feito): o registro passa a contar na meta;
   - **reprovado**: o registro é **cancelado**.
 - [PENDENTE] O limite de 10h será reavaliado no piloto.
-- [PENDENTE] Se o `presidente` e o `diretor_setor` (este, só no próprio setor) também podem revisar cronômetros. O protótipo permite.
+- O `presidente` e o `diretor_setor` (este, só no próprio setor) também revisam cronômetros. Respondido pelo líder do projeto em 09/11/2026.
 
 ## 5. Perfis e acesso
 
@@ -84,7 +84,7 @@ Definido com a diretora de RH em 07/11/2026.
 
 - Acessam o painel do RH: `rh`, `diretor_rh`, `diretor_setor` e `presidente`. Só o `membro` não acessa.
 - O painel do membro (registrar horas) é de quem tem meta: `membro` e `rh`.
-- **Cada setor tem no máximo um `diretor_setor`** ativo.
+- **Cada setor tem no máximo um diretor**: um `diretor_setor` por setor e um único `diretor_rh` (o diretor do setor RH). A EJ inteira tem **um único `presidente`**. Confirmado pelo líder do projeto em 09/11/2026.
 - **Login apenas com Google**, com contas `@ejuvv.com` (Google Workspace). Não há senha própria nem recuperação de senha. O login **fica salvo** no aparelho, para a pessoa não precisar entrar toda vez.
 - Só entra quem está **cadastrado e ativo** na tabela `membros`. Quem não está cadastrado vê "Acesso negado, procure o RH".
 - **Só o diretor do RH altera o perfil** de alguém.
@@ -94,14 +94,14 @@ Definido com a diretora de RH em 07/11/2026.
 
 ## 6. Membros e setores
 
-- Setores iniciais: **Projetos, Comercial, RH, Marketing, Gestão e Qualidade** (tabela editável pelo RH).
+- Setores iniciais: **Projetos, Comercial, RH, Marketing, Gestão e Qualidade** (tabela editável pelo diretor do RH e pelo presidente, como no protótipo; confirmado em 09/11/2026).
 - Cada membro pertence a **um setor**. Mudanças de setor ficam em histórico.
 - **Membro novo:** a meta começa a valer na **semana seguinte** ao cadastro.
 - **Membro desativado** (saiu da EJUVV):
   - não consegue mais entrar no sistema;
   - **não conta** na semana em que foi desativado nem nas seguintes;
   - mantém todo o histórico, que **só o RH** consegue ver.
-- [PENDENTE] Se esses dados ficam guardados para sempre ou são arquivados fora do sistema.
+- O histórico de quem saiu **fica no sistema**, a menos que comece a pesar no desempenho. Respondido pelo líder do projeto em 09/11/2026.
 
 ## 7. Requerimento de ausência
 
@@ -120,12 +120,12 @@ Substitui a antiga "dispensa de semana inteira registrada pelo RH".
 - **Só o diretor do RH aprova ou reprova** no sistema. Só requerimento aprovado muda a meta.
 - **Ninguém aprova o próprio requerimento.** Quem tem perfil `rh` abre requerimento como qualquer membro, e ele é respondido pelo diretor do RH.
 - A **reprovação exige um motivo**, que vai **por e-mail para o membro**.
-- **Na aprovação, o anexo é apagado** (pode ter dado de saúde). Na reprovação, ele continua guardado.
+- Na **aprovação**, o membro **também é avisado** por e-mail. Respondido pelo líder do projeto em 09/11/2026.
+- **Na aprovação, o anexo é apagado** (pode ter dado de saúde). Na reprovação, ele fica guardado por **um mês** e depois é apagado. Respondido pelo líder do projeto em 09/11/2026.
+- O anexo é **obrigatório em casos de saúde** ou parecidos (atestado, comprovante). O sistema não sabe sozinho o tipo do motivo: o formulário avisa, e o diretor do RH confere antes de aprovar. Respondido pelo líder do projeto em 09/11/2026.
 - O membro continua registrando horas normalmente.
 - A semana com ausência total aprovada **fica fora do cálculo do percentual** e **não conta como descumprimento**.
-- [PENDENTE] Se o membro também é avisado da aprovação, e como.
-- [PENDENTE] Se o RH também pode dispensar alguém direto, sem requerimento.
-- [PENDENTE] Se o anexo é obrigatório em algum caso, e por quanto tempo o anexo de um requerimento reprovado fica guardado.
+- O caminho para ser dispensado continua sendo **o requerimento**: o RH não registra dispensa direta. Respondido pelo líder do projeto em 09/11/2026.
 
 ## 8. Cálculos
 
@@ -158,7 +158,8 @@ Substitui a antiga "dispensa de semana inteira registrada pelo RH".
   - semana encerrada **sem a meta**: **vermelho**;
   - semana em andamento ainda sem a meta: um indicador de que **ainda não cumpriu**.
 - Barras de **quanto do tempo já passou**: do dia, da semana, do mês e do ano (em %), para o membro comparar com as próprias horas.
-- **Gráfico de barras** com as horas feitas por dia. [PENDENTE] Outros gráficos: há proposta em [`pauta-diretora-rh.md`](pauta-diretora-rh.md).
+- **Gráfico de barras** com as horas feitas por dia. [PENDENTE] Outros gráficos e o conteúdo dos relatórios: há proposta em [`pauta-diretora-rh.md`](pauta-diretora-rh.md), a definir depois.
+- No "% que bateu a meta de sede", quem está com requerimento "só remoto" aprovado **fica fora da conta**.
 
 ## 12. Ranking e selos
 
@@ -166,18 +167,18 @@ Substitui a antiga "dispensa de semana inteira registrada pelo RH".
 
 - Período: **mês**.
 - Ordem: **horas totais**; desempate por **horas na sede**; dispensados no fim.
-- [PENDENTE] Quem conta como "dispensado" no ranking de um mês: quem teve todas as semanas dispensadas ou pelo menos uma.
+- No ranking do mês, "dispensado" é quem teve **todas as semanas do mês** dispensadas.
 - **O RH** (`rh`, `diretor_rh`) e o `presidente` veem o ranking completo.
-- [PENDENTE] Se o `diretor_setor` vê o ranking do próprio setor.
+- O `diretor_setor` vê o ranking do **próprio setor**. Respondido pelo líder do projeto em 09/11/2026.
 - **O membro** vê só a **própria posição**, em relação a toda a EJ e em relação ao seu setor.
 
 ### Selos [FASE 2]
 
-- O membro ganha selos ao atingir marcos de horas, por exemplo **50, 100, 200 e 400 horas**.
-- As horas contam **desde a entrada na EJUVV** (não zeram na virada do ano). Todas as horas contam; alguns selos podem ser só de horas na sede.
+- O membro ganha selos ao atingir **50, 100, 200 e 400 horas**.
+- As horas contam **desde a entrada na EJUVV** (não zeram na virada do ano). Os selos são de **horas totais** (sede + online).
 - Os selos aparecem junto da foto de perfil e são **visíveis para todos**.
 - A foto é a da conta Google, e **a pessoa pode trocá-la no sistema**.
-- [PENDENTE] A lista definitiva de selos (50, 100, 200 e 400h ou só 100, 200 e 400h), quais são só de horas na sede e onde os membros veem os selos dos outros.
+- Os outros membros veem os selos **no perfil** da pessoa e numa marca junto ao nome, no ranking e na lista de quem está na sede. Respondido pelo líder do projeto em 09/11/2026.
 
 ## 13. Presença na sede em tempo real
 
@@ -185,7 +186,7 @@ Substitui a antiga "dispensa de semana inteira registrada pelo RH".
 - O membro **desmarca** quando sai. Se esquecer, **o sistema desmarca sozinho**.
 - **Todos os membros** veem quem está na sede no momento, com nome e setor.
 - Lembrete: se a pessoa lançar horas e ainda estiver marcada como "na sede", o sistema lembra de desmarcar.
-- [PENDENTE] A que horas o sistema desmarca sozinho (sugestão: à meia-noite).
+- O sistema desmarca sozinho **à meia-noite** (horário de Brasília).
 
 ## 14. Escopo do piloto
 
@@ -214,7 +215,8 @@ Escopo decidido pelo líder do projeto em 27/10/2026. Prioridades e cronograma e
 - Na troca de gestão, os dados são **arquivados**.
 - Os dados de anos anteriores ficam guardados para análise, sem pesar nas métricas do ano atual. A ideia é poder exportar os dados de cada ano.
 - Anexos de requerimento podem conter dados de saúde. Ficam em armazenamento privado, com acesso só de quem enviou, do RH e do presidente, e **são apagados quando o requerimento é aprovado**.
-- [PENDENTE] Prazo de retenção: a diretora citou 1 ano e 6 meses, mas falta definir a partir de quando conta e o que acontece depois (os dados não devem ser simplesmente apagados).
+- Prazo de retenção: **1 ano e 6 meses, contados a partir do primeiro registro**. Depois disso, os dados ficam **escondidos** no sistema, com a possibilidade de exportar e retirar. Respondido pelo líder do projeto em 09/11/2026.
+- [PENDENTE] Os detalhes de como esconder, exportar e retirar os dados depois do prazo.
 
 ## Pendências gerais
 

@@ -72,6 +72,8 @@ Relatório semanal automático com nota; cadastro de períodos de férias, feria
 
 ## 5. Plano por semana
 
+**Atualizado em 09/11/2026:** as telas de Guilherme e Johannes das semanas 1 a 4 ficaram prontas no protótipo (com dados falsos) até 07/11. Para tirar carga do Bernardo, a partir da semana 2 **Guilherme e Johannes trocam as funções falsas pelas reais** das telas que fizeram, e assumem o e-mail e o anexo. O Bernardo fica com o núcleo do banco: tabelas, RLS, cálculos em SQL, login real, tarefas automáticas e produção. As tabelas abaixo já mostram essa divisão. Tarefas e prazos atualizados ficam no Notion.
+
 Cada semana lista o que cada pessoa entrega. As tarefas detalhadas (formato do [`tarefas-semana-1.md`](tarefas-semana-1.md)) das semanas 2, 3 e 4 são escritas depois da conversa com a diretora de RH, porque o requerimento e a presença ainda têm perguntas abertas.
 
 ### Semana 1 (03/11 a 06/11) — Base
@@ -91,10 +93,10 @@ Tarefas detalhadas em [`tarefas-semana-1.md`](tarefas-semana-1.md).
 
 | Pessoa | Entrega |
 | --- | --- |
-| Bernardo | RLS de `registros`, `metas` e `setores`; prazos de 7 dias e sobreposição no banco; funções reais de registros, cronômetro (com encerramento após 10h), metas e membros; migrações de `requerimentos` e `presenca_sede` |
-| Guilherme | Formulário de registro manual (com o aviso "Não registre reuniões e eventos."), lista de registros da semana com editar e cancelar, cronômetro na tela |
-| Johannes | Cadastro, lista e desativação de membros; alterar perfil e metas (só `diretor_rh`) |
-| Victor | Site de desenvolvimento no ar na Vercel; revisar PRs |
+| Bernardo | Banco do `horas-dev` em migração e no GitHub; RLS de `registros`, `metas` e `setores`; prazos de 7 dias e sobreposição no banco; migrações de `requerimentos` e `presenca_sede` |
+| Guilherme | Registro que passa da meia-noite; trocar as falsas de `registros.ts` e `cronometro.ts` pelas reais |
+| Johannes | Tela de mudar setor; trocar as falsas de `membros.ts` e das metas pelas reais; Storage privado do anexo |
+| Victor | Convidar Guilherme e Johannes para o Supabase dev; validar o protótipo com o RH; PWA instalável; revisar PRs |
 
 **Meta até 13/11:** registrar horas manualmente e pelo cronômetro, com dados reais no `horas-dev`.
 
@@ -104,10 +106,10 @@ Semana com feriado na sexta.
 
 | Pessoa | Entrega |
 | --- | --- |
-| Bernardo | Cálculo semanal no banco (progresso, percentual, resumo, abaixo da meta, 2+ semanas seguidas); revisão de cronômetro; requerimentos reais |
-| Guilherme | Painel do membro: barras sede e total, indicador de meta, barras de tempo, resumo, grade de semanas do mês, histórico; formulário de requerimento |
-| Johannes | Painel do RH: % de cumprimento, quem ficou abaixo, destaque 2+ semanas, detalhe por membro (editar e cancelar com motivo), requerimentos (aprovar e reprovar), revisão de cronômetros |
-| Victor | Validação com o RH (até 19/11) |
+| Bernardo | Cálculo semanal no banco (progresso, percentual, resumo, abaixo da meta, 2+ semanas seguidas, médias); cronômetro que encerra sozinho após 10h; tabela de requerimentos |
+| Guilherme | Requerimento do membro real; e-mail do requerimento (função no Supabase) |
+| Johannes | Requerimentos e revisão de cronômetros do RH reais; `linkDoAnexo` real; anexo apagado na aprovação |
+| Victor | Configurar o serviço de e-mail (conta e domínio `ejuvv.com`); ajustes pedidos pelo RH |
 
 **Meta até 19/11, validada com o RH:** uma semana inteira de horas aparecendo no painel do membro e no do RH.
 
@@ -117,9 +119,9 @@ Semana com feriado na sexta.
 
 | Pessoa | Entrega |
 | --- | --- |
-| Bernardo | Ranking mensal no banco; presença na sede real (atualizando em tempo real e desmarcando sozinho); e-mail do requerimento; anexo com armazenamento privado e backup; migrações aplicadas no `horas-prod` |
-| Guilherme | Gráfico de horas por dia, posição no ranking, botão "estou na sede" com lista de quem está e o lembrete de desmarcar, campo de anexo no requerimento, PWA básico |
-| Johannes | Ranking completo no painel do RH, quem está na sede no painel do RH, abrir o anexo do requerimento |
+| Bernardo | Ranking mensal no banco; presença que desmarca sozinha; migrações aplicadas no `horas-prod` |
+| Guilherme | Presença na sede em tempo real na tela |
+| Johannes | Anexos incluídos no backup diário |
 | Victor | Produção: hospedagem, login Google no `horas-prod` (passo M5 no prod), restaurar um backup no `horas-dev` com o Bernardo |
 
 **Meta até 27/11:** o piloto completo, já em produção.

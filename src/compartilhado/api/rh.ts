@@ -196,7 +196,7 @@ export async function listarRequerimentos(situacao?: SituacaoRequerimento): Prom
 }
 
 // Só o diretor do RH responde. A reprovação exige motivo, que vai no e-mail para o membro.
-// Na aprovação, o anexo é apagado (pode ter dado de saúde); na reprovação, continua guardado.
+// Na aprovação, o anexo é apagado (pode ter dado de saúde); na reprovação, fica guardado por um mês.
 export async function responderRequerimento(id: string, aprovar: boolean, motivo = ''): Promise<void> {
   await atraso()
   if (perfilFalso() !== 'diretor_rh') throw new Error('Só o diretor do RH aprova ou reprova requerimentos')

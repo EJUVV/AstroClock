@@ -121,7 +121,7 @@ function RequerimentosRH() {
       <p className="flex items-start gap-2 text-sm text-muted-foreground">
         <InfoIcon className="mt-0.5 size-4 shrink-0" />
         {podeResponder
-          ? 'O membro recebe um e-mail com a resposta. A reprovação pede um motivo, que vai no e-mail. Ao aprovar, o anexo é apagado.'
+          ? 'O membro recebe um e-mail com a resposta. A reprovação pede um motivo, que vai no e-mail. Ao aprovar, o anexo é apagado; se reprovar, ele fica guardado por um mês.'
           : 'Só o diretor do RH aprova ou reprova. Você pode acompanhar os pedidos aqui.'}
       </p>
       <Carregavel carga={carga} esqueleto={<Skeleton className="h-96 rounded-[24px]" />}>

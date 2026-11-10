@@ -34,7 +34,7 @@ src/
   rh/                  painel do RH (responsável: Johannes)
     paginas.ts         idem, para o painel do RH
   compartilhado/
-    api/               funções de dados — ÚNICO lugar que importa o supabase (donos: Bernardo e Victor)
+    api/               funções de dados — ÚNICO lugar que importa o supabase (Bernardo e Victor; a partir da semana 2, Guilherme e Johannes trocam as falsas pelas reais das próprias telas)
     ui/                componentes visuais usados pelos dois painéis (responsável: Johannes)
       shadcn/          componentes do shadcn/ui; ajuste aqui só o visual
     perfis.ts          o que cada perfil pode fazer na tela (a proteção real é o RLS)

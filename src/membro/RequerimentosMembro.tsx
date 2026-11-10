@@ -74,7 +74,7 @@ function RequerimentosMembro() {
         )}
       </Carregavel>
 
-      <p className="text-sm text-muted-foreground">Se o diretor do RH reprovar o seu pedido, você recebe um e-mail com o motivo.</p>
+      <p className="text-sm text-muted-foreground">Você recebe um e-mail quando o diretor do RH responder. Se ele reprovar, o e-mail traz o motivo.</p>
 
       {jaAbriu && (
         <Suspense fallback={null}>

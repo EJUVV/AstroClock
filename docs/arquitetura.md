@@ -245,7 +245,7 @@ export interface HorasDoDia {
 
 Semana com requerimento `so_remoto` aprovado: `metaSede` vem como 0 em `ProgressoSemana`. Semana com `ausencia_total` aprovado: `dispensada` vem como `true`.
 
-Funções (todas `async`; em erro, lançam `Error` com mensagem em português pronta para a tela):
+Funções (todas `async`; em erro, lançam `Error` com mensagem em português pronta para a tela). Quem troca a versão falsa pela real, a partir de 09/11/2026: Guilherme em `registros.ts`, `cronometro.ts`, `requerimentos.ts` (lado do membro) e `presenca.ts`; Johannes em `membros.ts` e `rh.ts`; Bernardo em `auth.ts` e nos cálculos de `progresso.ts` e `rh.ts` que dependem de SQL. Tabelas e RLS continuam só com o Bernardo:
 
 | Arquivo | Função | Retorno | Usada por | Vira real |
 | --- | --- | --- | --- | --- |
@@ -271,7 +271,7 @@ Funções (todas `async`; em erro, lançam `Error` com mensagem em português pr
 | `membros.ts` | `alterarPerfil(id: string, perfil: Perfil)` | `void` | Johannes | Semana 2 |
 | `membros.ts` | `listarSetores()` | `string[]` | Johannes | Semana 2 |
 | `membros.ts` | `alterarSetor(id: string, setor: string)` | `void` | Johannes | Semana 2 |
-| `rh.ts` | `registrarDispensa(dados: NovaDispensa)` | `void` | Johannes | Depende da diretora de RH (ver [`pauta-diretora-rh.md`](pauta-diretora-rh.md)); se o RH não puder dispensar direto, sai do contrato |
+| `rh.ts` | `registrarDispensa(dados: NovaDispensa)` | `void` | — | **Sai do contrato** (09/11/2026): o RH não dispensa direto, o caminho é o requerimento. A tabela `dispensas` do `horas-dev` também sai |
 | `rh.ts` | `metasAtuais()` | `Metas` | Johannes, Guilherme | Semana 2 |
 | `rh.ts` | `listarMetas()` | `Metas[]` | Johannes | Semana 2 |
 | `rh.ts` | `alterarMetas(horasTotal: number, horasSede: number, vigenteDesde: string)` | `void` | Johannes | Semana 2 |

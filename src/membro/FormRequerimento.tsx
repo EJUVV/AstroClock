@@ -200,7 +200,7 @@ export function FormRequerimento({
         </Field>
 
         <Field>
-          <FieldLabel htmlFor="req-anexo">Anexo (opcional)</FieldLabel>
+          <FieldLabel htmlFor="req-anexo">Anexo (obrigatório em casos de saúde)</FieldLabel>
           {anexo ? (
             <div className="flex items-center gap-3 rounded-full border bg-card py-1.5 pr-1.5 pl-4 text-sm">
               <PaperclipIcon className="size-4 text-muted-foreground" />
@@ -224,7 +224,7 @@ export function FormRequerimento({
             className="sr-only"
             onChange={(e) => setAnexo(e.target.files?.[0] ?? null)}
           />
-          <FieldDescription>PDF, JPG ou PNG, até 5 MB. Só você, o RH e a presidência conseguem abrir. O arquivo é apagado quando o pedido é aprovado.</FieldDescription>
+          <FieldDescription>PDF, JPG ou PNG, até 5 MB. Só você, o RH e a presidência conseguem abrir. O arquivo é apagado quando o pedido é aprovado, ou um mês depois de reprovado.</FieldDescription>
         </Field>
 
         {erros.geral && (
