@@ -109,7 +109,7 @@ Semana com feriado na sexta.
 | Bernardo | Cálculo semanal no banco (progresso, percentual, resumo, abaixo da meta, 2+ semanas seguidas, médias); cronômetro que encerra sozinho após 10h; tabela de requerimentos |
 | Guilherme | Requerimento do membro real; e-mail do requerimento (função no Supabase) |
 | Johannes | Requerimentos e revisão de cronômetros do RH reais; `linkDoAnexo` real; anexo apagado na aprovação |
-| Victor | Configurar o serviço de e-mail (conta e domínio `ejuvv.com`); ajustes pedidos pelo RH |
+| Victor | Conta `@ejuvv.com` que envia os e-mails, com senha de app (sem Resend); ajustes pedidos pelo RH |
 
 **Meta até 19/11, validada com o RH:** uma semana inteira de horas aparecendo no painel do membro e no do RH.
 
@@ -141,7 +141,7 @@ Coisas que não são tela nem banco, mas travam o piloto se ficarem para o fim:
 | --- | --- | --- |
 | Conversa com a diretora de RH ([`pauta-diretora-rh.md`](pauta-diretora-rh.md)) | Até 06/11 | Aviso ao membro, dispensa direta e anexo ainda têm perguntas abertas |
 | Confirmar com o Rodrigo o plano da Vercel e o que fazer com a Hostinger | Feito (10/11): produção na **Vercel**; a Hostinger fica como possibilidade para depois | Site de desenvolvimento no ar na semana 2 |
-| Confirmar o serviço de e-mail (recomendado: Resend, plano grátis) e quem mexe no domínio `ejuvv.com` | Semana 2 | O Bernardo implementa na semana 4 |
+| Confirmar o serviço de e-mail | Feito (11/11): **Gmail da EJ** (conta `@ejuvv.com` com senha de app), sem Resend e sem depender do DNS | O Guilherme implementa na semana 3 (G8) |
 | Tarefas detalhadas das semanas 2, 3 e 4 | Feito (10/11): [`tarefas-semanas-2-a-4.md`](tarefas-semanas-2-a-4.md) | Com a IA, no formato da semana 1 |
 | Login Google no `horas-prod` | Semana 4 | Mesmo passo da M5, no prod, com a URL do site em produção |
 

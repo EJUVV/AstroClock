@@ -31,7 +31,8 @@ O login real já está na `main` (PR #3, juntado em 10/11/2026).
 ### Tarefas do Victor fora da IA
 
 - **V4:** convidar Guilherme e Johannes para a organização "EJUVV Dev" no Supabase (até 11/11).
-- **V5:** criar a conta do serviço de e-mail (recomendado: Resend) e alinhar com o Rodrigo quem mexe no domínio `ejuvv.com` (semana 3).
+- **V5:** criar a conta `@ejuvv.com` que envia os e-mails e a senha de app (semana 3). Decidido em 11/11/2026: e-mail pelo Gmail da EJ, sem Resend.
+- **Domínio:** o `ejuvv.com` continua ativo até 21/02/2027 (registro pela Tucows), mas o DNS ainda está na HostGator. Descobrir com o Rodrigo quem tem acesso e quem renova, porque o e-mail da EJ inteira depende disso.
 - **Hospedagem:** decidido em 10/11/2026 que a produção fica na **Vercel** (a Hostinger fica como possibilidade para depois).
 - **Segredos:** o Victor optou por guardar o ID do cliente e a chave secreta do Google num bloco de notas no computador (a IA recomendou um gerenciador de senhas).
 
