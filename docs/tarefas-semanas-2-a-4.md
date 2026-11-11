@@ -144,14 +144,18 @@ Semana curta: 20/11 (sexta) é feriado. Reunião em 18/11 e validação com o RH
   - ao enviar: para todos os membros ativos com perfil `rh` ou `diretor_rh`;
   - ao reprovar: para o membro, com o motivo;
   - ao aprovar: para o membro.
-- A chave do serviço de e-mail fica nos segredos do Supabase (`supabase secrets set`), **nunca no código**. O e-mail não leva o anexo.
+- **Envio pelo Gmail da EJ** (decidido em 11/11/2026): a função entra em `smtp.gmail.com`, **porta 465** (SSL; o Supabase bloqueia as portas 25 e 587), com a conta da V5 e a senha de app. Não usa Resend nem outro serviço.
+- A conta e a senha ficam só nos segredos do Supabase (`EMAIL_REMETENTE` e `EMAIL_SENHA_APP`, com `npx supabase secrets set`), **nunca no código** nem no `.env`. O e-mail não leva o anexo.
+- A função é chamada quando o requerimento é salvo ou respondido (combinar com o Bernardo se é pelo site ou por um gatilho no banco). Ela busca os destinatários no banco, não confia em e-mails mandados pelo site.
+- Se o envio falhar, o requerimento continua salvo; a falha aparece no log da função.
 
 **Como saber que terminou**
-- No `horas-dev`, enviar, aprovar e reprovar um requerimento gera os e-mails certos, para as pessoas certas.
+- No `horas-dev`, enviar, aprovar e reprovar um requerimento gera os e-mails certos, para as pessoas certas, saindo do endereço da V5.
+- Nenhuma senha aparece no código, no PR ou no log.
 - PR aprovado pelo Victor.
 
 **Depende de**
-- B8 e V5 (conta do serviço de e-mail). Pode começar com o envio para um e-mail de teste.
+- B8 e V5 (conta de envio). Pode começar mandando só para o próprio e-mail.
 
 ### Johannes (painel do RH)
 
@@ -186,17 +190,25 @@ Semana curta: 20/11 (sexta) é feriado. Reunião em 18/11 e validação com o RH
 
 ### Victor
 
-#### V5. Serviço de e-mail
+#### V5. Conta que envia os e-mails (Gmail da EJ)
+
+Decidido em 11/11/2026: os e-mails saem por uma conta `@ejuvv.com` do Google Workspace, sem Resend. Não depende de domínio novo nem do DNS (que ainda está na HostGator). Todos os destinatários são `@ejuvv.com`, então o e-mail não sai do Google e não cai no spam.
 
 **O que fazer**
-- Criar a conta do serviço de e-mail (recomendado: Resend, plano grátis) e configurar o envio pelo domínio `ejuvv.com`, com quem mexe no domínio (confirmar com o Rodrigo).
-- Passar a chave para o Guilherme cadastrar nos segredos do Supabase (nunca por mensagem aberta no grupo).
+- Criar no Google Workspace uma conta só para o sistema (ex.: `astroclock@ejuvv.com`), em vez de usar a conta pessoal de alguém.
+- Ligar a verificação em duas etapas nela (myaccount.google.com → Segurança). Se a opção não aparecer, o administrador do Workspace precisa permitir.
+- Criar uma senha de app em myaccount.google.com/apppasswords (nome "AstroClock"). O Google mostra a senha uma única vez.
+- Gravar no Supabase do `horas-dev`, ou passar ao Guilherme por um canal privado (nunca no grupo): `npx supabase secrets set EMAIL_REMETENTE=astroclock@ejuvv.com EMAIL_SENHA_APP=<senha>`.
+- Guardar a senha junto com os outros segredos da EJ e anotar para a próxima gestão: se a senha de app for revogada ou a conta trocar de senha, os e-mails param até gerar outra.
 
 **Como saber que terminou**
-- Um e-mail de teste sai de um endereço `@ejuvv.com` e chega sem cair no spam.
+- A senha de app existe e está nos segredos do Supabase do `horas-dev`.
+- Um e-mail de teste mandado pela G8 chega na caixa de um `@ejuvv.com`.
 
 **Depende de**
 - Nada.
+
+**Fica para depois (não trava o piloto):** descobrir com o Rodrigo quem ainda acessa o DNS do `ejuvv.com` na HostGator. O domínio vale até 21/02/2027 (registrado pela Tucows), e o e-mail da EJ inteira depende desse DNS. Se a conta da HostGator for encerrada, o DNS precisa ir para outro lugar antes.
 
 #### V6. Validação com o RH (até 19/11)
 
