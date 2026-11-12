@@ -57,7 +57,7 @@ Rotas protegidas usam um componente `RotaProtegida` que consulta `meuPerfil()`. 
 | Dados | Falsos (`supabase/seed.sql`) | Reais |
 | Quem mexe | Bernardo e Victor; Guilherme e Johannes a partir da semana 2 | Só o Victor (regra da equipe) |
 | Organização no Supabase | "EJUVV Dev" | "EJUVV Dev" (a mesma) |
-| Região | Leste dos EUA (`us-east-1`) | Oeste dos EUA (`us-west-2`) |
+| Região | Leste dos EUA (`us-east-1`) | São Paulo (`sa-east-1`), recriado em 11/11/2026 |
 
 **Decisão de 10/11/2026:** os dois projetos ficam na mesma organização, de propósito. Por isso, quem é convidado para a organização também **consegue** abrir a produção: não há bloqueio técnico. Aplicar migrações e mexer no `horas-prod` continua sendo só do Victor, por regra da equipe.
 
