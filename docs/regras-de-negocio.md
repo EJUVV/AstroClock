@@ -4,7 +4,7 @@ Fonte única das regras do sistema. Código, banco e telas seguem este documento
 
 Itens marcados com **[PENDENTE]** ainda não foram decididos. Itens marcados com **[FASE 2]** são regras decididas, mas que só serão implementadas depois do piloto (ver seção 14).
 
-Última revisão: 09/11/2026 (respostas do líder do projeto sobre férias, ranking, selos, presença e retenção). Antes, 07/11/2026, com as regras da conversa com a diretora de RH (perfis de diretor e presidente, requerimento e anexo). As respostas anteriores dela são de 27/10/2026.
+Última revisão: 12/11/2026 (líder do projeto, na revisão da B7: quem revisa cronômetro, quem lê a auditoria, fim do cronômetro e do registro manual). Antes, 09/11/2026 (respostas do líder do projeto sobre férias, ranking, selos, presença e retenção) e 07/11/2026, com as regras da conversa com a diretora de RH (perfis de diretor e presidente, requerimento e anexo). As respostas anteriores dela são de 27/10/2026.
 
 ## 1. Meta semanal
 
@@ -37,8 +37,8 @@ Decidido pelo líder do projeto em 28/10/2026 e confirmado em 01/11/2026, enquan
 ## 2. Registros de horas
 
 - Duas formas de registrar:
-  - **Manual:** sempre com **horário de início e de fim** (não existe registro só pela duração).
-  - **Cronômetro:** iniciar e parar.
+  - **Manual:** sempre com **horário de início e de fim** (não existe registro só pela duração). O fim **não pode ser no futuro**. Decidido pelo líder do projeto em 12/11/2026.
+  - **Cronômetro:** iniciar e parar. O fim é sempre **o horário em que a pessoa clica em parar** (hora do servidor): não dá para escolher outro horário ao parar. Decidido pelo líder do projeto em 12/11/2026.
 - Cada registro tem: início, fim, local (`sede` ou `online`), **descrição obrigatória**, origem (`manual` ou `cronometro`).
 - Não há categorias nem duração mínima.
 - O formulário mostra o aviso fixo: **"Não registre reuniões e eventos."** É uma regra por acordo; o sistema não bloqueia.
@@ -54,6 +54,7 @@ Decidido pelo líder do projeto em 28/10/2026 e confirmado em 01/11/2026, enquan
 - Quando o RH altera ou cancela um registro de outra pessoa, **o motivo é obrigatório**. O membro **não é avisado** (confirmado em 09/11/2026).
 - O RH também pode **lançar horas para outro membro**, inclusive de mais de 7 dias atrás, com **motivo obrigatório**.
 - "RH" aqui são os perfis `rh` e `diretor_rh`. O `presidente` e o `diretor_setor` não lançam, alteram nem cancelam registros de outras pessoas.
+- Cada correção do RH (e cada revisão de cronômetro) fica guardada num **histórico (auditoria)**: quem fez, quando, o motivo, como estava antes e como ficou. Leem esse histórico: `rh`, `diretor_rh` e `presidente`. O membro e o `diretor_setor` não leem. Decidido pelo líder do projeto em 12/11/2026.
 - Garantido no banco, não só na tela.
 
 ## 4. Cronômetro
@@ -63,11 +64,11 @@ Decidido pelo líder do projeto em 28/10/2026 e confirmado em 01/11/2026, enquan
 - **Só um cronômetro ativo por membro.**
 - Encerra **sozinho após 10h** e o registro fica **sinalizado para revisão**.
 - Enquanto está em revisão, o registro **não conta na meta**.
-- **Qualquer pessoa do RH** pode revisar:
+- Quem do RH pode revisar: `rh`, `diretor_rh` e `presidente`:
   - **aprovado** (o trabalho foi realmente feito): o registro passa a contar na meta;
   - **reprovado**: o registro é **cancelado**.
 - [PENDENTE] O limite de 10h será reavaliado no piloto.
-- O `presidente` e o `diretor_setor` (este, só no próprio setor) também revisam cronômetros. Respondido pelo líder do projeto em 09/11/2026.
+- O `diretor_setor` **não revisa** cronômetros. Decidido pelo líder do projeto em 12/11/2026 (em 09/11 ele revisaria os do próprio setor; isso foi retirado).
 
 ## 5. Perfis e acesso
 
@@ -78,8 +79,8 @@ Definido com a diretora de RH em 07/11/2026.
 | `membro` | Sim | Registrar e ver as próprias horas e o próprio progresso |
 | `rh` | Sim | Tudo do membro + painel do RH: ver todos os membros, desativar membros e mudar de setor, ver requerimentos e anexos, revisar cronômetros, lançar, alterar e cancelar registros de outros membros (com motivo) |
 | `diretor_rh` | Não | Painel do RH com tudo do `rh` + **cadastrar membros**, **alterar perfis**, **alterar as metas**, **cadastrar as férias** e **responder requerimentos** |
-| `diretor_setor` | Não | Painel do RH **só com os membros do próprio setor**: acompanhar horas, metas e quem ficou abaixo. Não vê requerimentos nem anexos e não corrige registros |
-| `presidente` | Não | Painel do RH com **todos os membros**, inclusive requerimentos e anexos. Não corrige registros |
+| `diretor_setor` | Não | Painel do RH **só com os membros do próprio setor**: acompanhar horas, metas e quem ficou abaixo. Não vê requerimentos nem anexos, não corrige registros e não revisa cronômetros |
+| `presidente` | Não | Painel do RH com **todos os membros**, inclusive requerimentos e anexos. Revisa cronômetros e lê a auditoria. Não corrige registros |
 
 - Acessam o painel do RH: `rh`, `diretor_rh`, `diretor_setor` e `presidente`. Só o `membro` não acessa.
 - O painel do membro (registrar horas) é de quem tem meta: `membro` e `rh`.

@@ -28,8 +28,8 @@ As tarefas desta semana já estão no Notion (Quadro de Sprints, projeto AstroCl
 | Tarefa | Pessoa | Prazo | Situação em 10/11 |
 | --- | --- | --- | --- |
 | B4. Login com Google real | Feito pela IA com o Victor; Bernardo revisa o PR | 11/11 | Feito e testado; falta o PR |
-| B6. Banco do `horas-dev` em migração e no GitHub (`supabase db pull`, seed) | Bernardo | 11/11 | A fazer |
-| B7. Destravar `registros` e `metas` para o site (RLS de `registros`, `grant insert` em `metas`, remover `dispensas`, revogar `rls_auto_enable`) | Bernardo | 11/11 | A fazer |
+| B6. Banco do `horas-dev` em migração e no GitHub (`supabase db pull`, seed) | Bernardo | 11/11 | Na `main` em 12/11 (sem PR); falta o `migration repair` no `horas-dev` |
+| B7. Destravar `registros` e `metas` para o site (RLS de `registros`, `grant insert` em `metas`, remover `dispensas`, revogar `rls_auto_enable`) | Bernardo | 11/11 | Na `main` e aplicada no `horas-dev` em 12/11 (sem PR); revisada pelo Victor, faltam 5 correções |
 | G5. Registro que passa da meia-noite | Guilherme | 15/11 | A fazer |
 | G6. Funções reais de `registros.ts` e `cronometro.ts` | Guilherme | 15/11 | A fazer |
 | J4. Tela de mudar o setor de um membro | Johannes | 15/11 | Feito |
@@ -97,7 +97,7 @@ Semana curta: 20/11 (sexta) é feriado. Reunião em 18/11 e validação com o RH
 **O que fazer**
 - Decidir e implementar o mecanismo: tarefa agendada no banco (`pg_cron`) ou cálculo na leitura (risco anotado na seção 9 do `planejamento-novembro.md`).
 - O registro encerrado sozinho fica com `precisa_revisao = true` e não conta na meta até ser revisado (seção 4 do `regras-de-negocio.md`).
-- RLS da revisão: `rh`, `diretor_rh` e `presidente` revisam qualquer um; o `diretor_setor`, só os do próprio setor. Reprovado = cancelado.
+- RLS da revisão: `rh`, `diretor_rh` e `presidente` revisam qualquer um; o `diretor_setor` não revisa (decidido em 12/11/2026). Reprovado = cancelado. A função `revisar_cronometro` já existe desde a B7.
 
 **Como saber que terminou**
 - Um cronômetro iniciado há mais de 10h aparece encerrado e em revisão, mesmo sem ninguém abrir o site.
@@ -110,7 +110,7 @@ Semana curta: 20/11 (sexta) é feriado. Reunião em 18/11 e validação com o RH
 
 **O que fazer**
 - Permitir que `rh` e `diretor_rh` lancem, alterem e cancelem registros de outro membro, inclusive com mais de 7 dias, sempre com **motivo obrigatório** (seção 3 do `regras-de-negocio.md`). O membro não é avisado.
-- Guardar o motivo e o antes e depois em `auditoria` (esboço na seção 5 do `arquitetura.md`). Só o RH lê a auditoria.
+- Guardar o motivo e o antes e depois em `auditoria` (esboço na seção 5 do `arquitetura.md`). Leem a auditoria: `rh`, `diretor_rh` e `presidente` (decidido em 12/11/2026). A B7 já criou a tabela e as funções; falta conferir com o front.
 - O `presidente` e o `diretor_setor` não corrigem registros.
 
 **Como saber que terminou**
