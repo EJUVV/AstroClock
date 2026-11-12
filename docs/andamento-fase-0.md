@@ -4,14 +4,23 @@ Retrato de onde a Fase 0 parou (atualizado em 12/11/2026). Ao retomar com uma IA
 
 ## Próxima sessão: comece por aqui
 
-Onde paramos (12/11/2026, semana 2): **as migrações da B6 e da B7 chegaram na `main`, mas ainda não foram revisadas nem aplicadas no `horas-dev`.** O login com Google funciona de verdade no `horas-dev` desde 10/11. As regras estão fechadas no [`regras-de-negocio.md`](regras-de-negocio.md), e as tarefas das semanas 2 a 4 estão em [`tarefas-semanas-2-a-4.md`](tarefas-semanas-2-a-4.md).
+Onde paramos (12/11/2026, semana 2): **a B6 e a B7 estão na `main` e a B7 já roda no `horas-dev`.** O Victor revisou e pediu 5 correções ao Bernardo (lista abaixo). O login com Google funciona de verdade no `horas-dev` desde 10/11. As regras estão fechadas no [`regras-de-negocio.md`](regras-de-negocio.md), e as tarefas das semanas 2 a 4 estão em [`tarefas-semanas-2-a-4.md`](tarefas-semanas-2-a-4.md).
 
 ### Feito em 11 e 12/11/2026
 
 - **E-mail pelo Gmail da EJ, sem Resend** (PR #4, 11/11): V5 e G8 reescritas em [`tarefas-semanas-2-a-4.md`](tarefas-semanas-2-a-4.md).
 - **`horas-prod` recriado em São Paulo** (PR #5, 11/11, juntado em 12/11): ref `gzjmavrrkqfqtqjycdnq`, ainda vazio. Ver a seção "Ambientes".
 - **Bernardo subiu B6 e B7** (commit `6d90a69`, 12/11 às 17:55): 6 arquivos em `supabase/migrations/`, `supabase/seed.sql` e `supabase/testes/teste.sql`. A B7 (`20261112170000_regras_de_registros.sql`) cria as regras de `registros`, a tabela `auditoria`, `meu_setor_id()`, libera o insert em `metas` e `setores` e apaga `dispensas`.
-  - **Atenção:** o commit foi direto na `main`, pelo "Add files via upload" do GitHub, sem PR. O [`CONTRIBUTING.md`](../CONTRIBUTING.md) proíbe commit direto na `main` e pede aprovação do Victor para tudo que mexe em `supabase/migrations/` ou RLS.
+  - **Atenção:** o commit foi direto na `main` por engano: no "Add files via upload" do GitHub, o destino padrão é a `main`, e a branch `db/migracoes` (criada por ele, ainda vazia) não foi escolhida. O [`CONTRIBUTING.md`](../CONTRIBUTING.md) proíbe commit direto na `main` e pede aprovação do Victor para tudo que mexe em `supabase/migrations/` ou RLS.
+  - Depois do commit, ele rodou a B7 à mão (SQL Editor) no `horas-dev`.
+- **Revisão da B6 e da B7 pelo Victor** (12/11): estrutura boa, prazos de 7 dias e regras do cronômetro batendo com o `regras-de-negocio.md`. Decisões novas de regra, já passadas para o `regras-de-negocio.md`: o `presidente` revisa cronômetro e lê a auditoria; o `diretor_setor` não revisa; o fim do cronômetro é sempre a hora em que a pessoa clica em parar; o registro manual não termina no futuro.
+- **Correções pedidas ao Bernardo** (migração nova na `db/migracoes`, com PR):
+  1. `revisar_cronometro`: liberar também para o `presidente` (hoje só `rh` e `diretor_rh`).
+  2. Parar o cronômetro pelo site: o banco grava `fim = now()`, ignorando o horário mandado.
+  3. Registro manual: o fim não pode ser no futuro (no lançamento e na edição pelo site).
+  4. `setores`: voltar o grant de insert e update só para `nome` e `ativo`.
+  5. Atualizar a `supabase/testes/teste.sql` com esses casos.
+  - A auditoria lida pelo `presidente` fica como está (já é o que a B7 faz).
 
 ### Feito em 10/11/2026 (Claude Code com o Victor)
 
@@ -21,18 +30,17 @@ Onde paramos (12/11/2026, semana 2): **as migrações da B6 e da B7 chegaram na 
 - Variável `VITE_LOGIN_FALSO=true` criada na Vercel (preview e production), para o site de protótipo continuar com a troca de perfil depois do merge.
 - Tarefas das semanas 2 a 4 escritas em [`tarefas-semanas-2-a-4.md`](tarefas-semanas-2-a-4.md). A semana 2 já estava no Notion; as semanas 3 e 4 ainda serão ajustadas pelo Victor antes de ir para o Notion.
 
-### Como está o `horas-dev` (conferido em 12/11/2026, antes do commit do Bernardo)
+### Como está o `horas-dev` (conferido em 12/11/2026, depois da B7)
 
-- Já existem `membros`, `setores`, `metas`, `registros`, `historico_setor` e `dispensas`, com RLS e as funções `meu_id`, `meu_perfil`, `meus_dados`, `eh_rh`, etc. Seed com 20 membros (5 perfis) e 115 registros.
-- **O histórico de migrações do banco está vazio:** tudo foi criado pelo painel. Os arquivos da B6 estão no repositório, mas o banco não sabe que eles já "rodaram".
-- `registros` continua **sem nenhuma regra de acesso** e `dispensas` ainda existe: a B7 não foi aplicada.
-- `metas` já tem a regra "só o diretor do RH cria" (feita pelo painel).
+- Tabelas: `membros`, `setores`, `metas`, `registros`, `historico_setor` e `auditoria` (a `dispensas` saiu). Todas com RLS; `registros` com leitura por perfil e escrita só nos próprios. Seed com 20 membros (5 perfis) e 115 registros.
+- Funções do RH para corrigir registros e revisar cronômetros já existem (ver `arquitetura.md`, seção 5).
+- **O histórico de migrações do banco está vazio:** tudo foi rodado à mão. Antes de qualquer migração nova, rodar no `horas-dev`: `npx supabase migration repair --status applied 20261106160000 20261106160100 20261108150000 20261108150100 20261109160000 20261112170000`.
 
 ### Próximos passos
 
-1. **Victor revisa o commit `6d90a69`** como se fosse um PR: migrações, RLS e testes. Combinar com o Bernardo que, daqui em diante, entra por branch e PR.
-2. Aplicar a B7 no `horas-dev` (só no dev) e rodar `supabase/testes/teste.sql`. Antes, marcar as migrações da B6 como já aplicadas, para não tentar criar as tabelas de novo.
-3. Depois da B7 aplicada: Guilherme e Johannes trocam as funções falsas pelas reais (G6 e J5).
+1. **Victor** roda a `supabase/testes/teste.sql` no SQL Editor do `horas-dev` (desfaz tudo no fim). Tem que terminar com "OK: todos os testes passaram".
+2. **Bernardo**: `migration repair` no `horas-dev` e as 5 correções acima, numa migração nova na `db/migracoes`, com PR. Combinado: daqui em diante, migração só pelo CLI e por PR, e só aplica no dev depois de aprovada.
+3. **Guilherme e Johannes já podem começar** a trocar as funções falsas pelas reais (G6 e J5): a B7 está no `horas-dev`, e as correções não mudam o que o site chama.
 4. Victor decide o que adianta das semanas 3 e 4; depois disso, as tarefas vão para o Notion.
 
 ### Tarefas do Victor fora da IA

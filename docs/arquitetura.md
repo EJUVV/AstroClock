@@ -87,7 +87,7 @@ Esboço inicial, refinado pelo Bernardo na semana 1. Nomes em snake_case.
 | `requerimentos` | `id`, `membro_id`, `tipo` (`so_remoto`/`ausencia_total`), `data_inicio`, `data_fim`, `motivo`, `situacao` (`pendente`/`aprovado`/`reprovado`), `anexo_caminho`, `anexo_nome`, `motivo_resposta`, `criado_em`, `respondido_por`, `respondido_em` | Os próprios (e cria) | `rh`, `diretor_rh` e `presidente` veem todos; só `diretor_rh` responde. O `diretor_setor` não vê |
 | `presenca_sede` | `id`, `membro_id`, `entrada`, `saida` (null = está na sede agora) | Quem está na sede agora (só o nome); marca e desmarca só a própria | Todas |
 | `historico_setor` | `id`, `membro_id`, `setor_anterior_id`, `setor_novo_id`, `alterado_em`, `alterado_por` (o banco grava sozinho quando `membros.setor_id` muda; o site só lê) | O próprio | `rh`, `diretor_rh` e `presidente` |
-| `auditoria` | `id`, `tabela`, `registro_id`, `acao`, `quem`, `quando`, `antes`, `depois` | Não | Todas |
+| `auditoria` | `id`, `tabela`, `registro_id`, `acao`, `quem`, `quando`, `motivo`, `antes`, `depois` (só as funções do banco gravam) | Não | `rh`, `diretor_rh` e `presidente` leem. O `diretor_setor` não |
 
 **Requerimento de ausência** (seção 7 do `regras-de-negocio.md`): substitui a antiga tabela `dispensas`. Só requerimento `aprovado` muda a meta: `so_remoto` zera a exigência de sede; `ausencia_total` dispensa a semana. Vale para **todas as semanas que as datas tocam, inteiras**, da segunda de `data_inicio` à segunda de `data_fim`. O e-mail vai para todos os membros ativos com perfil `rh` ou `diretor_rh`. Só o `diretor_rh` responde. A reprovação grava `motivo_resposta` e manda e-mail ao membro. A aprovação **apaga o anexo** do Storage e limpa `anexo_caminho`. Ainda depende da diretora de RH ([`pauta-diretora-rh.md`](pauta-diretora-rh.md)): aviso ao membro na aprovação e dispensa direta pelo RH.
 
@@ -105,11 +105,14 @@ Funções auxiliares que já existem no `horas-dev` (conferido em 10/11/2026), t
 | `eh_rh()` | Se o perfil é `rh` ou `diretor_rh` |
 | `eh_diretor_rh()` | Se o perfil é `diretor_rh` |
 | `ve_tudo()` | Se o perfil é `rh`, `diretor_rh` ou `presidente` (veem a EJ toda) |
-| `setor_que_dirijo()` | O setor do `diretor_setor` logado (no plano, se chamava `meu_setor_id`) |
+| `setor_que_dirijo()` | O setor do `diretor_setor` logado (null para os outros perfis) |
+| `meu_setor_id()` | O setor de quem está logado, qualquer perfil (criada na B7) |
 | `perfil_tem_meta(perfil)` | Se o perfil tem meta (`membro` e `rh`) |
 | `elegivel_na_semana(...)` | Se o membro conta na meta daquela semana |
 
-Também existe a visão `lista_de_metas`, para ler o histórico de metas. A tabela `dispensas` ainda existe no `horas-dev`, mas sai na B7.
+Também existe a visão `lista_de_metas`, para ler o histórico de metas. A tabela `dispensas` foi removida na B7 (12/11/2026).
+
+Funções do RH criadas na B7, chamadas pelo site com `supabase.rpc(...)`. Só `rh` e `diretor_rh` (motivo obrigatório; cada chamada grava na `auditoria`): `criar_registro_de_membro`, `editar_registro_de_membro` e `cancelar_registro_de_membro`. A `revisar_cronometro(id, aprovar, motivo?)` vale para `rh`, `diretor_rh` e `presidente` (a liberação do `presidente` é uma correção pedida na revisão de 12/11/2026).
 
 **Perfis no RLS** (seção 5 do `regras-de-negocio.md`):
 
