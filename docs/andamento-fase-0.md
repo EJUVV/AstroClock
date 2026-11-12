@@ -85,15 +85,15 @@ Nada desta seção é segredo. Senhas, chaves secretas e connection strings fica
 
 ### Supabase
 
-Os dois projetos estão na conta `@ejuvv.com` da diretoria de projetos, plano gratuito, **na mesma organização** (decisão de 10/11/2026). Regiões, conferidas em 10/11/2026: `horas-dev` no leste dos EUA (`us-east-1`) e `horas-prod` no oeste dos EUA (`us-west-2`).
+Os dois projetos estão na conta `@ejuvv.com` da diretoria de projetos, plano gratuito, **na mesma organização** (decisão de 10/11/2026). Regiões: `horas-dev` no leste dos EUA (`us-east-1`) e `horas-prod` em **São Paulo** (`sa-east-1`). O `horas-prod` foi recriado em São Paulo em 11/11/2026, ainda vazio, para ficar perto dos membros; o antigo (`zetjgqdagnlkodbexnoe`, oeste dos EUA) foi apagado.
 
 | | Dev | Prod |
 | --- | --- | --- |
 | Organização | EJUVV Dev | EJUVV Dev (a mesma) |
 | Projeto | `horas-dev` | `horas-prod` |
-| Ref | `cwvnzzqpqohvqjzigalu` | `zetjgqdagnlkodbexnoe` |
-| URL da API | `https://cwvnzzqpqohvqjzigalu.supabase.co` | `https://zetjgqdagnlkodbexnoe.supabase.co` |
-| Painel | [abrir](https://supabase.com/dashboard/project/cwvnzzqpqohvqjzigalu) | [abrir](https://supabase.com/dashboard/project/zetjgqdagnlkodbexnoe) |
+| Ref | `cwvnzzqpqohvqjzigalu` | `gzjmavrrkqfqtqjycdnq` |
+| URL da API | `https://cwvnzzqpqohvqjzigalu.supabase.co` | `https://gzjmavrrkqfqtqjycdnq.supabase.co` |
+| Painel | [abrir](https://supabase.com/dashboard/project/cwvnzzqpqohvqjzigalu) | [abrir](https://supabase.com/dashboard/project/gzjmavrrkqfqtqjycdnq) |
 | Bernardo | Convidar na M10 | Sem acesso |
 
 Opções usadas ao criar os dois: GitHub **não conectado**, Data API **ligada**, "Automatically expose new tables" **desligado**, RLS automático **ligado**.
@@ -111,7 +111,7 @@ Para o Bernardo (semana 1):
 - Tela de consentimento (Google Auth Platform): app "AstroClock", público **Interno** (só contas `@ejuvv.com` entram).
 - Cliente OAuth "AstroClock Supabase" (Aplicativo da Web), com os URIs de redirecionamento:
   - `https://cwvnzzqpqohvqjzigalu.supabase.co/auth/v1/callback`
-  - `https://zetjgqdagnlkodbexnoe.supabase.co/auth/v1/callback`
+  - `https://gzjmavrrkqfqtqjycdnq.supabase.co/auth/v1/callback` (prod em São Paulo; trocar no Google Cloud antes de ligar o login na produção)
 - O ID do cliente e a chave secreta estão no gerenciador de senhas.
 
 ### Login com Google (M5)
