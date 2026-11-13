@@ -21,6 +21,7 @@ import {
   calcularRanking,
   copia,
   dataEmBrasilia,
+  dividirNaMeiaNoite,
   membros,
   membroLogado,
   membrosElegiveis,
@@ -97,6 +98,7 @@ export async function editarRegistroDeMembro(id: string, dados: NovoRegistro, mo
   const registro = registroDeMembro(id)
   validarRegistro(registro.membroId, dados, id, 'deste membro')
   aplicarEdicao(registro, dados)
+  dividirNaMeiaNoite(registro)
   return copia(registro)
 }
 
@@ -133,6 +135,7 @@ export async function criarRegistroDeMembro(membroId: string, dados: NovoRegistr
     precisaRevisao: false,
   }
   registros.push(novo)
+  dividirNaMeiaNoite(novo)
   return copia(novo)
 }
 
