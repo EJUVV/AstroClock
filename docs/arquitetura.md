@@ -128,7 +128,7 @@ Só `membro` e `rh` têm registros de horas e requerimentos: os diretores e o pr
 
 Restrições previstas: exclusion constraint em `registros` contra sobreposição por `membro_id` (ignorando cancelados); índice único parcial garantindo um único registro com `fim is null` por membro; índice único parcial garantindo no máximo um `diretor_setor` ativo por `setor_id`.
 
-**Registro que passa da meia-noite:** vira duas linhas em `registros`, uma para cada dia. `criarRegistro()`, `editarRegistro()` e `pararCronometro()` devolvem a **primeira parte**, e a tela recarrega a lista depois de salvar. As funções falsas ainda não fazem a divisão.
+**Registro que passa da meia-noite:** vira duas linhas em `registros`, uma para cada dia. `criarRegistro()`, `editarRegistro()` e `pararCronometro()` devolvem a **primeira parte**, e a tela recarrega a lista depois de salvar. As funções falsas fazem a divisão pelo horário de Brasília (`dividirNaMeiaNoite`); cada parte vira um registro independente, editado ou cancelado sozinho.
 
 ## 6. Contrato das funções de dados
 
