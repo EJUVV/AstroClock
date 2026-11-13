@@ -1,5 +1,5 @@
 import { NavLink, Outlet } from 'react-router-dom'
-import { FileTextIcon, HouseIcon, LayoutDashboardIcon, ListIcon, LogOutIcon, MapPinIcon, SettingsIcon } from 'lucide-react'
+import { FileTextIcon, HouseIcon, LayoutDashboardIcon, ListIcon, LogOutIcon, MapPinIcon } from 'lucide-react'
 import { sair } from '@/compartilhado/api/auth'
 import { AvatarMembro } from '@/compartilhado/ui/AvatarMembro'
 import { LayoutPainel, type ItemMenu, type TituloPagina } from '@/compartilhado/ui/LayoutPainel'
@@ -7,7 +7,6 @@ import { LogoIcone } from '@/compartilhado/ui/Logo'
 import { useMinhaFoto } from '@/compartilhado/ui/preferencias'
 import { useSessao } from '@/compartilhado/ui/RotaProtegida'
 import { Button } from '@/compartilhado/ui/shadcn/button'
-import { SeletorTema } from '@/compartilhado/ui/tema'
 import { BotaoInstalarApp } from '@/compartilhado/ui/instalarApp'
 import { useEhDesktop } from '@/compartilhado/ui/useEhDesktop'
 import { cn } from '@/compartilhado/ui/utils'
@@ -49,17 +48,14 @@ function PainelMembroCelular({ nome, email, primeiroNome, ehRH }: { nome: string
   return (
     <div className="mx-auto flex min-h-svh w-full max-w-xl flex-col px-4 pt-4 pb-32 md:max-w-3xl md:px-6">
       <header className="flex items-center gap-3 pb-5">
-        <AvatarMembro nome={nome} foto={foto} className="size-11" />
-        <div className="min-w-0 flex-1">
-          <p className="text-xs text-muted-foreground">Bem-vindo de volta</p>
-          <p className="truncate text-lg font-bold">Olá, {primeiroNome}</p>
-        </div>
-        <SeletorTema className="hidden sm:inline-flex" />
-        <Button asChild variant="outline" size="icon">
-          <NavLink to="/membro/configuracoes" aria-label="Configurações">
-            <SettingsIcon />
-          </NavLink>
-        </Button>
+        {/* Clicar na foto abre as Configurações (foto, tema e fundo). */}
+        <NavLink to="/membro/configuracoes" aria-label="Abrir configurações" className="flex min-w-0 flex-1 items-center gap-3 rounded-full outline-none focus-visible:ring-3 focus-visible:ring-ring/50">
+          <AvatarMembro nome={nome} foto={foto} className="size-11" />
+          <div className="min-w-0 flex-1">
+            <p className="text-xs text-muted-foreground">Bem-vindo de volta</p>
+            <p className="truncate text-lg font-bold">Olá, {primeiroNome}</p>
+          </div>
+        </NavLink>
         <Button variant="outline" size="icon" aria-label="Sair" onClick={() => void sair()}>
           <LogOutIcon />
         </Button>
@@ -109,7 +105,7 @@ function PainelMembroCelular({ nome, email, primeiroNome, ehRH }: { nome: string
       <div className="mt-6 flex flex-col items-center gap-2 text-xs text-muted-foreground sm:hidden">
         <BotaoInstalarApp />
         <span className="flex items-center gap-2">
-          <LogoIcone className="size-5" /> AstroClock · <SeletorTema />
+          <LogoIcone className="size-5" /> AstroClock
         </span>
       </div>
     </div>
