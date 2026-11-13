@@ -25,6 +25,7 @@ function titulos(perfil: Perfil, eu: Membro): TituloPagina[] {
     { prefixo: '/rh/cronometros', titulo: 'Revisão de cronômetros', subtitulo: 'Cronômetros que pararam sozinhos após 10h.' },
     { prefixo: '/rh/ranking', titulo: 'Ranking mensal', subtitulo: 'Horas totais, com desempate pelas horas na sede.' },
     { prefixo: '/rh/metas', titulo: 'Metas', subtitulo: 'Meta semanal de horas, igual para todos.' },
+    { prefixo: '/rh/configuracoes', titulo: 'Configurações', subtitulo: 'Sua foto, aparência e preferências.' },
     { prefixo: '/rh/sede', titulo: 'Sede', subtitulo: 'Veja quem está lá agora e avise quando você chegar.' },
     { prefixo: '/rh', titulo: 'Visão geral', subtitulo: `Como ${alvo} está indo na meta semanal.` },
   ]

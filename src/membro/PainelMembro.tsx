@@ -1,9 +1,10 @@
 import { NavLink, Outlet } from 'react-router-dom'
-import { FileTextIcon, HouseIcon, LayoutDashboardIcon, ListIcon, LogOutIcon, MapPinIcon } from 'lucide-react'
+import { FileTextIcon, HouseIcon, LayoutDashboardIcon, ListIcon, LogOutIcon, MapPinIcon, SettingsIcon } from 'lucide-react'
 import { sair } from '@/compartilhado/api/auth'
 import { AvatarMembro } from '@/compartilhado/ui/AvatarMembro'
 import { LayoutPainel, type ItemMenu, type TituloPagina } from '@/compartilhado/ui/LayoutPainel'
 import { LogoIcone } from '@/compartilhado/ui/Logo'
+import { useMinhaFoto } from '@/compartilhado/ui/preferencias'
 import { useSessao } from '@/compartilhado/ui/RotaProtegida'
 import { Button } from '@/compartilhado/ui/shadcn/button'
 import { SeletorTema } from '@/compartilhado/ui/tema'
@@ -24,6 +25,7 @@ function PainelMembroDesktop({ primeiroNome, ehRH }: { primeiroNome: string; ehR
   const titulos: TituloPagina[] = [
     { prefixo: '/membro/registros', titulo: 'Registros', subtitulo: 'Suas horas, semana a semana.' },
     { prefixo: '/membro/requerimentos', titulo: 'Requerimentos', subtitulo: 'Peça para ficar só remoto ou ausente.' },
+    { prefixo: '/membro/configuracoes', titulo: 'Configurações', subtitulo: 'Sua foto, aparência e preferências.' },
     { prefixo: '/membro/sede', titulo: 'Sede', subtitulo: 'Veja quem está lá agora e avise quando você chegar.' },
     { prefixo: '/membro', titulo: `Olá, ${primeiroNome}`, subtitulo: 'Bem-vindo de volta. Veja como está sua semana.' },
   ]
@@ -42,16 +44,22 @@ function PainelMembroDesktop({ primeiroNome, ehRH }: { primeiroNome: string; ehR
 }
 
 // Celular: cabeçalho simples e barra inferior flutuante.
-function PainelMembroCelular({ nome, primeiroNome, ehRH }: { nome: string; primeiroNome: string; ehRH: boolean }) {
+function PainelMembroCelular({ nome, email, primeiroNome, ehRH }: { nome: string; email: string; primeiroNome: string; ehRH: boolean }) {
+  const foto = useMinhaFoto(email)
   return (
     <div className="mx-auto flex min-h-svh w-full max-w-xl flex-col px-4 pt-4 pb-32 md:max-w-3xl md:px-6">
       <header className="flex items-center gap-3 pb-5">
-        <AvatarMembro nome={nome} className="size-11" />
+        <AvatarMembro nome={nome} foto={foto} className="size-11" />
         <div className="min-w-0 flex-1">
           <p className="text-xs text-muted-foreground">Bem-vindo de volta</p>
           <p className="truncate text-lg font-bold">Olá, {primeiroNome}</p>
         </div>
         <SeletorTema className="hidden sm:inline-flex" />
+        <Button asChild variant="outline" size="icon">
+          <NavLink to="/membro/configuracoes" aria-label="Configurações">
+            <SettingsIcon />
+          </NavLink>
+        </Button>
         <Button variant="outline" size="icon" aria-label="Sair" onClick={() => void sair()}>
           <LogOutIcon />
         </Button>
@@ -119,7 +127,7 @@ function PainelMembro() {
       {ehDesktop ? (
         <PainelMembroDesktop primeiroNome={primeiroNome} ehRH={ehRH} />
       ) : (
-        <PainelMembroCelular nome={eu.nome} primeiroNome={primeiroNome} ehRH={ehRH} />
+        <PainelMembroCelular nome={eu.nome} email={eu.email} primeiroNome={primeiroNome} ehRH={ehRH} />
       )}
     </ProvedorPresenca>
   )

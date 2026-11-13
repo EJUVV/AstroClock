@@ -64,7 +64,7 @@
     --radius: 0.75rem;
     --background: #f4f2fd;
     --foreground: #1e1b39;
-    --card: #ffffff;
+    --card: rgb(255 255 255 / 0.72); /* translúcido: deixa o fundo de estrelas aparecer */
     --card-foreground: #1e1b39;
     --popover: #ffffff;
     --popover-foreground: #1e1b39;
@@ -94,7 +94,7 @@
     --chart-3: #5b3fd9;
     --chart-4: #16a34a;
     --chart-5: #dc2626;
-    --sidebar: #ffffff;
+    --sidebar: rgb(255 255 255 / 0.6);
     --sidebar-foreground: #1e1b39;
     --sidebar-primary: #7b5cf5;
     --sidebar-primary-foreground: #ffffff;
@@ -211,4 +211,10 @@ html.dark {
 .dark .cartao-roxo {
     background-image: linear-gradient(135deg, #5b21b6 0%, #3b138f 60%, #2a0f78 100%);
     box-shadow: 0 0 48px rgb(124 58 237 / 0.35), inset 0 1px 0 rgb(255 255 255 / 0.18);
+}
+
+/* Tema claro: cartões e sidebar translúcidos, com leve desfoque para o texto continuar legível sobre as estrelas. */
+:root:not(.dark) [data-slot="card"],
+:root:not(.dark) aside {
+    backdrop-filter: blur(8px);
 }

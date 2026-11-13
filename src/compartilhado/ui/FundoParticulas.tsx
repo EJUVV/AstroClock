@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import { useFundoAnimado } from '@/compartilhado/ui/preferencias'
 
 // Fundo de estrelas que descem devagar, riscos de luz que sobem e linhas que
 // ligam as estrelas perto do mouse. Fica atrás de todas as páginas.
@@ -17,8 +18,10 @@ function desenharEstrela(ctx: CanvasRenderingContext2D, x: number, y: number, r:
 
 export function FundoParticulas() {
   const ref = useRef<HTMLCanvasElement>(null)
+  const ligado = useFundoAnimado()
 
   useEffect(() => {
+    if (!ligado) return
     const canvas = ref.current
     const ctx = canvas?.getContext('2d')
     if (!canvas || !ctx) return
@@ -130,7 +133,8 @@ export function FundoParticulas() {
       window.removeEventListener('resize', redimensionar)
       window.removeEventListener('mousemove', aoMover)
     }
-  }, [])
+  }, [ligado])
 
+  if (!ligado) return null
   return <canvas ref={ref} aria-hidden="true" className="pointer-events-none fixed inset-0 -z-10 size-full" />
 }
