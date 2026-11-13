@@ -28,7 +28,7 @@ As tarefas desta semana já estão no Notion (Quadro de Sprints, projeto AstroCl
 | Tarefa | Pessoa | Prazo | Situação em 10/11 |
 | --- | --- | --- | --- |
 | B4. Login com Google real | Feito pela IA com o Victor; Bernardo revisa o PR | 11/11 | Feito e testado; falta o PR |
-| B6. Banco do `horas-dev` em migração e no GitHub (`supabase db pull`, seed) | Bernardo | 11/11 | Na `main` em 12/11 (sem PR); falta o `migration repair` no `horas-dev` |
+| B6. Banco do `horas-dev` em migração e no GitHub (`supabase db pull`, seed) | Bernardo | 11/11 | Feito: na `main` em 12/11 (sem PR); histórico de migrações do `horas-dev` acertado pelo Victor em 13/11 |
 | B7. Destravar `registros` e `metas` para o site (RLS de `registros`, `grant insert` em `metas`, remover `dispensas`, revogar `rls_auto_enable`) | Bernardo | 11/11 | Na `main` e aplicada no `horas-dev` em 12/11 (sem PR); revisada pelo Victor, faltam 5 correções |
 | G5. Registro que passa da meia-noite | Guilherme | 15/11 | A fazer |
 | G6. Funções reais de `registros.ts` e `cronometro.ts` | Guilherme | 15/11 | A fazer |

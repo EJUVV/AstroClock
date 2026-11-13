@@ -34,14 +34,16 @@ Onde paramos (12/11/2026, semana 2): **a B6 e a B7 estão na `main` e a B7 já r
 
 - Tabelas: `membros`, `setores`, `metas`, `registros`, `historico_setor` e `auditoria` (a `dispensas` saiu). Todas com RLS; `registros` com leitura por perfil e escrita só nos próprios. Seed com 20 membros (5 perfis) e 115 registros.
 - Funções do RH para corrigir registros e revisar cronômetros já existem (ver `arquitetura.md`, seção 5).
-- **O histórico de migrações do banco está vazio:** tudo foi rodado à mão. Antes de qualquer migração nova, rodar no `horas-dev`: `npx supabase migration repair --status applied 20261106160000 20261106160100 20261108150000 20261108150100 20261109160000 20261112170000`.
+- **Histórico de migrações em dia** (13/11/2026): o Victor rodou o `migration repair` no `horas-dev`, e as 6 migrações aparecem como aplicadas no `npx supabase migration list`. A próxima migração já pode ir pelo `npx supabase db push`.
+- **CLI:** use `--linked` nos comandos `migration list`, `migration repair` e `db push`. O CLI avisa que, na próxima versão grande (v3), esses comandos passam a mirar o banco local se o `--linked` não for passado. Este computador está na v2.122.0, ligado ao `horas-dev`.
 
 ### Próximos passos
 
-1. **Victor** roda a `supabase/testes/teste.sql` no SQL Editor do `horas-dev` (desfaz tudo no fim). Tem que terminar com "OK: todos os testes passaram".
-2. **Bernardo**: `migration repair` no `horas-dev` e as 5 correções acima, numa migração nova na `db/migracoes`, com PR. Combinado: daqui em diante, migração só pelo CLI e por PR, e só aplica no dev depois de aprovada.
-3. **Guilherme e Johannes já podem começar** a trocar as funções falsas pelas reais (G6 e J5): a B7 está no `horas-dev`, e as correções não mudam o que o site chama.
-4. Victor decide o que adianta das semanas 3 e 4; depois disso, as tarefas vão para o Notion.
+Feito em 13/11/2026: o Victor rodou a `supabase/testes/teste.sql` no `horas-dev` e **todos os testes passaram**. Guilherme e Johannes avisados de que podem começar a G6 e a J5.
+
+1. **Bernardo**: as 5 correções acima (o `migration repair` já foi feito pelo Victor em 13/11), numa migração nova na `db/migracoes`, com PR. Combinado: daqui em diante, migração só pelo CLI e por PR, e só aplica no dev depois de aprovada. O Victor revisa o PR com a IA.
+2. **Guilherme e Johannes**: G6 e J5 até 15/11 (funções falsas trocadas pelas reais). A meta da semana 2 ("registrar horas com dados reais no `horas-dev`") depende da G6. O Guilherme precisa transformar a branch `atualDev` num PR com nome no padrão do `CONTRIBUTING.md`.
+3. Victor decide o que adianta das semanas 3 e 4; depois disso, as tarefas vão para o Notion.
 
 ### Tarefas do Victor fora da IA
 
