@@ -39,6 +39,24 @@ export function instante(data: string, hora: string): string {
   return `${data}T${hora}:00-03:00`
 }
 
+// Divide um período nas meias-noites de Brasília: 23:00–02:00 vira 23:00–00:00 e 00:00–02:00.
+// Fim exatamente à meia-noite não divide. docs/regras-de-negocio.md, seção 2.
+export function partesPorDia(inicio: string, fim: string): { inicio: string; fim: string }[] {
+  const fimMs = Date.parse(fim)
+  if (Number.isNaN(Date.parse(inicio)) || Number.isNaN(fimMs)) throw new Error('Horário inválido')
+  const partes: { inicio: string; fim: string }[] = []
+  let atual = inicio
+  for (;;) {
+    const meiaNoite = instante(somarDias(dataEmBrasilia(atual), 1), '00:00')
+    if (fimMs <= Date.parse(meiaNoite)) {
+      partes.push({ inicio: atual, fim })
+      return partes
+    }
+    partes.push({ inicio: atual, fim: meiaNoite })
+    atual = meiaNoite
+  }
+}
+
 export function horaDe(iso: string): string {
   return formatoHora.format(new Date(iso))
 }

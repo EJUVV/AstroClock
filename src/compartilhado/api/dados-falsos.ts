@@ -419,6 +419,24 @@ export function validarRegistro(
   if (sobrepoe) throw new Error(`Este horário se sobrepõe a outro registro ${deQuem}`)
 }
 
+// Registro que passa da meia-noite (horário de Brasília) vira um registro por dia.
+// O registro recebido fica com a primeira parte; as outras são criadas.
+// Fim exatamente à meia-noite não divide. docs/regras-de-negocio.md, seção 2.
+export function dividirNaMeiaNoite(registro: Registro): void {
+  if (registro.fim === null) return
+  const fimTotal = Date.parse(registro.fim)
+  let atual = registro
+  for (;;) {
+    const meiaNoite = new Date(instante(somarDias(dataEmBrasilia(atual.inicio), 1), '00:00')).toISOString()
+    if (fimTotal <= Date.parse(meiaNoite)) return
+    const resto: Registro = { ...atual, id: crypto.randomUUID(), inicio: meiaNoite }
+    atual.fim = meiaNoite
+    registros.push(resto)
+    criadoEm.set(resto.id, criadoEm.get(registro.id) ?? Date.now())
+    atual = resto
+  }
+}
+
 export function aplicarEdicao(registro: Registro, dados: NovoRegistro): void {
   registro.inicio = dados.inicio
   registro.fim = dados.fim

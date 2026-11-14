@@ -1,4 +1,4 @@
-import { BuildingIcon, EllipsisVerticalIcon, LaptopIcon, LockIcon, PencilIcon, TimerIcon, Trash2Icon } from 'lucide-react'
+import { ArrowRightIcon, BuildingIcon, CornerDownRightIcon, EllipsisVerticalIcon, LaptopIcon, LockIcon, PencilIcon, TimerIcon, Trash2Icon } from 'lucide-react'
 import { diaSemanaMes, dataEmBrasilia, duracaoEmHoras, horaDe } from '@/compartilhado/datas'
 import type { Registro } from '@/compartilhado/tipos'
 import { Horas } from '@/compartilhado/ui/Horas'
@@ -32,6 +32,9 @@ export function ItemRegistro({
 }) {
   const ativo = registro.fim === null
   const horas = duracaoEmHoras(registro.inicio, registro.fim)
+  // Registro que passou da meia-noite vira dois: a primeira parte termina às 00:00 e a segunda começa às 00:00.
+  const continuaAmanha = registro.fim !== null && horaDe(registro.fim) === '00:00' && dataEmBrasilia(registro.fim) !== dataEmBrasilia(registro.inicio)
+  const continuacao = horaDe(registro.inicio) === '00:00'
   const semAcoes = cancelado || ativo || (!onEditar && !onCancelar)
 
   return (
@@ -62,6 +65,16 @@ export function ItemRegistro({
           {registro.origem === 'cronometro' && (
             <StatusPill tom="roxo">
               <TimerIcon /> Cronômetro
+            </StatusPill>
+          )}
+          {continuaAmanha && (
+            <StatusPill tom="neutro">
+              <ArrowRightIcon /> Continua no dia seguinte
+            </StatusPill>
+          )}
+          {continuacao && (
+            <StatusPill tom="neutro">
+              <CornerDownRightIcon /> Continuação do dia anterior
             </StatusPill>
           )}
           {ativo && <StatusPill tom="sucesso">Contando agora</StatusPill>}
