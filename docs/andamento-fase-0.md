@@ -1,10 +1,22 @@
 # Andamento da Fase 0
 
-Retrato de onde a Fase 0 parou (atualizado em 12/11/2026). Ao retomar com uma IA, peça para ela ler este arquivo e o [`fase-0.md`](fase-0.md). Quando a Fase 0 terminar, este arquivo pode ser apagado (antes, passe a seção "Ambientes" para o `arquitetura.md` ou o `README.md`).
+Retrato de onde a Fase 0 parou (atualizado em 14/11/2026). Ao retomar com uma IA, peça para ela ler este arquivo e o [`fase-0.md`](fase-0.md). Quando a Fase 0 terminar, este arquivo pode ser apagado (antes, passe a seção "Ambientes" para o `arquitetura.md` ou o `README.md`).
 
 ## Próxima sessão: comece por aqui
 
-Onde paramos (12/11/2026, semana 2): **a B6 e a B7 estão na `main` e a B7 já roda no `horas-dev`.** O Victor revisou e pediu 5 correções ao Bernardo (lista abaixo). O login com Google funciona de verdade no `horas-dev` desde 10/11. As regras estão fechadas no [`regras-de-negocio.md`](regras-de-negocio.md), e as tarefas das semanas 2 a 4 estão em [`tarefas-semanas-2-a-4.md`](tarefas-semanas-2-a-4.md).
+Onde paramos (14/11/2026, semana 2): **registros e cronômetro já usam o banco de verdade (G5 e G6 na `main`).** A B6 e a B7 estão na `main` e rodam no `horas-dev`; as 5 correções pedidas ao Bernardo (lista abaixo) ainda não chegaram. O login com Google funciona de verdade no `horas-dev` desde 10/11, mas só para o Victor e o Bernardo: Guilherme e Johannes ainda estão com e-mail provisório no banco. As regras estão fechadas no [`regras-de-negocio.md`](regras-de-negocio.md), e as tarefas das semanas 2 a 4 estão em [`tarefas-semanas-2-a-4.md`](tarefas-semanas-2-a-4.md).
+
+### Feito em 13 e 14/11/2026
+
+- **G5 e G6 do Guilherme na `main`** (commit `8b80bf4`, juntado em 14/11): `registros.ts` e `cronometro.ts` reais, com as versões falsas em `registros-falso.ts` e `cronometro-falso.ts` (ligadas por `VITE_LOGIN_FALSO=true`). Novo `banco.ts` com o que as funções reais compartilham: tradução dos erros do banco para português e `meuId()`. Registro que passa da meia-noite vira um por dia (`partesPorDia` em `datas.ts`), com as marcas "Continua no dia seguinte" e "Continuação do dia anterior" na lista. Testado pelo Victor no `horas-dev`.
+- **Data e fluidez** (branch `feat/form-data-e-fundo-leve`, juntada em 14/11, pedido do Victor depois de testar a G6):
+  - Formulário de registro: botões Hoje, Ontem e "Outro dia", que abre um calendário com só os dias permitidos (7 dias para o membro, sem limite para o RH). A duração aparece embaixo dos horários.
+  - Fundo animado mais leve: ~30 quadros por segundo, linhas desenhadas em grupo, resolução limitada a 1,5x e pausa enquanto uma janela está aberta.
+  - Janelas (gaveta, diálogo, confirmação) sem desfoque atrás: o desfoque era refeito a cada quadro por cima do fundo animado e travava a abertura. No lugar, uma camada escura um pouco mais forte.
+  - `meuId()` guardado durante a sessão, sem uma consulta extra a cada busca.
+- As duas branches entraram na `main` direto pelo Git, a pedido do Victor (sem a tela de PR, porque o GitHub CLI não está instalado neste computador).
+- **Limpeza:** apagadas 9 branches já juntadas na `main`. Sobrou só a `atualDev`, do Guilherme, que tem commits fora da `main`.
+- **Notion:** B6, B7, G5 e G6 marcadas como concluídas.
 
 ### Feito em 11 e 12/11/2026
 
@@ -41,13 +53,16 @@ Onde paramos (12/11/2026, semana 2): **a B6 e a B7 estão na `main` e a B7 já r
 
 Feito em 13/11/2026: o Victor rodou a `supabase/testes/teste.sql` no `horas-dev` e **todos os testes passaram**. Guilherme e Johannes avisados de que podem começar a G6 e a J5.
 
-1. **Bernardo**: as 5 correções acima (o `migration repair` já foi feito pelo Victor em 13/11), numa migração nova na `db/migracoes`, com PR. Combinado: daqui em diante, migração só pelo CLI e por PR, e só aplica no dev depois de aprovada. O Victor revisa o PR com a IA.
-2. **Guilherme e Johannes**: G6 e J5 até 15/11 (funções falsas trocadas pelas reais). A meta da semana 2 ("registrar horas com dados reais no `horas-dev`") depende da G6. O Guilherme precisa transformar a branch `atualDev` num PR com nome no padrão do `CONTRIBUTING.md`.
-3. Victor decide o que adianta das semanas 3 e 4; depois disso, as tarefas vão para o Notion.
+1. **Bernardo**: as 5 correções acima (o `migration repair` já foi feito pelo Victor em 13/11), numa migração nova na `db/migracoes`, com PR. A branch foi apagada do GitHub em 14/11 porque não tinha nada fora da `main` (nada se perdeu); ele a recria com o mesmo nome a partir da `main` atualizada (`git checkout main`, `git pull`, `git checkout -b db/migracoes`). Combinado: daqui em diante, migração só pelo CLI e por PR, e só aplica no dev depois de aprovada. O Victor revisa o PR com a IA.
+2. **Johannes**: J4, J5 e J6 até 15/11. Com a G6 na `main`, a parte de registros da meta da semana 2 ("registrar horas com dados reais no `horas-dev`") está pronta; falta a J5 (membros e metas).
+3. **Guilherme**: dizer se a branch `atualDev` ainda serve. Se sim, vira um PR com nome no padrão do `CONTRIBUTING.md`; se não, é apagada.
+4. Victor decide o que adianta das semanas 3 e 4; depois disso, as tarefas vão para o Notion.
 
 ### Tarefas do Victor fora da IA
 
-- **V4:** convidar Guilherme e Johannes para a organização "EJUVV Dev" no Supabase (até 11/11; confirmar se foi feito).
+- **E-mails da equipe no `horas-dev`:** trocar `troque.guilherme@ejuvv.com` e `troque.johannes@ejuvv.com` (tabela `membros`) pelos `@ejuvv.com` reais. Sem isso, os dois passam pelo Google, mas o site responde "Acesso negado. Procure o RH."
+- **V4:** convidar Guilherme e Johannes para a organização "EJUVV Dev" no Supabase (até 11/11; confirmar se foi feito). Ainda "A Fazer" no Notion.
+- **Resend:** revogar a chave criada antes da decisão de usar o Gmail da EJ.
 - **Google Cloud:** antes de ligar o login na produção (semana 4), trocar o URI de redirecionamento do prod antigo (`zetjgqdagnlkodbexnoe`, apagado) pelo novo: `https://gzjmavrrkqfqtqjycdnq.supabase.co/auth/v1/callback`.
 - **V5:** criar a conta `@ejuvv.com` que envia os e-mails e a senha de app (semana 3). Decidido em 11/11/2026: e-mail pelo Gmail da EJ, sem Resend.
 - **Domínio:** o `ejuvv.com` continua ativo até 21/02/2027 (registro pela Tucows), mas o DNS ainda está na HostGator. Descobrir com o Rodrigo quem tem acesso e quem renova, porque o e-mail da EJ inteira depende disso.
@@ -171,7 +186,7 @@ No `horas-prod` (semana 4, V7), repetir com a URL do site de produção no lugar
 
 ## Decisões em aberto
 
-1. Registro que passa da meia-noite: qual dos dois registros `criarRegistro()` / `pararCronometro()` devolvem no sistema real (com o Bernardo, antes da semana 2).
+1. ~~Registro que passa da meia-noite: qual dos dois registros `criarRegistro()` / `pararCronometro()` devolvem no sistema real.~~ Resolvido na G6 (14/11): as duas devolvem a primeira parte. No cronômetro, as partes depois da meia-noite entram como origem "manual", porque o banco só aceita registro novo de origem "cronometro" ligado e sem fim.
 2. Férias durante o piloto: decidido em 28/10 (o RH muda a meta na mão). Falta a diretora concordar e informar as datas.
 3. Prazo ("Vira real") das 3 funções novas do RH em `arquitetura.md`.
 4. shadcn/ui na stack: decidir junto com Johannes.
