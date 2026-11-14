@@ -45,9 +45,27 @@ export function erroDoBanco(e: PostgrestError): Error {
   return new Error('Não foi possível salvar. Tente de novo.')
 }
 
-export async function meuId(): Promise<string> {
+// O id do membro não muda durante a sessão: busca uma vez e guarda, ligado ao usuário logado
+// (a sessão é lida do próprio navegador, sem ir ao servidor). Trocou de conta, busca de novo.
+let guardado: { usuario: string; id: Promise<string> } | null = null
+
+async function buscarMeuId(): Promise<string> {
   const { data, error } = await supabase.rpc('meu_id')
   if (error) throw erroDoBanco(error)
   if (!data) throw new Error('Você não está logado. Entre novamente.')
   return data
+}
+
+export async function meuId(): Promise<string> {
+  const { data } = await supabase.auth.getSession()
+  const usuario = data.session?.user.id
+  if (!usuario) return buscarMeuId()
+  if (guardado?.usuario !== usuario) {
+    const id = buscarMeuId()
+    guardado = { usuario, id }
+    id.catch(() => {
+      if (guardado?.id === id) guardado = null // deu erro: tenta de novo na próxima vez
+    })
+  }
+  return guardado.id
 }
