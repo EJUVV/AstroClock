@@ -4,6 +4,7 @@ import { LifeBuoyIcon, LogOutIcon, MenuIcon, PanelLeftCloseIcon, PanelLeftOpenIc
 import { toast } from 'sonner'
 import { sair } from '@/compartilhado/api/auth'
 import { AvatarMembro } from '@/compartilhado/ui/AvatarMembro'
+import { BarraInferior } from '@/compartilhado/ui/BarraInferior'
 import { BotaoInstalarApp } from '@/compartilhado/ui/instalarApp'
 import { Logo } from '@/compartilhado/ui/Logo'
 import { useSessao } from '@/compartilhado/ui/RotaProtegida'
@@ -83,11 +84,13 @@ function Menu({ itens, recolhido, onNavegar }: { itens: ItemMenu[]; recolhido: b
   )
 }
 
-// Sidebar, topo e menu do celular no estilo FinSet, usados pelo painel do RH e pelo do membro no computador.
+// Sidebar e topo no estilo FinSet, usados pelo painel do RH e pelo do membro no computador.
+// Abaixo de 1024px, a sidebar vira uma barra embaixo com as abas de itensBarra e um botão "Mais" com o resto.
 export function LayoutPainel({
   secao,
   inicio,
   itens,
+  itensBarra = [],
   itensRodape,
   titulos,
   acoesTopo,
@@ -96,6 +99,7 @@ export function LayoutPainel({
   secao: string
   inicio: string
   itens: ItemMenu[]
+  itensBarra?: ItemMenu[]
   itensRodape: ItemMenu[]
   titulos: TituloPagina[]
   acoesTopo?: ReactNode
@@ -106,6 +110,10 @@ export function LayoutPainel({
   const [recolhido, setRecolhido] = useState(false)
   const [menuAberto, setMenuAberto] = useState(false)
   const pagina = titulos.find((t) => location.pathname.startsWith(t.prefixo)) ?? titulos[titulos.length - 1]
+  const naBarra = new Set(itensBarra.map((i) => i.para))
+  const itensMais = itens.filter((i) => !naBarra.has(i.para))
+  const ativo = (i: ItemMenu) => (i.fim ? location.pathname === i.para : location.pathname.startsWith(i.para))
+  const maisAtivo = [...itensMais, ...itensRodape].some(ativo)
 
   const rodapeMenu = (recolher: boolean, onNavegar?: () => void) => (
     <div className="flex flex-col gap-1">
@@ -174,9 +182,11 @@ export function LayoutPainel({
 
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="flex flex-wrap items-center gap-3 px-4 pt-4 pb-2 lg:px-8 lg:pt-7">
-          <Button variant="outline" size="icon" className="lg:hidden" aria-label="Abrir menu" onClick={() => setMenuAberto(true)}>
-            <MenuIcon />
-          </Button>
+          {itensBarra.length === 0 && (
+            <Button variant="outline" size="icon" className="lg:hidden" aria-label="Abrir menu" onClick={() => setMenuAberto(true)}>
+              <MenuIcon />
+            </Button>
+          )}
           {/* No celular, o título ganha uma linha só dele, abaixo do menu e das ações, para não virar "Requerim...". */}
           <div className="order-last min-w-0 basis-full sm:order-none sm:flex-1 sm:basis-auto">
             <h1 className="text-2xl font-bold tracking-tight text-balance sm:truncate lg:text-3xl">{pagina.titulo}</h1>
@@ -194,22 +204,46 @@ export function LayoutPainel({
           </div>
         </header>
 
-        <main className="flex flex-1 flex-col gap-5 px-4 pt-4 pb-10 lg:px-8">{children}</main>
+        {/* pb-32 abaixo de 1024px: espaço para a barra de baixo não cobrir o fim da página. */}
+        <main className={cn('flex flex-1 flex-col gap-5 px-4 pt-4 pb-10 lg:px-8', itensBarra.length > 0 && 'pb-32 lg:pb-10')}>{children}</main>
       </div>
 
-      <Drawer open={menuAberto} onOpenChange={setMenuAberto} direction="left">
-        <DrawerContent className="flex flex-col gap-6 p-4">
-          <DrawerTitle className="sr-only">Menu: {secao}</DrawerTitle>
-          <Logo />
-          <nav aria-label={secao} className="flex flex-1 flex-col justify-between gap-6">
-            <Menu itens={itens} recolhido={false} onNavegar={() => setMenuAberto(false)} />
-            <div className="flex flex-col gap-3">
-              {rodapeMenu(false, () => setMenuAberto(false))}
-              <SeletorTema className="self-start" />
-            </div>
-          </nav>
-        </DrawerContent>
-      </Drawer>
+      {itensBarra.length > 0 ? (
+        <>
+          <div className="lg:hidden">
+            <BarraInferior
+              itens={itensBarra}
+              onMais={() => setMenuAberto(true)}
+              maisAtivo={maisAtivo}
+              maisAlerta={itensMais.some((i) => (i.contador ?? 0) > 0)}
+            />
+          </div>
+          <Drawer open={menuAberto} onOpenChange={setMenuAberto}>
+            <DrawerContent className="mx-auto max-w-xl">
+              <DrawerTitle className="px-5 pt-4 text-lg font-bold">Mais opções</DrawerTitle>
+              <nav aria-label={`${secao}: mais opções`} className="flex flex-col gap-3 overflow-y-auto px-4 pt-2 pb-[max(1rem,env(safe-area-inset-bottom))]">
+                <Menu itens={itensMais} recolhido={false} onNavegar={() => setMenuAberto(false)} />
+                <div className="border-t pt-3">{rodapeMenu(false, () => setMenuAberto(false))}</div>
+                <SeletorTema className="self-start" />
+              </nav>
+            </DrawerContent>
+          </Drawer>
+        </>
+      ) : (
+        <Drawer open={menuAberto} onOpenChange={setMenuAberto} direction="left">
+          <DrawerContent className="flex flex-col gap-6 p-4">
+            <DrawerTitle className="sr-only">Menu: {secao}</DrawerTitle>
+            <Logo />
+            <nav aria-label={secao} className="flex flex-1 flex-col justify-between gap-6">
+              <Menu itens={itens} recolhido={false} onNavegar={() => setMenuAberto(false)} />
+              <div className="flex flex-col gap-3">
+                {rodapeMenu(false, () => setMenuAberto(false))}
+                <SeletorTema className="self-start" />
+              </div>
+            </nav>
+          </DrawerContent>
+        </Drawer>
+      )}
     </div>
   )
 }

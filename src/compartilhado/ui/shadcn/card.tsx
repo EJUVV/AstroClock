@@ -49,7 +49,11 @@ function CardDescription({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="card-description"
-      className={cn("text-sm text-muted-foreground", className)}
+      className={cn(
+        // Cabeçalho estreito (celular): o texto ocupa a largura toda, em vez de ficar espremido ao lado do selo.
+        "text-sm text-muted-foreground @max-md/card-header:col-span-full",
+        className
+      )}
       {...props}
     />
   )
@@ -60,7 +64,7 @@ function CardAction({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="card-action"
       className={cn(
-        "col-start-2 row-span-2 row-start-1 self-start justify-self-end",
+        "col-start-2 row-span-2 row-start-1 self-start justify-self-end @max-md/card-header:row-[1/2]",
         className
       )}
       {...props}

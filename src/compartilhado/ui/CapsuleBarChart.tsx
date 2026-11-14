@@ -52,9 +52,10 @@ export function CapsuleBarChart({ dias, altura = 180 }: { dias: BarraDia[]; altu
       </div>
       <div className="flex justify-between gap-2">
         {dias.map((d) => (
-          <div key={d.rotulo} className="flex flex-1 flex-col items-center gap-0.5">
-            <span className={cn('text-xs text-muted-foreground', d.ativo && 'font-semibold text-primary')}>{d.rotulo}</span>
-            <span className="text-[11px] font-semibold tabular-nums">{d.sede + d.online > 0 ? formatarHoras(d.sede + d.online) : '–'}</span>
+          // min-w-0 e texto menor no celular: com 8 semanas, os rótulos estouravam a borda do cartão.
+          <div key={d.rotulo} className="flex min-w-0 flex-1 flex-col items-center gap-0.5 text-center">
+            <span className={cn('text-[10px] leading-tight text-muted-foreground sm:text-xs', d.ativo && 'font-semibold text-primary')}>{d.rotulo}</span>
+            <span className="text-[10px] font-semibold tabular-nums sm:text-[11px]">{d.sede + d.online > 0 ? formatarHoras(d.sede + d.online) : '–'}</span>
           </div>
         ))}
       </div>

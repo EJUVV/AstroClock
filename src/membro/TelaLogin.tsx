@@ -50,10 +50,12 @@ function TelaLogin() {
     <main className="relative flex min-h-svh items-center justify-center p-4">
       <SeletorTema className="absolute top-4 right-4" />
       <div className="grid w-full max-w-4xl overflow-hidden rounded-[32px] border bg-card shadow-[0_8px_40px_rgb(91_63_217/0.08)] md:grid-cols-2">
-        <section className="flex flex-col gap-8 p-8 sm:p-10">
-          <LogoInfinito className="mx-auto -mt-10 -mb-12 w-[320px] max-w-none" />
-          <div className="flex flex-col gap-3">
-            <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Suas horas na EJ, sem complicação.</h1>
+        {/* min-w-0: sem ele, o logo (320px) alargava a coluna além do cartão no celular e empurrava tudo para a direita. */}
+        <section className="flex min-w-0 flex-col gap-8 p-6 sm:p-10">
+          {/* self-center: num celular estreito o logo passa um pouco das margens, por igual dos dois lados. */}
+          <LogoInfinito className="-mt-10 -mb-12 w-[320px] max-w-none self-center" />
+          <div className="flex flex-col gap-3 text-center md:text-left">
+            <h1 className="text-3xl font-bold tracking-tight text-balance sm:text-4xl">Suas horas na EJ, sem complicação.</h1>
             <p className="text-muted-foreground">Registre o que você fez, acompanhe a meta da semana e veja quem está na sede.</p>
           </div>
           <div className="flex flex-col gap-3">

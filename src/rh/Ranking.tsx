@@ -124,7 +124,12 @@ function Ranking() {
                             <span className="flex flex-wrap items-center gap-x-3 gap-y-1 whitespace-normal">
                               <AvatarMembro nome={l.membro.nome} className="size-8 max-sm:hidden" />
                               <span className="font-semibold">{l.membro.nome}</span>
-                              {l.dispensado && <StatusPill tom="neutro">semana dispensada</StatusPill>}
+                              {/* No celular, só "dispensada": o selo inteiro não quebra linha e empurrava a tabela para os lados. */}
+                              {l.dispensado && (
+                                <StatusPill tom="neutro">
+                                  <span className="hidden sm:inline">semana</span> dispensada
+                                </StatusPill>
+                              )}
                             </span>
                           </TableCell>
                           <TableCell className="hidden text-muted-foreground md:table-cell">{l.membro.setor}</TableCell>

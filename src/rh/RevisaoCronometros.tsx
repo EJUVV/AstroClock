@@ -50,7 +50,8 @@ function RevisaoCronometros() {
                 return (
                   <Card key={r.id}>
                     <CardContent className="flex flex-col gap-4">
-                      <div className="flex items-start gap-3">
+                      {/* flex-wrap: no celular, o selo desce para a linha de baixo em vez de espremer o nome. */}
+                      <div className="flex flex-wrap items-start gap-3">
                         <AvatarMembro nome={membro?.nome ?? '?'} className="size-11" />
                         <div className="min-w-0 flex-1">
                           <p className="font-semibold">{membro?.nome}</p>
@@ -60,7 +61,7 @@ function RevisaoCronometros() {
                           <TimerIcon /> Parou sozinho após 10h
                         </StatusPill>
                       </div>
-                      <div className="grid grid-cols-3 gap-3 rounded-[20px] bg-muted p-4 text-sm">
+                      <div className="grid grid-cols-2 gap-3 rounded-[20px] bg-muted p-4 text-sm sm:grid-cols-3">
                         <div>
                           <p className="text-xs text-muted-foreground">Dia</p>
                           <p className="font-semibold">{diaSemanaMes(dataEmBrasilia(r.inicio))}</p>
@@ -75,7 +76,7 @@ function RevisaoCronometros() {
                           <p className="text-xs text-muted-foreground">Duração</p>
                           <Horas valor={duracaoEmHoras(r.inicio, r.fim)} />
                         </div>
-                        <div className="col-span-3">
+                        <div className="col-span-full">
                           <p className="text-xs text-muted-foreground">Descrição</p>
                           <p>{r.descricao}</p>
                         </div>
