@@ -2,6 +2,7 @@ import { NavLink, Outlet } from 'react-router-dom'
 import { FileTextIcon, HouseIcon, LayoutDashboardIcon, ListIcon, LogOutIcon, MapPinIcon } from 'lucide-react'
 import { sair } from '@/compartilhado/api/auth'
 import { AvatarMembro } from '@/compartilhado/ui/AvatarMembro'
+import { BarraInferior } from '@/compartilhado/ui/BarraInferior'
 import { LayoutPainel, type ItemMenu, type TituloPagina } from '@/compartilhado/ui/LayoutPainel'
 import { LogoIcone } from '@/compartilhado/ui/Logo'
 import { useSessao } from '@/compartilhado/ui/RotaProtegida'
@@ -9,7 +10,6 @@ import { Button } from '@/compartilhado/ui/shadcn/button'
 import { SeletorTema } from '@/compartilhado/ui/tema'
 import { BotaoInstalarApp } from '@/compartilhado/ui/instalarApp'
 import { useEhDesktop } from '@/compartilhado/ui/useEhDesktop'
-import { cn } from '@/compartilhado/ui/utils'
 import { BotaoSedeTopo, ProvedorPresenca } from './usePresenca'
 
 const ABAS: ItemMenu[] = [
@@ -73,31 +73,7 @@ function PainelMembroCelular({ nome, primeiroNome, ehRH }: { nome: string; prime
         <Outlet />
       </main>
 
-      <nav
-        aria-label="Navegação principal"
-        className="fixed inset-x-0 bottom-4 z-30 mx-auto flex w-[calc(100%-2rem)] max-w-md items-center justify-between rounded-full border bg-card p-1.5 shadow-[0_10px_30px_rgb(30_27_57/0.12)]"
-      >
-        {ABAS.map(({ para, rotulo, icone: Icone, fim }) => (
-          <NavLink
-            key={para}
-            to={para}
-            end={fim}
-            className={({ isActive }) =>
-              cn(
-                'flex h-11 items-center justify-center gap-2 rounded-full px-3 text-sm font-semibold text-muted-foreground transition-colors',
-                isActive ? 'bg-primary px-4 text-primary-foreground' : 'hover:text-foreground',
-              )
-            }
-          >
-            {({ isActive }) => (
-              <>
-                <Icone className="size-5" />
-                <span className={cn(!isActive && 'sr-only')}>{rotulo}</span>
-              </>
-            )}
-          </NavLink>
-        ))}
-      </nav>
+      <BarraInferior itens={ABAS} />
       <div className="mt-6 flex flex-col items-center gap-2 text-xs text-muted-foreground sm:hidden">
         <BotaoInstalarApp />
         <span className="flex items-center gap-2">

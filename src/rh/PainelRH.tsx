@@ -59,6 +59,10 @@ function PainelRH() {
     ...(perfil === 'diretor_rh' ? [{ para: '/rh/metas', rotulo: 'Metas', icone: TargetIcon }] : []),
     { para: '/rh/sede', rotulo: 'Sede', icone: MapPinIcon },
   ]
+  // Celular e tablet: 3 abas na barra de baixo; o resto fica no botão "Mais".
+  // Quem não vê requerimentos (diretor de setor) fica com o Ranking no lugar.
+  const naBarra = ['/rh', '/rh/membros', veRequerimentos(perfil) ? '/rh/requerimentos' : '/rh/ranking']
+  const itensBarra = naBarra.map((para) => itens.find((i) => i.para === para)!)
 
   return (
     <ProvedorPresenca>
@@ -66,6 +70,7 @@ function PainelRH() {
       secao={SECAO[perfil]}
       inicio="/rh"
       itens={itens}
+      itensBarra={itensBarra}
       itensRodape={perfil === 'rh' ? [{ para: '/membro', rotulo: 'Minhas horas', icone: ClockIcon }] : []}
       titulos={titulos(perfil, eu)}
       acoesTopo={

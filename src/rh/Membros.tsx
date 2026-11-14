@@ -236,10 +236,12 @@ function Membros() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Membro</TableHead>
+                      {/* w-full max-w-0: a coluna do membro fica com o espaço que sobra e corta nome e e-mail com reticências,
+                          em vez de empurrar o Status para fora do cartão. */}
+                      <TableHead className="w-full">Membro</TableHead>
                       {veTodosOsSetores && <TableHead className="hidden md:table-cell">Setor</TableHead>}
                       <TableHead className="hidden md:table-cell">Perfil</TableHead>
-                      <TableHead className="hidden lg:table-cell">Desde</TableHead>
+                      <TableHead className="hidden xl:table-cell">Desde</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead className="w-12">
                         <span className="sr-only">Ações</span>
@@ -249,7 +251,7 @@ function Membros() {
                   <TableBody>
                     {filtrados.map((m) => (
                       <TableRow key={m.id} className="cursor-pointer" onClick={() => navigate(`/rh/membros/${m.id}`)}>
-                        <TableCell>
+                        <TableCell className="max-w-0">
                           <span className="flex items-center gap-3">
                             <AvatarMembro nome={m.nome} className="size-9" />
                             <span className="min-w-0">
@@ -262,7 +264,7 @@ function Membros() {
                         <TableCell className="hidden md:table-cell">
                           <StatusPill tom={m.perfil === 'membro' ? 'neutro' : 'roxo'}>{NOME_PERFIL[m.perfil]}</StatusPill>
                         </TableCell>
-                        <TableCell className="hidden text-muted-foreground lg:table-cell">
+                        <TableCell className="hidden text-muted-foreground xl:table-cell">
                           {new Date(`${m.dataEntrada}T12:00:00`).toLocaleDateString('pt-BR')}
                         </TableCell>
                         <TableCell>
