@@ -25,19 +25,19 @@ Desde 10/11 o `auth.ts` é real (login com Google no `horas-dev`). As outras fun
 
 As tarefas desta semana já estão no Notion (Quadro de Sprints, projeto AstroClock), com o texto completo. Resumo:
 
-| Tarefa | Pessoa | Prazo | Situação em 10/11 |
+| Tarefa | Pessoa | Prazo | Situação em 16/11 |
 | --- | --- | --- | --- |
-| B4. Login com Google real | Feito pela IA com o Victor; Bernardo revisa o PR | 11/11 | Feito e testado; falta o PR |
+| B4. Login com Google real | Feito pela IA com o Victor; Bernardo revisa o PR | 11/11 | Feito: na `main` (PR #3, 10/11) |
 | B6. Banco do `horas-dev` em migração e no GitHub (`supabase db pull`, seed) | Bernardo | 11/11 | Feito: na `main` em 12/11 (sem PR); histórico de migrações do `horas-dev` acertado pelo Victor em 13/11 |
-| B7. Destravar `registros` e `metas` para o site (RLS de `registros`, `grant insert` em `metas`, remover `dispensas`, revogar `rls_auto_enable`) | Bernardo | 11/11 | Na `main` e aplicada no `horas-dev` em 12/11 (sem PR); revisada pelo Victor, faltam 5 correções |
-| G5. Registro que passa da meia-noite | Guilherme | 15/11 | A fazer |
-| G6. Funções reais de `registros.ts` e `cronometro.ts` | Guilherme | 15/11 | A fazer |
-| J4. Tela de mudar o setor de um membro | Johannes | 15/11 | Feito |
-| J5. Funções reais de `membros.ts` e das metas em `rh.ts` | Johannes | 15/11 | A fazer |
-| J6. Bucket privado do anexo (Storage) | Johannes | 15/11 | A fazer |
+| B7. Destravar `registros` e `metas` para o site (RLS de `registros`, `grant insert` em `metas`, remover `dispensas`, revogar `rls_auto_enable`) | Bernardo | 11/11 | Na `main` e aplicada no `horas-dev` em 12/11 (sem PR); revisada pelo Victor; as 5 correções viraram a B7.1 (semana 3) |
+| G5. Registro que passa da meia-noite | Guilherme | 15/11 | Feito: na `main` em 14/11 |
+| G6. Funções reais de `registros.ts` e `cronometro.ts` | Guilherme | 15/11 | Feito: na `main` em 14/11 |
+| J4. Tela de mudar o setor de um membro | Johannes | 15/11 | **Atrasada**: não está na `main`; novo prazo 18/11 |
+| J5. Funções reais de `membros.ts` e das metas em `rh.ts` | Johannes | 15/11 | **Atrasada**: novo prazo 17/11 |
+| J6. Bucket privado do anexo (Storage) | Johannes | 15/11 | **Atrasada**: só se der tempo até 19/11; senão, semana 4 |
 | V2. Validar o protótipo com o RH e a diretora | Victor | — | Feito |
 | V3. PWA instalável | Victor | — | Feito |
-| V4. Convidar Guilherme e Johannes para o Supabase dev | Victor | 11/11 | A fazer |
+| V4. Convidar Guilherme e Johannes para o Supabase dev | Victor | 11/11 | Feito |
 
 Observações:
 
@@ -55,9 +55,43 @@ Semana curta: 20/11 (sexta) é feriado. Reunião em 18/11 e validação com o RH
 
 **Ponto de decisão (18/11):** se o P0 não estiver todo de pé, a semana 4 vira semana de completar o P0, e o P1 (requerimento, presença, ranking, gráfico) passa para dezembro.
 
+### Replanejamento de 16/11
+
+A semana 2 fechou pela metade (J4, J5, J6 e as correções da B7 não chegaram) e o Bernardo teria 4 tarefas mais as correções em 4 dias. Por isso, a semana 3 ficou **só com o P0**, e o requerimento inteiro (P1) passou para a semana 4. Tarefas no Notion em 16/11.
+
+| Tarefa | Pessoa | Prazo |
+| --- | --- | --- |
+| B7.1. Correções da revisão da B7 | Bernardo | 17/11 |
+| B9. Cálculo semanal no banco (primeiro sem os requerimentos) | Bernardo | 18/11 |
+| B10. Cronômetro que encerra sozinho após 10h | Bernardo | 19/11 |
+| J5. Membros e metas reais (atrasada, da semana 2) | Johannes | 17/11 |
+| J4. Tela de mudar o setor (atrasada, da semana 2) | Johannes | 18/11 |
+| J6. Bucket privado do anexo (só se der tempo) | Johannes | 19/11 |
+| G10. Revisão de cronômetros e correções do RH reais (era a J8) | Guilherme | 18/11 |
+| G11. Painel do membro com o cálculo real | Guilherme | 19/11 |
+
+Passam para a semana 4: **B8, B11, G7, G8 e J7** (e a J6, se não der tempo). A J8 passou do Johannes para o Guilherme como G10: é a mesma tabela e o mesmo padrão de erros da G6, e as funções do banco já existem desde a B7.
+
 ### Bernardo (banco)
 
-#### B8. Tabela `requerimentos` com RLS
+#### B7.1. Correções da revisão da B7
+
+**O que fazer**
+- Uma migração nova na `db/migracoes` (recriada a partir da `main` atualizada), com PR:
+  1. `revisar_cronometro` liberada também para o `presidente`;
+  2. parar o cronômetro pelo site: o banco grava `fim = now()` e ignora o horário mandado;
+  3. registro manual: o fim não pode ser no futuro (no lançamento e na edição);
+  4. `setores`: grant de insert e update só para `nome` e `ativo`;
+  5. a `supabase/testes/teste.sql` com esses casos.
+
+**Como saber que terminou**
+- Os testes passam no `horas-dev`.
+- PR aprovado pelo Victor.
+
+**Depende de**
+- Nada.
+
+#### B8. Tabela `requerimentos` com RLS (passou para a semana 4)
 
 **O que fazer**
 - Migração da tabela `requerimentos` seguindo o esboço da seção 5 do `arquitetura.md` (`tipo`, `data_inicio`, `data_fim`, `motivo`, `situacao`, `anexo_caminho`, `anexo_nome`, `motivo_resposta`, `respondido_por`, `respondido_em`).
@@ -81,7 +115,8 @@ Semana curta: 20/11 (sexta) é feriado. Reunião em 18/11 e validação com o RH
 **O que fazer**
 - Funções SQL para o cálculo da seção 8 do `regras-de-negocio.md`: horas da semana (sede e total), meta vigente na semana, requerimentos aprovados (`so_remoto` zera a sede; `ausencia_total` dispensa a semana, e o requerimento vale para todas as semanas que toca, inteiras), quem é elegível (ativo, `membro` ou `rh`, cadastrado antes da semana).
 - Só contam registros não cancelados e fora de revisão. Nada de total guardado em tabela.
-- Trocar pelas reais: `progressoDaSemana` e `progressoDoMes` (`progresso.ts`); `percentualDaSemana`, `resumoDaSemana`, `abaixoDaMeta`, `mediasDaSemana`, `progressoDeMembro` e `semanasSeguidasAbaixo` (`rh.ts`).
+- **Primeiro sem os requerimentos** (replanejamento de 16/11): o efeito do `so_remoto` e da `ausencia_total` entra quando a B8 existir.
+- Trocar pelas reais: `percentualDaSemana`, `resumoDaSemana`, `abaixoDaMeta`, `mediasDaSemana`, `progressoDeMembro` e `semanasSeguidasAbaixo` (`rh.ts`). O `progresso.ts` passou para o Guilherme (G11): avise-o quando as funções do membro existirem.
 - O `diretor_setor` vê sempre só o próprio setor, mesmo que a tela peça outro.
 
 **Como saber que terminou**
@@ -90,7 +125,7 @@ Semana curta: 20/11 (sexta) é feriado. Reunião em 18/11 e validação com o RH
 - PR aprovado pelo Victor.
 
 **Depende de**
-- B7 e B8.
+- B7 (a parte dos requerimentos depende da B8).
 
 #### B10. Cronômetro que encerra sozinho após 10h
 
@@ -106,7 +141,10 @@ Semana curta: 20/11 (sexta) é feriado. Reunião em 18/11 e validação com o RH
 **Depende de**
 - B7.
 
-#### B11. Correções do RH com motivo
+#### B11. Correções do RH com motivo (passou para a semana 4)
+
+As funções do banco já existem desde a B7. Nesta semana, só entram os ajustes que o Guilherme pedir na G10.
+
 
 **O que fazer**
 - Permitir que `rh` e `diretor_rh` lancem, alterem e cancelem registros de outro membro, inclusive com mais de 7 dias, sempre com **motivo obrigatório** (seção 3 do `regras-de-negocio.md`). O membro não é avisado.
@@ -123,7 +161,35 @@ Semana curta: 20/11 (sexta) é feriado. Reunião em 18/11 e validação com o RH
 
 ### Guilherme (painel do membro)
 
-#### G7. Requerimento do membro real
+#### G10. Revisão de cronômetros e correções do RH reais (era a J8)
+
+**O que fazer**
+- Trocar `cronometrosEmRevisao` e `revisarCronometro` (`rh.ts`) pelas reais.
+- Trocar `buscarRegistrosDoMembro`, `criarRegistroDeMembro`, `editarRegistroDeMembro` e `cancelarRegistroDeMembro` (`rh.ts`) pelas reais, com as funções do banco que já existem desde a B7 (`criar_registro_de_membro`, `editar_registro_de_membro`, `cancelar_registro_de_membro` e `revisar_cronometro`), sempre com motivo obrigatório.
+- Erros em português com o `erroDoBanco`. Se a correção passar da meia-noite, reaproveitar o `partesPorDia`.
+- Para testar a revisão antes da B10, pedir ao Bernardo um registro com `precisa_revisao = true` no `horas-dev`.
+
+**Como saber que terminou**
+- O RH lança, edita e cancela um registro de outro membro com motivo, e a correção aparece na `auditoria`.
+- Aprovar um cronômetro faz ele contar na meta; reprovar cancela.
+- PR aprovado pelo Victor.
+
+**Depende de**
+- Nada (as funções do banco já existem).
+
+#### G11. Painel do membro com o cálculo real
+
+**O que fazer**
+- Trocar `progressoDaSemana` e `progressoDoMes` (`progresso.ts`) pelas funções da B9.
+
+**Como saber que terminou**
+- As barras de sede x/5h e total x/10h mostram as horas reais do `horas-dev`, iguais à conta da B9.
+- PR aprovado pelo Victor.
+
+**Depende de**
+- B9.
+
+#### G7. Requerimento do membro real (passou para a semana 4)
 
 **O que fazer**
 - Trocar `enviarRequerimento` e `meusRequerimentos` (`requerimentos.ts`) pelas reais.
@@ -137,7 +203,7 @@ Semana curta: 20/11 (sexta) é feriado. Reunião em 18/11 e validação com o RH
 **Depende de**
 - B8 e J6.
 
-#### G8. E-mails do requerimento (função no Supabase)
+#### G8. E-mails do requerimento (função no Supabase) (passou para a semana 4)
 
 **O que fazer**
 - Edge Function do Supabase que manda os e-mails da seção 7 do `regras-de-negocio.md`:
@@ -159,7 +225,9 @@ Semana curta: 20/11 (sexta) é feriado. Reunião em 18/11 e validação com o RH
 
 ### Johannes (painel do RH)
 
-#### J7. Requerimentos do RH reais
+Nesta semana, o Johannes fica com a J5 e a J4, atrasadas da semana 2 (e a J6, se der tempo).
+
+#### J7. Requerimentos do RH reais (passou para a semana 4)
 
 **O que fazer**
 - Trocar `listarRequerimentos`, `responderRequerimento` (`rh.ts`) e `linkDoAnexo` (`requerimentos.ts`) pelas reais. O link do anexo é temporário (link assinado do Storage).
@@ -174,7 +242,7 @@ Semana curta: 20/11 (sexta) é feriado. Reunião em 18/11 e validação com o RH
 **Depende de**
 - B8 e J6.
 
-#### J8. Revisão de cronômetros e correções do RH reais
+#### J8. Revisão de cronômetros e correções do RH reais (passou para o Guilherme: G10)
 
 **O que fazer**
 - Trocar `cronometrosEmRevisao` e `revisarCronometro` pelas reais.
@@ -227,6 +295,8 @@ Decidido em 11/11/2026: os e-mails saem por uma conta `@ejuvv.com` do Google Wor
 ## Semana 4 (23/11 a 27/11) — Complementos e produção
 
 **Meta até 27/11:** o piloto completo, já em produção.
+
+**Vindas da semana 3 (replanejamento de 16/11):** B8 e B11 (Bernardo), G7 e G8 (Guilherme), J7 e talvez J6 (Johannes). O texto delas continua na seção da semana 3. Se a reunião de 18/11 decidir completar o P0 primeiro, o requerimento passa para dezembro.
 
 ### Bernardo (banco)
 
