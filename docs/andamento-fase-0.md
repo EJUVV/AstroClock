@@ -1,10 +1,20 @@
 # Andamento da Fase 0
 
-Retrato de onde a Fase 0 parou (atualizado em 14/11/2026). Ao retomar com uma IA, peça para ela ler este arquivo e o [`fase-0.md`](fase-0.md). Quando a Fase 0 terminar, este arquivo pode ser apagado (antes, passe a seção "Ambientes" para o `arquitetura.md` ou o `README.md`).
+Retrato de onde a Fase 0 parou (atualizado em 16/11/2026). Ao retomar com uma IA, peça para ela ler este arquivo e o [`fase-0.md`](fase-0.md). Quando a Fase 0 terminar, este arquivo pode ser apagado (antes, passe a seção "Ambientes" para o `arquitetura.md` ou o `README.md`).
 
 ## Próxima sessão: comece por aqui
 
-Onde paramos (14/11/2026, semana 2): **registros e cronômetro já usam o banco de verdade (G5 e G6 na `main`).** A B6 e a B7 estão na `main` e rodam no `horas-dev`; as 5 correções pedidas ao Bernardo (lista abaixo) ainda não chegaram. O login com Google funciona de verdade no `horas-dev` desde 10/11, mas só para o Victor e o Bernardo: Guilherme e Johannes ainda estão com e-mail provisório no banco. As regras estão fechadas no [`regras-de-negocio.md`](regras-de-negocio.md), e as tarefas das semanas 2 a 4 estão em [`tarefas-semanas-2-a-4.md`](tarefas-semanas-2-a-4.md).
+Onde paramos (16/11/2026, início da semana 3): **registros e cronômetro já usam o banco de verdade (G5 e G6 na `main`), mas o resto do painel ainda é falso.** A semana 2 fechou pela metade: as tarefas do Johannes (J4, J5, J6) e as 5 correções da B7 não chegaram. A semana 3 foi replanejada em 16/11 para focar no P0 (ver "Revisão de 16/11" e o [`tarefas-semanas-2-a-4.md`](tarefas-semanas-2-a-4.md)). O login com Google funciona de verdade no `horas-dev` desde 10/11, mas só para o Victor e o Bernardo: Guilherme e Johannes ainda estão com e-mail provisório no banco. As regras estão fechadas no [`regras-de-negocio.md`](regras-de-negocio.md), e as tarefas das semanas 2 a 4 estão em [`tarefas-semanas-2-a-4.md`](tarefas-semanas-2-a-4.md).
+
+### Revisão de 16/11/2026 (início da semana 3)
+
+Conferido no GitHub, no Notion, no código e no `horas-dev` (só leitura):
+
+- **Guilherme:** G5 e G6 na `main` e testadas. A branch `atualDev` (13/11) tem uma tela de Configurações (foto de perfil guardada no aparelho e botão para desligar o fundo animado). Está fora do plano, partiu de uma `main` antiga e tem cópias de rascunho (`LayoutPainel-1.tsx`, `PainelMembro-1.tsx`); a decisão do que fazer com ela fica com o Victor e o Guilherme.
+- **Johannes:** J4, J5 e J6 vencidas em 15/11, sem branch no GitHub. `membros.ts` e as metas do `rh.ts` não fazem nenhuma chamada ao banco, e nenhuma tela chama o `alterarSetor`.
+- **Bernardo:** as 5 correções da B7 não começaram (sem branch).
+- **`horas-dev`:** sem login, nenhuma tabela é lida (protegido). `requerimentos` e `presenca_sede` ainda não existem; `dispensas` já saiu. O conector do Supabase pede nova autorização e o CLI deste computador está desligado do projeto, então o histórico de migrações não foi conferido.
+- **Replanejamento:** a semana 3 ficou só com o P0 (cálculo semanal, cronômetro que para sozinho, revisão e correções do RH, membros e metas reais). O requerimento inteiro (B8, G7, G8, J6, J7) passou para a semana 4. A J8 passou do Johannes para o Guilherme, como G10, e o Guilherme ganhou a G11 (painel do membro com o cálculo real). Tarefas novas no Notion: B7.1, B9, B10, G10 e G11; J4, J5 e J6 marcadas como atrasadas, com prazo novo.
 
 ### Feito em 13 e 14/11/2026
 
@@ -14,9 +24,13 @@ Onde paramos (14/11/2026, semana 2): **registros e cronômetro já usam o banco 
   - Fundo animado mais leve: ~30 quadros por segundo, linhas desenhadas em grupo, resolução limitada a 1,5x e pausa enquanto uma janela está aberta.
   - Janelas (gaveta, diálogo, confirmação) sem desfoque atrás: o desfoque era refeito a cada quadro por cima do fundo animado e travava a abertura. No lugar, uma camada escura um pouco mais forte.
   - `meuId()` guardado durante a sessão, sem uma consulta extra a cada busca.
-- As duas branches entraram na `main` direto pelo Git, a pedido do Victor (sem a tela de PR, porque o GitHub CLI não está instalado neste computador).
+- As branches de 14/11 entraram na `main` direto pelo Git, a pedido do Victor (sem a tela de PR, porque o GitHub CLI não está instalado neste computador).
 - **Limpeza:** apagadas 9 branches já juntadas na `main`. Sobrou só a `atualDev`, do Guilherme, que tem commits fora da `main`.
-- **Notion:** B6, B7, G5 e G6 marcadas como concluídas.
+- **Responsividade** (branch `ui/responsividade`, juntada em 14/11): revisão automática em 44 combinações de tela (360, 390, celular deitado e 1024 px) nos perfis membro, diretor do RH e diretor de setor, mais conferência visual tela por tela.
+  - Login no celular: o logo alargava o cartão e empurrava tudo para a direita, cortando o botão do Google. Agora fica centralizado.
+  - Painel do RH, diretores e presidência: abaixo de 1024 px, barra embaixo com Visão geral, Membros e Requerimentos (o diretor de setor fica com Ranking) e um botão "Mais" com o resto, no lugar do menu ☰ (decisão do Victor). A barra é a mesma do membro (`BarraInferior.tsx`), com fundo opaco.
+  - Tabela de membros sem a coluna Status cortada; cartões com selo usando a largura toda quando estreitos; gráfico das 8 semanas, revisão de cronômetros e ranking cabendo no celular.
+- **Notion:** B6, B7, G5 e G6 marcadas como concluídas. O trabalho de 14/11 entrou como V8 (calendário e fluidez) e V9 (responsividade), já concluídas.
 
 ### Feito em 11 e 12/11/2026
 
@@ -51,17 +65,18 @@ Onde paramos (14/11/2026, semana 2): **registros e cronômetro já usam o banco 
 
 ### Próximos passos
 
-Feito em 13/11/2026: o Victor rodou a `supabase/testes/teste.sql` no `horas-dev` e **todos os testes passaram**. Guilherme e Johannes avisados de que podem começar a G6 e a J5.
+Semana 3 (16 a 19/11; 20/11 é feriado). Reunião de decisão em 18/11. Detalhes no [`tarefas-semanas-2-a-4.md`](tarefas-semanas-2-a-4.md).
 
-1. **Bernardo**: as 5 correções acima (o `migration repair` já foi feito pelo Victor em 13/11), numa migração nova na `db/migracoes`, com PR. A branch foi apagada do GitHub em 14/11 porque não tinha nada fora da `main` (nada se perdeu); ele a recria com o mesmo nome a partir da `main` atualizada (`git checkout main`, `git pull`, `git checkout -b db/migracoes`). Combinado: daqui em diante, migração só pelo CLI e por PR, e só aplica no dev depois de aprovada. O Victor revisa o PR com a IA.
-2. **Johannes**: J4, J5 e J6 até 15/11. Com a G6 na `main`, a parte de registros da meta da semana 2 ("registrar horas com dados reais no `horas-dev`") está pronta; falta a J5 (membros e metas).
-3. **Guilherme**: dizer se a branch `atualDev` ainda serve. Se sim, vira um PR com nome no padrão do `CONTRIBUTING.md`; se não, é apagada.
-4. Victor decide o que adianta das semanas 3 e 4; depois disso, as tarefas vão para o Notion.
+1. **Bernardo:** B7.1 (as 5 correções acima, numa migração nova na `db/migracoes`, recriada a partir da `main` atualizada) até 17/11; B9 (cálculo semanal, primeiro sem os requerimentos) até 18/11; B10 (cronômetro que para sozinho após 10h) até 19/11. Combinado: migração só pelo CLI e por PR, e só aplica no dev depois de aprovada.
+2. **Johannes:** J5 (membros e metas reais) até 17/11; J4 (mudar setor) até 18/11; J6 só se der tempo.
+3. **Guilherme:** G10 (revisão de cronômetros e correções do RH, a antiga J8) até 18/11; G11 (`progresso.ts` real) até 19/11, depois da B9. Combinar com o Victor o destino da `atualDev`.
+4. **Victor:** reunião de 18/11. Se a B9 e a G10 não estiverem de pé, a semana 4 vira semana de completar o P0 e o requerimento vai para dezembro.
 
 ### Tarefas do Victor fora da IA
 
 - **E-mails da equipe no `horas-dev`:** trocar `troque.guilherme@ejuvv.com` e `troque.johannes@ejuvv.com` (tabela `membros`) pelos `@ejuvv.com` reais. Sem isso, os dois passam pelo Google, mas o site responde "Acesso negado. Procure o RH."
-- **V4:** convidar Guilherme e Johannes para a organização "EJUVV Dev" no Supabase (até 11/11; confirmar se foi feito). Ainda "A Fazer" no Notion.
+- **V6:** validação com o RH até 19/11 e reunião de decisão em 18/11.
+- **Regra a decidir com o Bernardo:** no cronômetro que passa da meia-noite, a parte do dia seguinte é salva como lançamento manual e pode escapar do corte de 10h e da revisão do RH.
 - **Resend:** revogar a chave criada antes da decisão de usar o Gmail da EJ.
 - **Google Cloud:** antes de ligar o login na produção (semana 4), trocar o URI de redirecionamento do prod antigo (`zetjgqdagnlkodbexnoe`, apagado) pelo novo: `https://gzjmavrrkqfqtqjycdnq.supabase.co/auth/v1/callback`.
 - **V5:** criar a conta `@ejuvv.com` que envia os e-mails e a senha de app (semana 3). Decidido em 11/11/2026: e-mail pelo Gmail da EJ, sem Resend.
