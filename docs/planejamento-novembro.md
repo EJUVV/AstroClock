@@ -26,7 +26,7 @@ Aprovado pelo Victor em 28/10/2026 e atualizado em 01/11/2026, com a reunião de
 | Kickoff | 30/10 | Feito na reunião presencial. 02/11 (segunda) é feriado de Finados |
 | Semana 1 | 03/11 a 06/11 | Semana curta (4 dias). Reunião em 04/11 |
 | Semana 2 | 09/11 a 13/11 | Reunião em 11/11 |
-| Semana 3 | 16/11 a 19/11 | 20/11 (sexta) é feriado da Consciência Negra. Reunião em 18/11 e validação com o RH até 19/11 |
+| Semana 3 | 16/11 a 19/11 | 20/11 (sexta) é feriado da Consciência Negra. Reunião na quinta, 19/11, às 11h (adiada de 18/11) e validação com o RH até 19/11 |
 | Semana 4 | 23/11 a 27/11 | Reunião em 25/11 |
 | Estabilização | 30/11 a 04/12 | Reunião em 02/12. Correções, produção no ar, cadastro dos membros reais, apresentação para a EJ |
 | **Início do teste** | **07/12** | Segunda-feira: o teste começa numa semana inteira, para o cálculo semanal ficar limpo |
@@ -113,7 +113,7 @@ Semana com feriado na sexta.
 
 **Meta até 19/11, validada com o RH:** uma semana inteira de horas aparecendo no painel do membro e no do RH.
 
-**Ponto de decisão (reunião de 18/11):** se o P0 não estiver todo de pé, a semana 4 vira semana de completar o P0, e o P1 passa para dezembro.
+**Ponto de decisão (reunião de 19/11, adiada de 18/11):** se o P0 não estiver todo de pé, a semana 4 vira semana de completar o P0, e o P1 passa para dezembro.
 
 ### Semana 4 (23/11 a 27/11) — Complementos e produção
 
@@ -164,7 +164,7 @@ Fechado em 01/11/2026 na seção 6 do [`arquitetura.md`](arquitetura.md), com as
 
 | Risco | Efeito | O que fazer |
 | --- | --- | --- |
-| Escopo apertado para 4 semanas (com 2 feriados) | P1 não termina em novembro | Prioridades da seção 4; ponto de decisão em 18/11 |
+| Escopo apertado para 4 semanas (com 2 feriados) | P1 não termina em novembro | Prioridades da seção 4; ponto de decisão em 19/11 |
 | Equipe com tempo parcial (EJ + faculdade) | Atrasos de dias por pessoa | PRs pequenos; uma tarefa por vez; avisar no grupo ao travar |
 | Respostas da diretora atrasarem | Requerimento e presença sem regra | Conversa até 06/11; o que continuar pendente fica para dezembro |
 | Hospedagem e e-mail sem definição | Produção e e-mail ficam para a última hora | Prazos da seção 6. O plano grátis da Vercel é só para uso pessoal e não comercial; se o Rodrigo entender que a EJ não se encaixa, usar Cloudflare Pages |

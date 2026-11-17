@@ -90,7 +90,7 @@ Conferido no GitHub, no Notion, no código e no `horas-dev` (só leitura):
 
 ### Próximos passos
 
-Semana 3 (16 a 19/11; 20/11 é feriado). Reunião de decisão em 18/11. Detalhes no [`tarefas-semanas-2-a-4.md`](tarefas-semanas-2-a-4.md).
+Semana 3 (16 a 19/11; 20/11 é feriado). Reunião de decisão na quinta, 19/11, às 11h (adiada em 17/11, era 18/11, porque boa parte das entregas da semana ainda não estava pronta; a equipe deve subir o que tiver, com branch e PR, até quarta, 18/11, à noite). Detalhes no [`tarefas-semanas-2-a-4.md`](tarefas-semanas-2-a-4.md).
 
 1. **Bernardo:** B7.1 (as 5 correções acima, numa migração nova na `db/migracoes`, recriada a partir da `main` atualizada) até 17/11; B9 (cálculo semanal, primeiro sem os requerimentos) até 18/11; B10 (cronômetro que para sozinho após 10h) até 19/11. Combinado: migração só pelo CLI e por PR, e só aplica no dev depois de aprovada.
 2. **Johannes:** J5 (membros e metas reais) até 17/11; J4 (mudar setor) até 18/11; J6 só se der tempo.
@@ -99,8 +99,8 @@ Semana 3 (16 a 19/11; 20/11 é feriado). Reunião de decisão em 18/11. Detalhes
    - Testar a revisão de cronômetros no `horas-dev` com o perfil `rh` (sair e entrar de novo no site). O resto da G10 só depois da J5.
    - G11 (`progresso.ts` real) até 19/11: combinar já com o Bernardo o nome e o formato da função da B9, para a G11 ser só a troca quando a B9 sair.
    - G8: só se o Victor fizer a V5 (adiantar parte da semana 4, mandando só para o próprio e-mail). Senão, fica para a semana 4.
-   - `atualDev`: decidir com o Victor na reunião de 18/11. Se aprovada, refazer a partir da `main` atual, sem as cópias `-1`, depois do P0.
-4. **Victor:** reunião de 18/11. Se a B9 e a G10 não estiverem de pé, a semana 4 vira semana de completar o P0 e o requerimento vai para dezembro. Levar o risco da J5: ela trava a G10, e o Johannes está atrasado desde a semana 2.
+   - `atualDev`: decidir com o Victor na reunião de 19/11. Se aprovada, refazer a partir da `main` atual, sem as cópias `-1`, depois do P0.
+4. **Victor:** reunião de 19/11, às 11h (adiada de 18/11). Como é o último dia útil antes do feriado, a decisão da semana 4 sai sem folga para ajustes na mesma semana. Se a B9 e a G10 não estiverem de pé, a semana 4 vira semana de completar o P0 e o requerimento vai para dezembro. Levar o risco da J5: ela trava a G10, e o Johannes está atrasado desde a semana 2.
 
 ### Tarefas do Victor fora da IA
 
@@ -109,7 +109,7 @@ Semana 3 (16 a 19/11; 20/11 é feriado). Reunião de decisão em 18/11. Detalhes
 - **Decidir a G8 antecipada:** se quiser que o Guilherme comece a G8 nesta semana, fazer a V5 agora e passar a senha de app a ele só por canal privado.
 - **Perfil do Guilherme:** pedir para voltar para `membro` no `horas-dev` quando ele for testar a G11.
 - **GitHub CLI:** instalar neste computador (`winget install --id GitHub.cli`, depois `gh auth login`), para a IA conseguir abrir e revisar os PRs que o `CONTRIBUTING.md` pede.
-- **V6:** validação com o RH até 19/11 e reunião de decisão em 18/11.
+- **V6:** validação com o RH até 19/11 e reunião de decisão na quinta, 19/11, às 11h.
 - **Regra a decidir com o Bernardo:** no cronômetro que passa da meia-noite, a parte do dia seguinte é salva como lançamento manual e pode escapar do corte de 10h e da revisão do RH.
 - **Resend:** revogar a chave criada antes da decisão de usar o Gmail da EJ.
 - **Google Cloud:** antes de ligar o login na produção (semana 4), trocar o URI de redirecionamento do prod antigo (`zetjgqdagnlkodbexnoe`, apagado) pelo novo: `https://gzjmavrrkqfqtqjycdnq.supabase.co/auth/v1/callback`.

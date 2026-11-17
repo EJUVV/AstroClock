@@ -49,11 +49,11 @@ Observações:
 
 ## Semana 3 (16/11 a 19/11) — Painéis e requerimento
 
-Semana curta: 20/11 (sexta) é feriado. Reunião em 18/11 e validação com o RH até 19/11.
+Semana curta: 20/11 (sexta) é feriado. Reunião na quinta, 19/11, às 11h (adiada de 18/11) e validação com o RH até 19/11.
 
 **Meta até 19/11, validada com o RH:** uma semana inteira de horas aparecendo no painel do membro e no do RH.
 
-**Ponto de decisão (18/11):** se o P0 não estiver todo de pé, a semana 4 vira semana de completar o P0, e o P1 (requerimento, presença, ranking, gráfico) passa para dezembro.
+**Ponto de decisão (19/11, às 11h; adiado de 18/11):** se o P0 não estiver todo de pé, a semana 4 vira semana de completar o P0, e o P1 (requerimento, presença, ranking, gráfico) passa para dezembro.
 
 ### Replanejamento de 16/11
 
@@ -282,7 +282,7 @@ Decidido em 11/11/2026: os e-mails saem por uma conta `@ejuvv.com` do Google Wor
 
 **O que fazer**
 - Com o RH, usar o `horas-dev` por uma semana inteira de horas e conferir os dois painéis.
-- Conduzir o ponto de decisão de 18/11.
+- Conduzir o ponto de decisão de 19/11, às 11h.
 
 **Como saber que terminou**
 - Lista de ajustes repassada para a equipe, ou validação aprovada.
@@ -296,7 +296,7 @@ Decidido em 11/11/2026: os e-mails saem por uma conta `@ejuvv.com` do Google Wor
 
 **Meta até 27/11:** o piloto completo, já em produção.
 
-**Vindas da semana 3 (replanejamento de 16/11):** B8 e B11 (Bernardo), G7 e G8 (Guilherme), J7 e talvez J6 (Johannes). O texto delas continua na seção da semana 3. Se a reunião de 18/11 decidir completar o P0 primeiro, o requerimento passa para dezembro.
+**Vindas da semana 3 (replanejamento de 16/11):** B8 e B11 (Bernardo), G7 e G8 (Guilherme), J7 e talvez J6 (Johannes). O texto delas continua na seção da semana 3. Se a reunião de 19/11 decidir completar o P0 primeiro, o requerimento passa para dezembro.
 
 ### Bernardo (banco)
 
