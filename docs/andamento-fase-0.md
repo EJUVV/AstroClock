@@ -1,10 +1,22 @@
 # Andamento da Fase 0
 
-Retrato de onde a Fase 0 parou (atualizado em 16/11/2026). Ao retomar com uma IA, peça para ela ler este arquivo e o [`fase-0.md`](fase-0.md). Quando a Fase 0 terminar, este arquivo pode ser apagado (antes, passe a seção "Ambientes" para o `arquitetura.md` ou o `README.md`).
+Retrato de onde a Fase 0 parou (atualizado em 17/11/2026). Ao retomar com uma IA, peça para ela ler este arquivo e o [`fase-0.md`](fase-0.md). Quando a Fase 0 terminar, este arquivo pode ser apagado (antes, passe a seção "Ambientes" para o `arquitetura.md` ou o `README.md`).
 
 ## Próxima sessão: comece por aqui
 
-Onde paramos (16/11/2026, início da semana 3): **registros e cronômetro já usam o banco de verdade (G5 e G6 na `main`), mas o resto do painel ainda é falso.** A semana 2 fechou pela metade: as tarefas do Johannes (J4, J5, J6) e as 5 correções da B7 não chegaram. A semana 3 foi replanejada em 16/11 para focar no P0 (ver "Revisão de 16/11" e o [`tarefas-semanas-2-a-4.md`](tarefas-semanas-2-a-4.md)). O login com Google funciona de verdade no `horas-dev` desde 10/11, mas só para o Victor e o Bernardo: Guilherme e Johannes ainda estão com e-mail provisório no banco. As regras estão fechadas no [`regras-de-negocio.md`](regras-de-negocio.md), e as tarefas das semanas 2 a 4 estão em [`tarefas-semanas-2-a-4.md`](tarefas-semanas-2-a-4.md).
+Onde paramos (16/11/2026, início da semana 3): **registros e cronômetro já usam o banco de verdade (G5 e G6 na `main`), mas o resto do painel ainda é falso.** A semana 2 fechou pela metade: as tarefas do Johannes (J4, J5, J6) e as 5 correções da B7 não chegaram. A semana 3 foi replanejada em 16/11 para focar no P0 (ver "Revisão de 16/11" e o [`tarefas-semanas-2-a-4.md`](tarefas-semanas-2-a-4.md)). O login com Google funciona de verdade no `horas-dev` desde 10/11 para o Victor, o Bernardo e o Guilherme. Só o Johannes ainda está com e-mail provisório no banco (conferido em 17/11). As regras estão fechadas no [`regras-de-negocio.md`](regras-de-negocio.md), e as tarefas das semanas 2 a 4 estão em [`tarefas-semanas-2-a-4.md`](tarefas-semanas-2-a-4.md).
+
+### Conferência de 17/11/2026
+
+Conferido no GitHub, no código e no `horas-dev` (só leitura):
+
+- **GitHub:** nada novo desde 16/11. Ainda não há branch da B7.1 (Bernardo) nem da J5 (Johannes), as duas com prazo em 17/11. A `atualDev` continua parada em 13/11.
+- **Código:** `npm run lint` sem erros (6 avisos `only-export-components`) e `npm run build` OK (aviso de um pedaço de 656 kB, acima do limite de 500 kB do Vite).
+- **`horas-dev`:** as 6 migrações da pasta `supabase/migrations/` aparecem como aplicadas; 6 tabelas, todas com RLS (117 registros, auditoria vazia). O e-mail do Guilherme já foi trocado; falta só o `troque.johannes`.
+- **Correção da revisão de 16/11:** o conector do Supabase voltou a funcionar (enxerga o `horas-dev` e o `horas-prod`), e o CLI deste computador está logado e ligado ao `horas-dev`.
+- **Atenção:** o conector do Supabase tem permissão de escrita nos dois bancos, inclusive no `horas-prod`. Quem impede uma IA de mexer na produção é a regra do `AGENTS.md`, não a permissão do conector.
+- **Ferramentas deste computador:** sem GitHub CLI (`gh`), sem Python e sem Docker. Sem o `gh`, a IA não abre nem revisa PRs. Python e Docker não fazem falta hoje.
+- **Arquivo solto no repositório:** `Claude outputs/AstroClock-visual-roxo.zip` (34 kB, do commit `11756ac`). Decidir se sai do repositório.
 
 ### Revisão de 16/11/2026 (início da semana 3)
 
@@ -61,7 +73,7 @@ Conferido no GitHub, no Notion, no código e no `horas-dev` (só leitura):
 - Tabelas: `membros`, `setores`, `metas`, `registros`, `historico_setor` e `auditoria` (a `dispensas` saiu). Todas com RLS; `registros` com leitura por perfil e escrita só nos próprios. Seed com 20 membros (5 perfis) e 115 registros.
 - Funções do RH para corrigir registros e revisar cronômetros já existem (ver `arquitetura.md`, seção 5).
 - **Histórico de migrações em dia** (13/11/2026): o Victor rodou o `migration repair` no `horas-dev`, e as 6 migrações aparecem como aplicadas no `npx supabase migration list`. A próxima migração já pode ir pelo `npx supabase db push`.
-- **CLI:** use `--linked` nos comandos `migration list`, `migration repair` e `db push`. O CLI avisa que, na próxima versão grande (v3), esses comandos passam a mirar o banco local se o `--linked` não for passado. Este computador está na v2.122.0, ligado ao `horas-dev`.
+- **CLI:** use `--linked` nos comandos `migration list`, `migration repair` e `db push`. O CLI avisa que, na próxima versão grande (v3), esses comandos passam a mirar o banco local se o `--linked` não for passado. Este computador está na v2.122.0, ligado ao `horas-dev`. A v3.2.0 já saiu (aviso de 17/11); a recomendação é ficar na v2 até o fim da semana 3 e, ao atualizar, sempre passar o `--linked`.
 
 ### Próximos passos
 
@@ -74,7 +86,8 @@ Semana 3 (16 a 19/11; 20/11 é feriado). Reunião de decisão em 18/11. Detalhes
 
 ### Tarefas do Victor fora da IA
 
-- **E-mails da equipe no `horas-dev`:** trocar `troque.guilherme@ejuvv.com` e `troque.johannes@ejuvv.com` (tabela `membros`) pelos `@ejuvv.com` reais. Sem isso, os dois passam pelo Google, mas o site responde "Acesso negado. Procure o RH."
+- **E-mail do Johannes no `horas-dev`:** trocar `troque.johannes@ejuvv.com` (tabela `membros`) pelo `@ejuvv.com` real. Sem isso, ele passa pelo Google, mas o site responde "Acesso negado. Procure o RH." O do Guilherme já foi trocado (conferido em 17/11).
+- **GitHub CLI:** instalar neste computador (`winget install --id GitHub.cli`, depois `gh auth login`), para a IA conseguir abrir e revisar os PRs que o `CONTRIBUTING.md` pede.
 - **V6:** validação com o RH até 19/11 e reunião de decisão em 18/11.
 - **Regra a decidir com o Bernardo:** no cronômetro que passa da meia-noite, a parte do dia seguinte é salva como lançamento manual e pode escapar do corte de 10h e da revisão do RH.
 - **Resend:** revogar a chave criada antes da decisão de usar o Gmail da EJ.
