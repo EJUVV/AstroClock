@@ -284,6 +284,32 @@ export type Database = {
       }
     }
     Functions: {
+      cancelar_registro_de_membro: {
+        Args: { p_id: string; p_motivo: string }
+        Returns: Database["public"]["Tables"]["registros"]["Row"]
+      }
+      criar_registro_de_membro: {
+        Args: {
+          p_descricao: string
+          p_fim: string
+          p_inicio: string
+          p_local: Database["public"]["Enums"]["local_registro"]
+          p_membro_id: string
+          p_motivo: string
+        }
+        Returns: Database["public"]["Tables"]["registros"]["Row"]
+      }
+      editar_registro_de_membro: {
+        Args: {
+          p_descricao?: string
+          p_fim?: string
+          p_id: string
+          p_inicio?: string
+          p_local?: Database["public"]["Enums"]["local_registro"]
+          p_motivo: string
+        }
+        Returns: Database["public"]["Tables"]["registros"]["Row"]
+      }
       eh_diretor_rh: { Args: never; Returns: boolean }
       eh_rh: { Args: never; Returns: boolean }
       elegivel_na_semana: {
@@ -315,6 +341,10 @@ export type Database = {
       perfil_tem_meta: {
         Args: { p: Database["public"]["Enums"]["perfil"] }
         Returns: boolean
+      }
+      revisar_cronometro: {
+        Args: { p_aprovar: boolean; p_id: string; p_motivo?: string }
+        Returns: Database["public"]["Tables"]["registros"]["Row"]
       }
       setor_que_dirijo: { Args: never; Returns: string }
       ve_tudo: { Args: never; Returns: boolean }
