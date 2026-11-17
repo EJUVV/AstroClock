@@ -18,6 +18,19 @@ Conferido no GitHub, no código e no `horas-dev` (só leitura):
 - **Ferramentas deste computador:** sem GitHub CLI (`gh`), sem Python e sem Docker. Sem o `gh`, a IA não abre nem revisa PRs. Python e Docker não fazem falta hoje.
 - **Arquivo solto no repositório:** `Claude outputs/AstroClock-visual-roxo.zip` (34 kB, do commit `11756ac`). Decidir se sai do repositório.
 
+### Revisão da G10 (17/11/2026)
+
+O Guilherme subiu a G10 na branch `feat/Revisão-de-cronômetros-e-correções-do-RH-reais` (commit `30f31d0`, 17/11 às 12:28). Revisada pelo Victor com a IA; **ainda não juntada na `main`**.
+
+- **Bom:** as 6 funções de `rh.ts` (`cronometrosEmRevisao`, `revisarCronometro`, `buscarRegistrosDoMembro`, `criarRegistroDeMembro`, `editarRegistroDeMembro`, `cancelarRegistroDeMembro`) seguem o contrato do `arquitetura.md` e usam as funções do banco da B7. Motivo obrigatório no site e no banco. A versão falsa foi para `rh-falso.ts` (com `VITE_LOGIN_FALSO=true`), no mesmo padrão da G6. Correção que passa da meia-noite usa o `partesPorDia` e desfaz as partes criadas se uma falhar. `erroDoBanco` diz "deste membro" quando é o RH. Lint e build OK; as assinaturas das 4 funções batem com o `horas-dev`; sem conflito com a `main`.
+- **Trava o teste:** a tela do membro no RH (`DetalheMembro.tsx`) e a revisão de cronômetros pegam os membros da lista falsa (`membros.ts`, ids `m1`, `m2`...). Com login real, o id falso vai para o banco, que recusa: o RH veria "Não foi possível salvar. Tente de novo." ao abrir um membro, e a revisão fica sem os nomes. **A G10 só pode ser testada por inteiro depois da J5** (membros reais, do Johannes).
+- **Correções pedidas ao Guilherme:**
+  1. Gerar de novo o `tipos-banco.ts` com `npx supabase gen types typescript --linked > src/compartilhado/tipos-banco.ts`. Foi editado à mão e ainda tem a `dispensas` (já apagada) e não tem a `auditoria`.
+  2. Branch sem acento e em minúsculas (ex.: `feat/g10-revisao-e-correcoes-rh`), commit no formato `feat: ...` (o atual é "atualizacion") e PR para a `main`.
+  3. `editarRegistroDeMembro`: se o registro era um cronômetro ainda ligado e uma parte falha, o desfazer não volta ele para "ligado". Avisar no erro ou bloquear a edição de cronômetro ligado pelo RH (o Guilherme escolhe e conta ao Victor).
+- **Perfil do Guilherme no `horas-dev`:** trocado de `membro` para `rh` em 17/11, a pedido do Victor, para ele testar a G10 (o banco só deixa o RH revisar e corrigir). **Voltar para `membro` antes do teste da G11.** O Victor também está como `rh` no `horas-dev` (o seed dizia `diretor_rh`).
+- **No `horas-dev`:** 1 registro esperando revisão e `auditoria` vazia; ninguém testou essas funções no banco ainda.
+
 ### Revisão de 16/11/2026 (início da semana 3)
 
 Conferido no GitHub, no Notion, no código e no `horas-dev` (só leitura):
@@ -81,12 +94,20 @@ Semana 3 (16 a 19/11; 20/11 é feriado). Reunião de decisão em 18/11. Detalhes
 
 1. **Bernardo:** B7.1 (as 5 correções acima, numa migração nova na `db/migracoes`, recriada a partir da `main` atualizada) até 17/11; B9 (cálculo semanal, primeiro sem os requerimentos) até 18/11; B10 (cronômetro que para sozinho após 10h) até 19/11. Combinado: migração só pelo CLI e por PR, e só aplica no dev depois de aprovada.
 2. **Johannes:** J5 (membros e metas reais) até 17/11; J4 (mudar setor) até 18/11; J6 só se der tempo.
-3. **Guilherme:** G10 (revisão de cronômetros e correções do RH, a antiga J8) até 18/11; G11 (`progresso.ts` real) até 19/11, depois da B9. Combinar com o Victor o destino da `atualDev`.
-4. **Victor:** reunião de 18/11. Se a B9 e a G10 não estiverem de pé, a semana 4 vira semana de completar o P0 e o requerimento vai para dezembro.
+3. **Guilherme** (combinado em 17/11, ver "Revisão da G10"):
+   - Hoje: as 3 correções da G10 e abrir o PR.
+   - Testar a revisão de cronômetros no `horas-dev` com o perfil `rh` (sair e entrar de novo no site). O resto da G10 só depois da J5.
+   - G11 (`progresso.ts` real) até 19/11: combinar já com o Bernardo o nome e o formato da função da B9, para a G11 ser só a troca quando a B9 sair.
+   - G8: só se o Victor fizer a V5 (adiantar parte da semana 4, mandando só para o próprio e-mail). Senão, fica para a semana 4.
+   - `atualDev`: decidir com o Victor na reunião de 18/11. Se aprovada, refazer a partir da `main` atual, sem as cópias `-1`, depois do P0.
+4. **Victor:** reunião de 18/11. Se a B9 e a G10 não estiverem de pé, a semana 4 vira semana de completar o P0 e o requerimento vai para dezembro. Levar o risco da J5: ela trava a G10, e o Johannes está atrasado desde a semana 2.
 
 ### Tarefas do Victor fora da IA
 
 - **E-mail do Johannes no `horas-dev`:** trocar `troque.johannes@ejuvv.com` (tabela `membros`) pelo `@ejuvv.com` real. Sem isso, ele passa pelo Google, mas o site responde "Acesso negado. Procure o RH." O do Guilherme já foi trocado (conferido em 17/11).
+- **Mandar ao Guilherme a revisão da G10** (as 3 correções, o teste com perfil `rh` e o que adiantar). Mensagem pronta escrita pela IA em 17/11.
+- **Decidir a G8 antecipada:** se quiser que o Guilherme comece a G8 nesta semana, fazer a V5 agora e passar a senha de app a ele só por canal privado.
+- **Perfil do Guilherme:** pedir para voltar para `membro` no `horas-dev` quando ele for testar a G11.
 - **GitHub CLI:** instalar neste computador (`winget install --id GitHub.cli`, depois `gh auth login`), para a IA conseguir abrir e revisar os PRs que o `CONTRIBUTING.md` pede.
 - **V6:** validação com o RH até 19/11 e reunião de decisão em 18/11.
 - **Regra a decidir com o Bernardo:** no cronômetro que passa da meia-noite, a parte do dia seguinte é salva como lançamento manual e pode escapar do corte de 10h e da revisão do RH.
