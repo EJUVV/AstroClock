@@ -1,4 +1,4 @@
-// FALSO: trocar pela versão real (ver docs/arquitetura.md)
+// FALSO (exceto metasAtuais, listarMetas e alterarMetas, que já são reais): trocar pela versão real (ver docs/arquitetura.md)
 import type {
   LinhaRanking,
   Membro,
@@ -12,6 +12,8 @@ import type {
   ResumoMembroSemana,
   SituacaoRequerimento,
 } from '../tipos.ts'
+import { supabase } from '../supabase.ts'
+import { erroDoBanco } from './banco.ts'
 import { corrigeRegistros, temPainelRH, veRequerimentos } from '../perfis.ts'
 import {
   anexos,
@@ -25,8 +27,6 @@ import {
   membros,
   membroLogado,
   membrosElegiveis,
-  metaDaSemana,
-  metas,
   perfilFalso,
   progressoDoMembro,
   registros,
@@ -216,31 +216,60 @@ export async function responderRequerimento(id: string, aprovar: boolean, motivo
   }
 }
 
+interface LinhaMeta {
+  horas_total: number | string
+  horas_sede: number | string
+  vigente_desde: string
+}
+
+function paraMetas(linha: LinhaMeta): Metas {
+  return {
+    horasTotal: Number(linha.horas_total),
+    horasSede: Number(linha.horas_sede),
+    vigenteDesde: linha.vigente_desde,
+  }
+}
+
+// A meta que vale na semana atual: a mais recente que já começou.
 export async function metasAtuais(): Promise<Metas> {
-  await atraso()
-  return copia(metaDaSemana(semanaAtual()))
+  const { data, error } = await supabase
+    .from('metas')
+    .select('horas_total, horas_sede, vigente_desde')
+    .lte('vigente_desde', semanaAtual())
+    .order('vigente_desde', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+  if (error) throw erroDoBanco(error)
+  if (!data) throw new Error('Nenhuma meta cadastrada')
+  return paraMetas(data)
 }
 
 // Todas as metas, inclusive as programadas para semanas futuras, da mais recente para a mais antiga.
 export async function listarMetas(): Promise<Metas[]> {
-  await atraso()
-  return copia([...metas].sort((a, b) => b.vigenteDesde.localeCompare(a.vigenteDesde)))
+  const { data, error } = await supabase
+    .from('metas')
+    .select('horas_total, horas_sede, vigente_desde')
+    .order('vigente_desde', { ascending: false })
+  if (error) throw erroDoBanco(error)
+  return (data ?? []).map(paraMetas)
 }
 
-// O diretor escolhe a segunda-feira em que a meta começa, a partir da semana seguinte
-// (a atual e as anteriores mantêm a meta delas). Ela vale até a próxima meta programada.
-// A meta de sede pode ser 0 (férias durante o piloto).
+// O diretor escolhe a segunda-feira em que a meta começa, a partir da semana seguinte.
+// Se já houver meta programada para essa segunda, ela é substituída. Quem pode: só o diretor_rh (RLS).
 export async function alterarMetas(horasTotal: number, horasSede: number, vigenteDesde: string): Promise<void> {
-  await atraso()
-  if (perfilFalso() !== 'diretor_rh') throw new Error('Só o diretor do RH pode alterar as metas')
   if (!(horasTotal > 0)) throw new Error('A meta total precisa ser maior que zero')
   if (!(horasSede >= 0)) throw new Error('A meta de sede não pode ser negativa')
   if (segundaDaSemana(vigenteDesde) !== vigenteDesde) throw new Error('Escolha a segunda-feira da semana')
   if (vigenteDesde <= semanaAtual()) throw new Error('A meta só pode mudar a partir da semana seguinte')
-  const indice = metas.findIndex((m) => m.vigenteDesde === vigenteDesde)
-  if (indice >= 0) metas.splice(indice, 1)
-  metas.push({ horasTotal, horasSede, vigenteDesde })
+  const { error } = await supabase
+    .from('metas')
+    .upsert(
+      { horas_total: horasTotal, horas_sede: horasSede, vigente_desde: vigenteDesde },
+      { onConflict: 'vigente_desde' },
+    )
+  if (error) throw erroDoBanco(error)
 }
+
 
 // Percentual por membros: cumpriram ÷ (elegíveis − dispensados).
 export async function percentualDaSemana(semana: string, setor?: string): Promise<number> {
