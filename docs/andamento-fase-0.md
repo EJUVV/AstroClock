@@ -1,10 +1,25 @@
 # Andamento da Fase 0
 
-Retrato de onde a Fase 0 parou (atualizado em 17/11/2026). Ao retomar com uma IA, peça para ela ler este arquivo e o [`fase-0.md`](fase-0.md). Quando a Fase 0 terminar, este arquivo pode ser apagado (antes, passe a seção "Ambientes" para o `arquitetura.md` ou o `README.md`).
+Retrato de onde a Fase 0 parou (atualizado em 24/11/2026). Ao retomar com uma IA, peça para ela ler este arquivo e o [`fase-0.md`](fase-0.md). Quando a Fase 0 terminar, este arquivo pode ser apagado (antes, passe a seção "Ambientes" para o `arquitetura.md` ou o `README.md`).
 
 ## Próxima sessão: comece por aqui
 
-Onde paramos (16/11/2026, início da semana 3): **registros e cronômetro já usam o banco de verdade (G5 e G6 na `main`), mas o resto do painel ainda é falso.** A semana 2 fechou pela metade: as tarefas do Johannes (J4, J5, J6) e as 5 correções da B7 não chegaram. A semana 3 foi replanejada em 16/11 para focar no P0 (ver "Revisão de 16/11" e o [`tarefas-semanas-2-a-4.md`](tarefas-semanas-2-a-4.md)). O login com Google funciona de verdade no `horas-dev` desde 10/11 para o Victor, o Bernardo e o Guilherme. Só o Johannes ainda está com e-mail provisório no banco (conferido em 17/11). As regras estão fechadas no [`regras-de-negocio.md`](regras-de-negocio.md), e as tarefas das semanas 2 a 4 estão em [`tarefas-semanas-2-a-4.md`](tarefas-semanas-2-a-4.md).
+Onde paramos (24/11/2026, semana 4): **o banco já tem o cálculo semanal, o corte de 10h e as correções da B7 prontos e revisados (PR #9), mas nada disso está na `main` nem no `horas-dev` ainda.** O site continua com registros e cronômetro reais (G5 e G6) e o resto falso. A ordem combinada em 23/11 para o `rh.ts` é G10, depois J5, depois J10; a G10 trava as outras duas. O acompanhamento das tarefas está no Notion (Quadro de Sprints, projeto AstroClock), que foi atualizado em 23/11. As regras estão fechadas no [`regras-de-negocio.md`](regras-de-negocio.md).
+
+### Revisão de 23/11 e conferência de 24/11/2026 (início da semana 4)
+
+As revisões de 23/11 foram feitas pelo Victor e registradas no Notion; em 24/11 a IA passou o resumo para cá e conferiu o GitHub, o `horas-dev` (só leitura) e o DNS.
+
+- **Bernardo (B7.1, B9 e B10):** entregues em 19/11 numa branch enviada pelo upload do site (`B7.1,-B10-e-cálculo-da-semanaD`, commit `632bdcf`): 3 migrações novas (`20261117214000_correcoes_da_revisao_b7`, `20261119111000_cronometro_encerra_sozinho`, `20261119111100_calculo_da_semana`) e a `teste.sql` atualizada. Revisadas e aprovadas no conteúdo em 23/11; o Victor abriu o **PR #9** a partir da branch, com a CI passando. Ainda não está na `main` nem aplicado no `horas-dev` (a última migração lá continua a `20261112170000`).
+  - A B10 faz o banco dividir o cronômetro na meia-noite, cortar em 10h e gravar o fim com a hora do servidor (isso resolve a regra que estava pendente sobre a parte do dia seguinte). Como o site também dividia, **a B10 só vai para o `horas-dev` junto com a G13** (Guilherme), para as duas divisões não brigarem.
+  - Funções da B9 para o site: `progresso_da_semana(p_semana)` e `progresso_do_mes(p_mes)` (membro, G11) e `percentual_da_semana`, `resumo_da_semana`, `abaixo_da_meta`, `medias_da_semana`, `progresso_de_membro` e `semanas_seguidas_abaixo` (RH, J10).
+- **Johannes (J5):** entregue em 18/11 na branch `johannes/membros-real`, sem PR. O `membros.ts` está bom; faltam 3 ajustes: (1) `alterarMetas` usa `upsert` e o banco só aceita `insert` (ler pela visão `lista_de_metas`); (2) as 3 funções de metas não têm o `if (loginFalso)`, o que quebra o site de protótipo; (3) depois que a G10 entrar, trazer a `main` e resolver o conflito no `rh.ts`. Novo prazo: 24/11.
+  - **O e-mail do Johannes no `horas-dev` ainda é o provisório** (conferido em 24/11): sem a troca, ele não consegue testar a J5 com o login real.
+- **Guilherme (G10):** as 3 correções da revisão de 17/11 ainda não foram feitas, e não há PR. Novo prazo: 24/11. É a primeira a entrar na `main`.
+- **Ordem do `rh.ts`:** G10 → J5 → J10. A J10 passa para o Guilherme se não andar até 25/11.
+- **Tarefas novas no Notion (23/11):** G13 (parar o cronômetro do jeito da B10, até 25/11), J10 (painel do RH com o cálculo real, até 26/11), B14 (migrações no `horas-prod` com o Victor, até 26/11, depois do PR #9 na `main` e testado no dev) e G12 (a tela de Configurações da `atualDev`, como extra, até 27/11). A troca das funções do site saiu da B9: a do membro ficou na G11 (até 25/11) e a do RH na J10.
+- **Perfis da equipe no `horas-dev`:** Victor, Johannes e Guilherme como `rh`; Bernardo como `membro`. O Guilherme volta para `membro` antes do teste da G11.
+- **E-mail da EJ:** o DNS do `ejuvv.com` caiu quando o plano da HostGator expirou (os servidores `ns944`/`ns945.hostgator.com.br` deixaram de responder, e os e-mails pararam de chegar). Resolvido pelo Victor: em 24/11 o domínio aponta para `byte` e `pixel.dns-parking.com`, com o MX `smtp.google.com`, o SPF do Google e um DMARC. **Falta o DKIM** (`google._domainkey`), que se gera no painel do Google Workspace e ajuda a não cair no spam. A conta da UOL usada nessa busca tem e-mail de contato `@ejuvv.com` e estava com o cadastro pendente de validação (prazo de 3 dias a partir de 19/11).
 
 ### Conferência de 17/11/2026
 
@@ -90,31 +105,29 @@ Conferido no GitHub, no Notion, no código e no `horas-dev` (só leitura):
 
 ### Próximos passos
 
-Semana 3 (16 a 19/11; 20/11 é feriado). Reunião de decisão na quinta, 19/11, às 11h (adiada em 17/11, era 18/11, porque boa parte das entregas da semana ainda não estava pronta; a equipe deve subir o que tiver, com branch e PR, até quarta, 18/11, à noite). Detalhes no [`tarefas-semanas-2-a-4.md`](tarefas-semanas-2-a-4.md).
+Semana 4 (23 a 27/11). Meta: o piloto completo, em produção. O teste com membros começa em 07/12. Tarefas e prazos no Notion (Quadro de Sprints).
 
-1. **Bernardo:** B7.1 (as 5 correções acima, numa migração nova na `db/migracoes`, recriada a partir da `main` atualizada) até 17/11; B9 (cálculo semanal, primeiro sem os requerimentos) até 18/11; B10 (cronômetro que para sozinho após 10h) até 19/11. Combinado: migração só pelo CLI e por PR, e só aplica no dev depois de aprovada.
-2. **Johannes:** J5 (membros e metas reais) até 17/11; J4 (mudar setor) até 18/11; J6 só se der tempo.
-3. **Guilherme** (combinado em 17/11, ver "Revisão da G10"):
-   - Hoje: as 3 correções da G10 e abrir o PR.
-   - Testar a revisão de cronômetros no `horas-dev` com o perfil `rh` (sair e entrar de novo no site). O resto da G10 só depois da J5.
-   - G11 (`progresso.ts` real) até 19/11: combinar já com o Bernardo o nome e o formato da função da B9, para a G11 ser só a troca quando a B9 sair.
-   - G8: só se o Victor fizer a V5 (adiantar parte da semana 4, mandando só para o próprio e-mail). Senão, fica para a semana 4.
-   - `atualDev`: decidir com o Victor na reunião de 19/11. Se aprovada, refazer a partir da `main` atual, sem as cópias `-1`, depois do P0.
-4. **Victor:** reunião de 19/11, às 11h (adiada de 18/11). Como é o último dia útil antes do feriado, a decisão da semana 4 sai sem folga para ajustes na mesma semana. Se a B9 e a G10 não estiverem de pé, a semana 4 vira semana de completar o P0 e o requerimento vai para dezembro. Levar o risco da J5: ela trava a G10, e o Johannes está atrasado desde a semana 2.
+1. **Guilherme:** G10 com as 3 correções e PR até 24/11 (trava a J5 e a J10); G13 até 25/11, junto com a aplicação da B10 no `horas-dev`; G11 até 25/11, depois da B9 no `horas-dev`; G12 (extra) até 27/11. Pode herdar a J10 se ela não andar até 25/11.
+2. **Johannes:** J5 com os 3 ajustes e PR até 24/11, depois da G10; J10 até 26/11; J4 até 25/11.
+3. **Bernardo:** PR #9 já revisado. Aplicar no `horas-dev` junto com a G13 (combinar o dia com o Guilherme e o Victor); depois B14 com o Victor até 26/11.
+4. **Victor:**
+   - Cobrar a G10 hoje; se não chegar até 25/11 cedo, terminar as 3 correções com a IA e abrir o PR (avisando o Guilherme).
+   - Marcar com o Bernardo e o Guilherme o dia de juntar o PR #9 e aplicar no `horas-dev` (junto com a G13).
+   - Adiantar a V7 (produção) no que não depende da B14: projeto de produção na Vercel sem o login falso, endereço de volta do Google no `horas-prod` e provedor Google ligado no `horas-prod`.
+   - V6 (validação com o RH) assim que a B9 estiver no `horas-dev` e a J10 na `main`.
 
 ### Tarefas do Victor fora da IA
 
-- **E-mail do Johannes no `horas-dev`:** trocar `troque.johannes@ejuvv.com` (tabela `membros`) pelo `@ejuvv.com` real. Sem isso, ele passa pelo Google, mas o site responde "Acesso negado. Procure o RH." O do Guilherme já foi trocado (conferido em 17/11).
-- **Mandar ao Guilherme a revisão da G10** (as 3 correções, o teste com perfil `rh` e o que adiantar). Mensagem pronta escrita pela IA em 17/11.
+- **E-mail do Johannes no `horas-dev` (urgente para a J5):** trocar `troque.johannes@ejuvv.com` (tabela `membros`) pelo `@ejuvv.com` real. Ainda provisório em 24/11. Sem isso, ele passa pelo Google, mas o site responde "Acesso negado. Procure o RH."
 - **Decidir a G8 antecipada:** se quiser que o Guilherme comece a G8 nesta semana, fazer a V5 agora e passar a senha de app a ele só por canal privado.
 - **Perfil do Guilherme:** pedir para voltar para `membro` no `horas-dev` quando ele for testar a G11.
 - **GitHub CLI:** instalar neste computador (`winget install --id GitHub.cli`, depois `gh auth login`), para a IA conseguir abrir e revisar os PRs que o `CONTRIBUTING.md` pede.
-- **V6:** validação com o RH até 19/11 e reunião de decisão na quinta, 19/11, às 11h.
-- **Regra a decidir com o Bernardo:** no cronômetro que passa da meia-noite, a parte do dia seguinte é salva como lançamento manual e pode escapar do corte de 10h e da revisão do RH.
+- **V6:** validação com o RH depois que a B9 estiver no `horas-dev` e a J10 na `main` (a reunião de 19/11 não ficou registrada aqui; o plano da semana 4 seguiu o Notion de 23/11).
+- **Regra do cronômetro na meia-noite:** resolvida pela B10 (o banco divide na meia-noite e corta em 10h). Falta a G13 no site.
 - **Resend:** revogar a chave criada antes da decisão de usar o Gmail da EJ.
 - **Google Cloud:** antes de ligar o login na produção (semana 4), trocar o URI de redirecionamento do prod antigo (`zetjgqdagnlkodbexnoe`, apagado) pelo novo: `https://gzjmavrrkqfqtqjycdnq.supabase.co/auth/v1/callback`.
 - **V5:** criar a conta `@ejuvv.com` que envia os e-mails e a senha de app (semana 3). Decidido em 11/11/2026: e-mail pelo Gmail da EJ, sem Resend.
-- **Domínio:** o `ejuvv.com` continua ativo até 21/02/2027 (registro pela Tucows), mas o DNS ainda está na HostGator. Descobrir com o Rodrigo quem tem acesso e quem renova, porque o e-mail da EJ inteira depende disso.
+- **Domínio e DNS:** o `ejuvv.com` vale até 21/02/2027 (registro pela Tucows). O DNS saiu da HostGator (expirada) e, em 24/11, está em `dns-parking.com` com MX, SPF e DMARC do Google. Falta: gerar o DKIM no Google Workspace; anotar quem tem acesso ao painel do domínio e do DNS e quem renova; trocar o e-mail de contato da conta da UOL para um que não seja `@ejuvv.com`.
 - **Hospedagem:** decidido em 10/11/2026 que a produção fica na **Vercel** (a Hostinger fica como possibilidade para depois).
 - **Segredos:** o Victor optou por guardar o ID do cliente e a chave secreta do Google num bloco de notas no computador (a IA recomendou um gerenciador de senhas).
 
