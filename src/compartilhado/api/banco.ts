@@ -30,9 +30,13 @@ const REGRAS: Record<string, string> = {
 }
 
 // Traduz o erro do banco. As regras feitas à mão (triggers) já vêm em português na mensagem.
-export function erroDoBanco(e: PostgrestError): Error {
+// deQuem completa a mensagem de sobreposição: "seu" (membro) ou "deste membro" (RH).
+export function erroDoBanco(e: PostgrestError, deQuem = 'seu'): Error {
   if (!e.code) return new Error(ERRO_CONEXAO)
-  if (e.code === '23P01') return new Error('Este horário se sobrepõe a outro registro seu')
+  if (e.code === '23P01') return new Error(`Este horário se sobrepõe a outro registro ${deQuem}`)
+  if (e.code === '23503') return new Error('Membro não encontrado')
+  if (e.code === 'P0002') return new Error(e.message)
+  if (e.code === 'PGRST202') return new Error('O banco ainda não tem esta função. Peça ao Bernardo para aplicar as migrações no horas-dev.')
   if (e.code === '23505') return new Error('Você já tem um cronômetro ligado')
   if (e.code === '23514') {
     const regra = /check constraint "(\w+)"/.exec(e.message)?.[1]

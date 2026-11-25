@@ -1,10 +1,48 @@
 # Andamento da Fase 0
 
-Retrato de onde a Fase 0 parou (atualizado em 17/11/2026). Ao retomar com uma IA, peça para ela ler este arquivo e o [`fase-0.md`](fase-0.md). Quando a Fase 0 terminar, este arquivo pode ser apagado (antes, passe a seção "Ambientes" para o `arquitetura.md` ou o `README.md`).
+Retrato de onde a Fase 0 parou (atualizado em 24/11/2026). Ao retomar com uma IA, peça para ela ler este arquivo e o [`fase-0.md`](fase-0.md). Quando a Fase 0 terminar, este arquivo pode ser apagado (antes, passe a seção "Ambientes" para o `arquitetura.md` ou o `README.md`).
 
 ## Próxima sessão: comece por aqui
 
-Onde paramos (16/11/2026, início da semana 3): **registros e cronômetro já usam o banco de verdade (G5 e G6 na `main`), mas o resto do painel ainda é falso.** A semana 2 fechou pela metade: as tarefas do Johannes (J4, J5, J6) e as 5 correções da B7 não chegaram. A semana 3 foi replanejada em 16/11 para focar no P0 (ver "Revisão de 16/11" e o [`tarefas-semanas-2-a-4.md`](tarefas-semanas-2-a-4.md)). O login com Google funciona de verdade no `horas-dev` desde 10/11 para o Victor, o Bernardo e o Guilherme. Só o Johannes ainda está com e-mail provisório no banco (conferido em 17/11). As regras estão fechadas no [`regras-de-negocio.md`](regras-de-negocio.md), e as tarefas das semanas 2 a 4 estão em [`tarefas-semanas-2-a-4.md`](tarefas-semanas-2-a-4.md).
+Onde paramos (24/11/2026, semana 4): **o banco já tem o cálculo semanal, o corte de 10h e as correções da B7 prontos e revisados (PR #9), mas nada disso está na `main` nem no `horas-dev` ainda.** O site continua com registros e cronômetro reais (G5 e G6) e o resto falso. A ordem combinada em 23/11 para o `rh.ts` é G10, depois J5, depois J10; a G10 trava as outras duas. O acompanhamento das tarefas está no Notion (Quadro de Sprints, projeto AstroClock), que foi atualizado em 23/11. As regras estão fechadas no [`regras-de-negocio.md`](regras-de-negocio.md).
+
+### Revisão de 23/11 e conferência de 24/11/2026 (início da semana 4)
+
+As revisões de 23/11 foram feitas pelo Victor e registradas no Notion; em 24/11 a IA passou o resumo para cá e conferiu o GitHub, o `horas-dev` (só leitura) e o DNS.
+
+- **Bernardo (B7.1, B9 e B10):** entregues em 19/11 numa branch enviada pelo upload do site (`B7.1,-B10-e-cálculo-da-semanaD`, commit `632bdcf`): 3 migrações novas (`20261117214000_correcoes_da_revisao_b7`, `20261119111000_cronometro_encerra_sozinho`, `20261119111100_calculo_da_semana`) e a `teste.sql` atualizada. Revisadas e aprovadas no conteúdo em 23/11; o Victor abriu o **PR #9** a partir da branch, com a CI passando. Ainda não está na `main` nem aplicado no `horas-dev` (a última migração lá continua a `20261112170000`).
+  - A B10 faz o banco dividir o cronômetro na meia-noite, cortar em 10h e gravar o fim com a hora do servidor (isso resolve a regra que estava pendente sobre a parte do dia seguinte). Como o site também dividia, **a B10 só vai para o `horas-dev` junto com a G13** (Guilherme), para as duas divisões não brigarem.
+  - Funções da B9 para o site: `progresso_da_semana(p_semana)` e `progresso_do_mes(p_mes)` (membro, G11) e `percentual_da_semana`, `resumo_da_semana`, `abaixo_da_meta`, `medias_da_semana`, `progresso_de_membro` e `semanas_seguidas_abaixo` (RH, J10).
+- **Johannes (J5):** entregue em 18/11 na branch `johannes/membros-real`, sem PR. O `membros.ts` está bom; faltam 3 ajustes: (1) `alterarMetas` usa `upsert` e o banco só aceita `insert` (ler pela visão `lista_de_metas`); (2) as 3 funções de metas não têm o `if (loginFalso)`, o que quebra o site de protótipo; (3) depois que a G10 entrar, trazer a `main` e resolver o conflito no `rh.ts`. Novo prazo: 24/11.
+  - **O e-mail do Johannes no `horas-dev` ainda é o provisório** (conferido em 24/11): sem a troca, ele não consegue testar a J5 com o login real.
+- **Guilherme (G10):** as 3 correções da revisão de 17/11 ainda não foram feitas, e não há PR. Novo prazo: 24/11. É a primeira a entrar na `main`.
+- **Ordem do `rh.ts`:** G10 → J5 → J10. A J10 passa para o Guilherme se não andar até 25/11.
+- **Tarefas novas no Notion (23/11):** G13 (parar o cronômetro do jeito da B10, até 25/11), J10 (painel do RH com o cálculo real, até 26/11), B14 (migrações no `horas-prod` com o Victor, até 26/11, depois do PR #9 na `main` e testado no dev) e G12 (a tela de Configurações da `atualDev`, como extra, até 27/11). A troca das funções do site saiu da B9: a do membro ficou na G11 (até 25/11) e a do RH na J10.
+- **Perfis da equipe no `horas-dev`:** Victor, Johannes e Guilherme como `rh`; Bernardo como `membro`. O Guilherme volta para `membro` antes do teste da G11.
+- **E-mail da EJ (relatório do Victor, 24/11):** o DNS do `ejuvv.com` foi migrado do UOL Host para a Hostinger em 24/11, às 15h16. A Hostinger criou sozinha os registros do e-mail dela, e o recebimento ficou intermitente até cerca de 19h30. Corrigido no mesmo dia (MX `smtp.google.com`, SPF do Google e DMARC) e validado às 20h14. Quem cuida de cada coisa agora: **registro do domínio no UOL Host**, **DNS e site institucional na Hostinger** (hPanel → Domínios → ejuvv.com → DNS), **e-mail no Google Workspace**. Nunca usar "Redefinir registros DNS" nem ativar o e-mail da Hostinger: isso derruba o e-mail da EJ. **Falta o DKIM**, que depende do administrador do Workspace. A falha de DNS vista em 19/11 provavelmente tem a ver com os MX do Google estarem desativados na zona antiga do UOL (ponto em aberto no relatório).
+
+### Ranking com pódio (feito em 24/11/2026, na branch `feat/ranking-podio`)
+
+Funcionalidade nova pedida pelo Victor para motivar os membros a registrar mais horas. **Ainda fora da `main` e do `horas-dev`.**
+
+- **Regra nova (seção 12, só na branch até o merge):** o membro vê o pódio da EJ (5 primeiros) e o do setor (3 primeiros), com nome, setor e horas, a própria posição e quanto falta para o pódio; todos veem o ranking dos setores pela média de horas por membro no mês (sem dispensados). Período continua o mês.
+- **Na branch:** desenho e plano em `docs/superpowers/`; migração `20261125005432_ranking_e_podio.sql` (`ranking_do_mes`, `podio_do_mes`, `minha_posicao_no_ranking`, `ranking_dos_setores`) e `supabase/testes/teste-ranking.sql`; `src/compartilhado/api/ranking.ts` (e `ranking-falso.ts`); página **Ranking** do membro (abas EJ, Meu setor e Setores), item no menu, mini pódio no Início e aba **Setores** no ranking do RH. A branch parte da branch do PR #9, porque a migração usa as funções da B9.
+- **Verificado:** lint e build; navegador no modo de demonstração (computador e 360 px); revisão final por um revisor separado (nada crítico; as 2 correções importantes já entraram). Prévia do protótipo na Vercel: `astro-clock-git-feat-ranking-podio-ejuvv.vercel.app` (pede login da equipe na Vercel).
+- **Não feito ainda:** o `teste-ranking.sql` não rodou no banco; nada foi aplicado no `horas-dev`.
+- **Ordem:** só vai para a `main` **depois do PR #9** e **depois de a migração estar no `horas-dev`** (senão o cartão do ranking no Início dá erro com login real). A lista completa do RH continua falsa até a J10; a B12 encolheu (sobrou o `horasPorDia`).
+- **Decisão pendente do Victor:** em setor com 1 ou 2 membros, a média revela as horas de alguém. Opções: mostrar só setores com 3 ou mais membros (sugestão da IA), aceitar e registrar na regra, ou esconder o número de membros.
+- **Pequenos, para depois:** aba Setores com todos em 0h mostra "1º" para todos; a aba da página do membro volta para "EJ" ao trocar de mês; a demonstração não filtra quem entrou na semana.
+- **Avisar:** Guilherme (página nova na pasta do membro; `progresso.ts` reexporta `minhaPosicaoNoRanking` de `ranking.ts`, atenção na G11), Bernardo (B12 menor; a migração depende da B9) e Johannes (aba Setores no `Ranking.tsx`).
+
+### Produção (V7), montada em 24/11/2026
+
+- **Vercel:** projeto novo **`astroclock-prod`** (time EJUVV), ligado ao repositório, com deploy automático da `main`. Variáveis só de produção: `VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY` (chave publishable) do `horas-prod`, **sem** `VITE_LOGIN_FALSO` e **sem** `VITE_MOSTRAR_DEMO`. O protótipo `astro-clock` continua como estava.
+- **Domínio:** **`https://astroclock.ejuvv.com`**, com o CNAME `astroclock` → `6fa0201913852cd0.vercel-dns-017.com` na zona da Hostinger. A Vercel reconheceu e emitiu o certificado. Os registros do e-mail não foram tocados.
+- **Primeiro deploy:** commit `0cc32c4`. A tela de login abre sem erros e o site fala com o `horas-prod`.
+- **Supabase `horas-prod`:** provedor Google ligado; Site URL `https://astroclock.ejuvv.com`; Redirect URL `https://astroclock.ejuvv.com/inicio`.
+- **Teste de login:** **falhou com `redirect_uri_mismatch`** (Google). O endereço `https://gzjmavrrkqfqtqjycdnq.supabase.co/auth/v1/callback` **não está** no cliente OAuth "AstroClock Supabase". Para cadastrar, é preciso entrar no console do Google Cloud, que desde 20/10/2026 exige verificação em duas etapas; a organização `ejuvv.com` ainda não permite ativar, e a `victor.gomes@ejuvv.com` não é administradora do Workspace.
+- **Atenção:** a partir de agora, **todo envio para a `main` vai para a produção**. Enquanto o banco do prod estiver vazio não tem efeito, mas depois do piloto a `main` precisa estar sempre estável.
+- **Falta para a produção:** (1) o cadastro do endereço no Google Cloud; (2) a B14 (migrações e primeiro diretor do RH no `horas-prod`); (3) testar de novo o login, que deve entrar no painel certo.
 
 ### Conferência de 17/11/2026
 
@@ -90,32 +128,31 @@ Conferido no GitHub, no Notion, no código e no `horas-dev` (só leitura):
 
 ### Próximos passos
 
-Semana 3 (16 a 19/11; 20/11 é feriado). Reunião de decisão na quinta, 19/11, às 11h (adiada em 17/11, era 18/11, porque boa parte das entregas da semana ainda não estava pronta; a equipe deve subir o que tiver, com branch e PR, até quarta, 18/11, à noite). Detalhes no [`tarefas-semanas-2-a-4.md`](tarefas-semanas-2-a-4.md).
+Semana 4 (23 a 27/11). Meta: o piloto completo, em produção. O teste com membros começa em 07/12. Tarefas e prazos no Notion (Quadro de Sprints).
 
-1. **Bernardo:** B7.1 (as 5 correções acima, numa migração nova na `db/migracoes`, recriada a partir da `main` atualizada) até 17/11; B9 (cálculo semanal, primeiro sem os requerimentos) até 18/11; B10 (cronômetro que para sozinho após 10h) até 19/11. Combinado: migração só pelo CLI e por PR, e só aplica no dev depois de aprovada.
-2. **Johannes:** J5 (membros e metas reais) até 17/11; J4 (mudar setor) até 18/11; J6 só se der tempo.
-3. **Guilherme** (combinado em 17/11, ver "Revisão da G10"):
-   - Hoje: as 3 correções da G10 e abrir o PR.
-   - Testar a revisão de cronômetros no `horas-dev` com o perfil `rh` (sair e entrar de novo no site). O resto da G10 só depois da J5.
-   - G11 (`progresso.ts` real) até 19/11: combinar já com o Bernardo o nome e o formato da função da B9, para a G11 ser só a troca quando a B9 sair.
-   - G8: só se o Victor fizer a V5 (adiantar parte da semana 4, mandando só para o próprio e-mail). Senão, fica para a semana 4.
-   - `atualDev`: decidir com o Victor na reunião de 19/11. Se aprovada, refazer a partir da `main` atual, sem as cópias `-1`, depois do P0.
-4. **Victor:** reunião de 19/11, às 11h (adiada de 18/11). Como é o último dia útil antes do feriado, a decisão da semana 4 sai sem folga para ajustes na mesma semana. Se a B9 e a G10 não estiverem de pé, a semana 4 vira semana de completar o P0 e o requerimento vai para dezembro. Levar o risco da J5: ela trava a G10, e o Johannes está atrasado desde a semana 2.
+1. **Guilherme:** G10 com as 3 correções e PR até 24/11 (trava a J5 e a J10); G13 até 25/11, junto com a aplicação da B10 no `horas-dev`; G11 até 25/11, depois da B9 no `horas-dev`; G12 (extra) até 27/11. Pode herdar a J10 se ela não andar até 25/11.
+2. **Johannes:** J5 com os 3 ajustes e PR até 24/11, depois da G10; J10 até 26/11; J4 até 25/11.
+3. **Bernardo:** PR #9 já revisado. Aplicar no `horas-dev` junto com a G13 (combinar o dia com o Guilherme e o Victor); depois B14 com o Victor até 26/11.
+4. **Victor:**
+   - Cobrar a G10 hoje; se não chegar até 25/11 cedo, terminar as 3 correções com a IA e abrir o PR (avisando o Guilherme).
+   - Marcar com o Bernardo e o Guilherme o dia de juntar o PR #9 e aplicar no `horas-dev` (junto com a G13).
+   - V7: a produção está montada (ver "Produção (V7)"). Falta cadastrar o endereço de volta do prod no Google Cloud, o que depende do administrador do Workspace, e depois a B14.
+   - V6 (validação com o RH) assim que a B9 estiver no `horas-dev` e a J10 na `main`.
+   - Ranking com pódio: decidir o caso dos setores pequenos; quando o PR #9 (com a G13) estiver no `horas-dev`, aplicar a migração do ranking com a IA, rodar o `teste-ranking.sql`, testar com login real e abrir o PR da `feat/ranking-podio` (ver "Ranking com pódio").
 
 ### Tarefas do Victor fora da IA
 
-- **E-mail do Johannes no `horas-dev`:** trocar `troque.johannes@ejuvv.com` (tabela `membros`) pelo `@ejuvv.com` real. Sem isso, ele passa pelo Google, mas o site responde "Acesso negado. Procure o RH." O do Guilherme já foi trocado (conferido em 17/11).
-- **Mandar ao Guilherme a revisão da G10** (as 3 correções, o teste com perfil `rh` e o que adiantar). Mensagem pronta escrita pela IA em 17/11.
+- **E-mail do Johannes no `horas-dev` (urgente para a J5):** trocar `troque.johannes@ejuvv.com` (tabela `membros`) pelo `@ejuvv.com` real. Ainda provisório em 24/11. Sem isso, ele passa pelo Google, mas o site responde "Acesso negado. Procure o RH."
 - **Decidir a G8 antecipada:** se quiser que o Guilherme comece a G8 nesta semana, fazer a V5 agora e passar a senha de app a ele só por canal privado.
 - **Perfil do Guilherme:** pedir para voltar para `membro` no `horas-dev` quando ele for testar a G11.
 - **GitHub CLI:** instalar neste computador (`winget install --id GitHub.cli`, depois `gh auth login`), para a IA conseguir abrir e revisar os PRs que o `CONTRIBUTING.md` pede.
-- **V6:** validação com o RH até 19/11 e reunião de decisão na quinta, 19/11, às 11h.
-- **Regra a decidir com o Bernardo:** no cronômetro que passa da meia-noite, a parte do dia seguinte é salva como lançamento manual e pode escapar do corte de 10h e da revisão do RH.
+- **V6:** validação com o RH depois que a B9 estiver no `horas-dev` e a J10 na `main` (a reunião de 19/11 não ficou registrada aqui; o plano da semana 4 seguiu o Notion de 23/11).
+- **Regra do cronômetro na meia-noite:** resolvida pela B10 (o banco divide na meia-noite e corta em 10h). Falta a G13 no site.
 - **Resend:** revogar a chave criada antes da decisão de usar o Gmail da EJ.
-- **Google Cloud:** antes de ligar o login na produção (semana 4), trocar o URI de redirecionamento do prod antigo (`zetjgqdagnlkodbexnoe`, apagado) pelo novo: `https://gzjmavrrkqfqtqjycdnq.supabase.co/auth/v1/callback`.
-- **V5:** criar a conta `@ejuvv.com` que envia os e-mails e a senha de app (semana 3). Decidido em 11/11/2026: e-mail pelo Gmail da EJ, sem Resend.
-- **Domínio:** o `ejuvv.com` continua ativo até 21/02/2027 (registro pela Tucows), mas o DNS ainda está na HostGator. Descobrir com o Rodrigo quem tem acesso e quem renova, porque o e-mail da EJ inteira depende disso.
-- **Hospedagem:** decidido em 10/11/2026 que a produção fica na **Vercel** (a Hostinger fica como possibilidade para depois).
+- **Google Cloud (trava o login na produção):** descobrir quem administra o Workspace da EJ (testar se a `projetos@ejuvv.com` abre o `admin.google.com`). O administrador libera em Segurança → Autenticação → Verificação em duas etapas ("Permitir que os usuários ativem", sem obrigar). Depois, ativar a verificação na `victor.gomes@ejuvv.com`, entrar no console e adicionar `https://gzjmavrrkqfqtqjycdnq.supabase.co/auth/v1/callback` no cliente "AstroClock Supabase" (manter o do dev; tirar o do prod antigo `zetjgqdagnlkodbexnoe`, se ainda estiver lá).
+- **V5:** criar a conta `@ejuvv.com` que envia os e-mails e a senha de app. A senha de app exige a verificação em duas etapas, então também depende do administrador do Workspace. Decidido em 11/11/2026: e-mail pelo Gmail da EJ, sem Resend.
+- **Domínio e DNS:** o `ejuvv.com` vale até 21/02/2027 (registro no UOL Host, pela Tucows). DNS na Hostinger desde 24/11, com MX, SPF e DMARC do Google e o CNAME `astroclock` da produção. Falta: o DKIM (administrador do Workspace); ligar a renovação automática no UOL Host; trocar o e-mail de contato da conta do UOL para um que não seja `@ejuvv.com`. Detalhes no relatório do Victor de 24/11 ("Relatório técnico: migração de DNS e restabelecimento do e-mail").
+- **Hospedagem:** decidido em 10/11/2026 que a produção fica na **Vercel**. Montada em 24/11 no projeto `astroclock-prod`. A Hostinger hospeda só o site institucional da EJ.
 - **Segredos:** o Victor optou por guardar o ID do cliente e a chave secreta do Google num bloco de notas no computador (a IA recomendou um gerenciador de senhas).
 
 ## Já feito (Claude Code)
@@ -187,18 +224,23 @@ Para o Bernardo (semana 1):
 - Como "expose new tables" está desligado, cada migração precisa de `grant` nas tabelas que o site usa; senão o site recebe "permission denied".
 - O `.env.local` usa a chave **publishable** do dev (`sb_publishable_...`). Nunca usar a chave `secret`/`service_role` no front.
 
+### Vercel
+
+- Time EJUVV. **`astro-clock`**: site de protótipo (`astro-clock-ejuvv.vercel.app`), com login falso e painel de demonstração. **`astroclock-prod`**: produção, em `https://astroclock.ejuvv.com`, apontando para o `horas-prod`. Os dois fazem deploy da `main`.
+
 ### Google Cloud
 
 - Projeto `astroclock-512918` (nome AstroClock), na organização ejuvv.com, conta `victor.gomes@ejuvv.com`.
+- **Acesso ao console:** desde 20/10/2026 o Google Cloud exige verificação em duas etapas. Quem libera para a organização é o administrador do Workspace (a `victor.gomes` não é).
 - Tela de consentimento (Google Auth Platform): app "AstroClock", público **Interno** (só contas `@ejuvv.com` entram).
 - Cliente OAuth "AstroClock Supabase" (Aplicativo da Web), com os URIs de redirecionamento:
   - `https://cwvnzzqpqohvqjzigalu.supabase.co/auth/v1/callback`
-  - `https://gzjmavrrkqfqtqjycdnq.supabase.co/auth/v1/callback` (prod em São Paulo; trocar no Google Cloud antes de ligar o login na produção)
+  - O do prod (`https://gzjmavrrkqfqtqjycdnq.supabase.co/auth/v1/callback`) **ainda não está cadastrado** (teste de 24/11 deu `redirect_uri_mismatch`). Ver "Produção (V7)".
 - O ID do cliente e a chave secreta estão no gerenciador de senhas.
 
 ### Login com Google (M5)
 
-No `horas-dev` (o prod fica para antes do piloto):
+No `horas-dev` (feito em 10/11) e no `horas-prod` (feito em 24/11, com Site URL `https://astroclock.ejuvv.com` e Redirect URL `https://astroclock.ejuvv.com/inicio`):
 
 1. Authentication → Sign In / Providers → Google: ligar e colar o ID do cliente e a chave secreta.
 2. Authentication → URL Configuration: Site URL `http://localhost:5173`; Redirect URLs `http://localhost:5173/inicio` e `https://*-ejuvv.vercel.app/inicio` (prévias da Vercel).
