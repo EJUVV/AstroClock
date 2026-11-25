@@ -19,6 +19,7 @@ const InicioMembro = paginaDe(membro, 'InicioMembro')
 const RegistrosMembro = paginaDe(membro, 'RegistrosMembro')
 const RequerimentosMembro = paginaDe(membro, 'RequerimentosMembro')
 const SedeMembro = paginaDe(membro, 'SedeMembro')
+const RankingMembro = paginaDe(membro, 'RankingMembro')
 const PainelRH = paginaDe(rh, 'PainelRH')
 const VisaoGeral = paginaDe(rh, 'VisaoGeral')
 const Membros = paginaDe(rh, 'Membros')
@@ -48,6 +49,7 @@ function App() {
             <Route path="registros" element={<RegistrosMembro />} />
             <Route path="requerimentos" element={<RequerimentosMembro />} />
             <Route path="sede" element={<SedeMembro />} />
+            <Route path="ranking" element={<RankingMembro />} />
           </Route>
           <Route
             path="/rh"

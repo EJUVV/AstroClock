@@ -300,16 +300,14 @@ Decidido em 11/11/2026: os e-mails saem por uma conta `@ejuvv.com` do Google Wor
 
 ### Bernardo (banco)
 
-#### B12. Ranking mensal e horas por dia no banco
+#### B12. Horas por dia no banco (o ranking saiu daqui em 24/11)
 
 **O que fazer**
-- Trocar `rankingDoMes` (`rh.ts`), `minhaPosicaoNoRanking` e `horasPorDia` (`progresso.ts`) pelas reais (seção 12 do `regras-de-negocio.md`).
-- Ordem: horas totais; desempate por horas na sede; dispensados (todas as semanas do mês dispensadas) no fim. A semana conta para o mês da segunda-feira.
-- O `diretor_setor` vê o ranking do próprio setor; o membro, só a própria posição na EJ e no setor.
+- Trocar `horasPorDia` (`progresso.ts`) pela real.
+- A parte do ranking passou para a entrega do pódio (24/11/2026): funções `ranking_do_mes`, `podio_do_mes`, `minha_posicao_no_ranking` e `ranking_dos_setores` no banco, e `ranking.ts` no site. A troca do `rankingDoMes` no `rh.ts` entra depois da J10, usando `ranking_do_mes`.
 
 **Como saber que terminou**
-- Com o seed, o ranking bate com a conta feita à mão.
-- Um membro não consegue ler a lista inteira do ranking.
+- Com o seed, as horas por dia batem com a conta feita à mão.
 - PR aprovado pelo Victor.
 
 **Depende de**

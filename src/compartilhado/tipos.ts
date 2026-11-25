@@ -107,11 +107,41 @@ export interface LinhaRanking {
   dispensado: boolean
 }
 
+// Posição do membro logado no mês. "Faltam" = 0 no pódio; 0,5 se o pódio ainda tem vaga; senão, horas para
+// alcançar o último do pódio, para cima em meia hora (mínimo 0,5).
 export interface PosicaoRanking {
   posicaoEJ: number
   totalEJ: number
   posicaoSetor: number
   totalSetor: number
+  horasTotal: number
+  faltamParaPodioEJ: number
+  faltamParaPodioSetor: number
+}
+
+// Pódio: só nome, setor e horas (o membro nunca recebe a lista completa).
+export interface LinhaPodio {
+  posicao: number
+  membroId: string
+  nome: string
+  setor: string
+  horasTotal: number
+  horasSede: number
+}
+
+// ej: até a 5ª posição; setor: até a 3ª, do setor de quem chama. Empate na última vaga mostra todos.
+export interface PodioDoMes {
+  ej: LinhaPodio[]
+  setor: LinhaPodio[]
+}
+
+// Média de horas por membro do setor no mês, sem os dispensados.
+export interface LinhaRankingSetor {
+  posicao: number
+  setor: string
+  membrosContados: number
+  mediaTotal: number
+  mediaSede: number
 }
 
 // Médias por membro na semana (regras-de-negocio.md, seção 8). A diária divide pelos 5 dias úteis.

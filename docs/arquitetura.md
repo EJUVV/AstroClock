@@ -244,11 +244,42 @@ export interface LinhaRanking {
   dispensado: boolean
 }
 
+// Posição do membro logado no mês. "Faltam" = 0 no pódio; 0,5 se o pódio ainda tem vaga; senão, horas para
+// alcançar o último do pódio, para cima em meia hora (mínimo 0,5). minhaPosicaoNoRanking devolve null se a
+// pessoa não entra no ranking do mês.
 export interface PosicaoRanking {
   posicaoEJ: number
   totalEJ: number
   posicaoSetor: number
   totalSetor: number
+  horasTotal: number
+  faltamParaPodioEJ: number
+  faltamParaPodioSetor: number
+}
+
+// Pódio: só nome, setor e horas (o membro nunca recebe a lista completa).
+export interface LinhaPodio {
+  posicao: number
+  membroId: string
+  nome: string
+  setor: string
+  horasTotal: number
+  horasSede: number
+}
+
+// ej: até 5 posições; setor: até 3 posições do setor de quem chama. Empate na última vaga mostra todos.
+export interface PodioDoMes {
+  ej: LinhaPodio[]
+  setor: LinhaPodio[]
+}
+
+// Média de horas por membro do setor no mês, sem os dispensados.
+export interface LinhaRankingSetor {
+  posicao: number
+  setor: string
+  membrosContados: number
+  mediaTotal: number
+  mediaSede: number
 }
 
 // Médias por membro na semana. A diária divide pelos 5 dias úteis.
@@ -286,7 +317,9 @@ Funções (todas `async`; em erro, lançam `Error` com mensagem em português pr
 | `progresso.ts` | `progressoDaSemana(semana: string)` | `ProgressoSemana` | Guilherme | Começo da semana 3 |
 | `progresso.ts` | `progressoDoMes(mes: string)` | `ProgressoSemana[]` | Guilherme | Semana 3 |
 | `progresso.ts` | `horasPorDia(semana: string)` | `HorasDoDia[]` | Guilherme | Semana 4 |
-| `progresso.ts` | `minhaPosicaoNoRanking(mes: string)` | `PosicaoRanking` | Guilherme | Semana 4 |
+| `ranking.ts` | `minhaPosicaoNoRanking(mes: string)` | `PosicaoRanking` ou `null` | Guilherme | Ranking com pódio (24/11); o `progresso.ts` reexporta |
+| `ranking.ts` | `podioDoMes(mes: string)` | `PodioDoMes` | Guilherme | Ranking com pódio (24/11) |
+| `ranking.ts` | `rankingDosSetores(mes: string)` | `LinhaRankingSetor[]` | Guilherme, Johannes | Ranking com pódio (24/11) |
 | `membros.ts` | `listarMembros()` | `Membro[]` | Johannes | Semana 2 |
 | `membros.ts` | `cadastrarMembro(dados: NovoMembro)` | `Membro` | Johannes | Semana 2 |
 | `membros.ts` | `desativarMembro(id: string)` | `void` | Johannes | Semana 2 |
@@ -306,7 +339,7 @@ Funções (todas `async`; em erro, lançam `Error` com mensagem em português pr
 | `rh.ts` | `semanasSeguidasAbaixo(semana: string)` | `MembroAbaixoSeguido[]` | Johannes | Semana 3 |
 | `rh.ts` | `cronometrosEmRevisao()` | `Registro[]` | Johannes | Semana 3 |
 | `rh.ts` | `revisarCronometro(id: string, aprovar: boolean)` | `void` | Johannes | Semana 3 |
-| `rh.ts` | `rankingDoMes(mes: string)` | `LinhaRanking[]` | Johannes | Semana 4 |
+| `rh.ts` | `rankingDoMes(mes: string)` | `LinhaRanking[]` | Johannes | Depois da J10 (função do banco `ranking_do_mes` pronta na entrega do pódio) |
 | `rh.ts` | `buscarRegistrosDoMembro(membroId: string, semana: string)` | `Registro[]` | Johannes | A definir |
 | `rh.ts` | `criarRegistroDeMembro(membroId: string, dados: NovoRegistro, motivo: string)` | `Registro` | Johannes | A definir |
 | `rh.ts` | `editarRegistroDeMembro(id: string, dados: NovoRegistro, motivo: string)` | `Registro` | Johannes | A definir |

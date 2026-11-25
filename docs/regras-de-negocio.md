@@ -166,12 +166,20 @@ Substitui a antiga "dispensa de semana inteira registrada pelo RH".
 
 ### Ranking
 
-- Período: **mês**.
-- Ordem: **horas totais**; desempate por **horas na sede**; dispensados no fim.
+- Objetivo: motivar os membros a registrar mais horas. Ninguém vê quem está no fim, só o RH, a presidência e o diretor do setor (lista completa).
+- Período: **mês**. A semana conta no mês da segunda-feira.
+- Entra no ranking do mês quem é elegível (seção 8) em pelo menos uma semana do mês que já tenha meta. Diretores e presidência ficam de fora.
+- Ordem: **horas totais**; desempate por **horas na sede**; dispensados no fim. Empate nas duas divide a posição.
 - No ranking do mês, "dispensado" é quem teve **todas as semanas do mês** dispensadas.
 - **O RH** (`rh`, `diretor_rh`) e o `presidente` veem o ranking completo.
 - O `diretor_setor` vê o ranking do **próprio setor**. Respondido pelo líder do projeto em 09/11/2026.
-- **O membro** vê só a **própria posição**, em relação a toda a EJ e em relação ao seu setor.
+- **O membro** (e o `rh`, no próprio painel de membro) vê o **pódio da EJ (5 primeiros)** e o **pódio do setor (3 primeiros)**, com **nome, setor e horas**, e a própria posição na EJ e no setor, com quantas horas faltam para entrar no pódio. O pódio mostra só quem tem horas no mês; com empate na última vaga, todos os empatados aparecem. Decidido pelo líder do projeto em 24/11/2026.
+
+### Ranking dos setores
+
+- Todos os setores ativos, ordenados pela **média de horas totais por membro no mês**; desempate pela média de horas na sede.
+- A média conta os membros que entram no ranking do setor, **sem os dispensados**. Setor sem ninguém que conte não aparece.
+- **Todos veem** (membros, diretores, RH e presidência), num gráfico de barras e numa lista. Decidido pelo líder do projeto em 24/11/2026.
 
 ### Selos [FASE 2]
 

@@ -13,11 +13,13 @@ import {
 } from 'lucide-react'
 import { horasPorDia, minhaPosicaoNoRanking, progressoDaSemana, progressoDoMes } from '@/compartilhado/api/progresso'
 import { quemEstaNaSede } from '@/compartilhado/api/presenca'
+import { podioDoMes } from '@/compartilhado/api/ranking'
 import {
   diasCurtos,
   formatarHoras,
   hoje,
   mesAtual,
+  mesDoRanking,
   rotuloMes,
   rotuloSemana,
   semanaAtual,
@@ -25,19 +27,22 @@ import {
   somarMeses,
   tempoDecorrido,
 } from '@/compartilhado/datas'
-import type { HorasDoDia, PosicaoRanking, ProgressoSemana } from '@/compartilhado/tipos'
+import type { HorasDoDia, PodioDoMes, PosicaoRanking, ProgressoSemana } from '@/compartilhado/tipos'
 import { AvatarMembro } from '@/compartilhado/ui/AvatarMembro'
 import { CapsuleBarChart } from '@/compartilhado/ui/CapsuleBarChart'
 import { CartaoSemana, PilulaSituacao, situacaoDaSemana } from '@/compartilhado/ui/CartaoSemana'
 import { Carregavel, useCarregar, type Carregamento } from '@/compartilhado/ui/demo'
 import { Horas } from '@/compartilhado/ui/Horas'
 import { KpiCard } from '@/compartilhado/ui/KpiCard'
+import { useSessao } from '@/compartilhado/ui/RotaProtegida'
+import { ListaPodio } from '@/compartilhado/ui/ListaPodio'
 import { Button } from '@/compartilhado/ui/shadcn/button'
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from '@/compartilhado/ui/shadcn/card'
 import { Skeleton } from '@/compartilhado/ui/shadcn/skeleton'
 import { useEhDesktop } from '@/compartilhado/ui/useEhDesktop'
 import { cn } from '@/compartilhado/ui/utils'
 import { CartaoCronometro } from './CartaoCronometro'
+import { frasePosicao } from './frasePosicao.ts'
 import { usePresenca } from './usePresenca'
 
 type Carga<T> = Carregamento<T> & { recarregar: () => void }
@@ -235,36 +240,32 @@ function CartaoHorasPorDia({
   )
 }
 
-function CartaoRanking({ posicao }: { posicao: Carga<PosicaoRanking> }) {
+// Mini pódio da EJ (3 primeiras linhas, mesmo com empate: a lista inteira fica na página Ranking) e a posição de quem está logado, com o link para a página Ranking.
+function CartaoRanking({ posicao, podio, euId }: { posicao: Carga<PosicaoRanking | null>; podio: Carga<PodioDoMes>; euId: string }) {
   return (
-    <Carregavel carga={posicao} esqueleto={<Skeleton className="h-32 rounded-[24px]" />}>
-      {(p) => (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Sua posição no ranking</CardTitle>
-            <CardDescription>{rotuloMes(mesAtual())} · por horas totais</CardDescription>
-          </CardHeader>
-          <CardContent className="grid grid-cols-2 gap-3">
-            <div className="flex flex-col gap-1 rounded-2xl bg-secondary p-4">
-              <span className="flex items-center gap-1.5 text-xs font-medium text-secondary-foreground">
-                <TrophyIcon className="size-3.5" /> Na EJ
-              </span>
-              <span className="text-2xl font-bold">
-                {p.posicaoEJ}º <span className="text-sm font-medium text-muted-foreground">de {p.totalEJ}</span>
-              </span>
-            </div>
-            <div className="flex flex-col gap-1 rounded-2xl bg-muted p-4">
-              <span className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-                <UsersIcon className="size-3.5" /> No setor
-              </span>
-              <span className="text-2xl font-bold">
-                {p.posicaoSetor}º <span className="text-sm font-medium text-muted-foreground">de {p.totalSetor}</span>
-              </span>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-    </Carregavel>
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-lg">Ranking do mês</CardTitle>
+        <CardDescription>{rotuloMes(mesDoRanking())} · por horas totais</CardDescription>
+        <CardAction>
+          <Button asChild variant="outline" size="sm">
+            <Link to="/membro/ranking">Ver ranking</Link>
+          </Button>
+        </CardAction>
+      </CardHeader>
+      <CardContent className="flex flex-col gap-3">
+        <Carregavel carga={podio} esqueleto={<Skeleton className="h-32 rounded-2xl" />}>
+          {(p) => <ListaPodio linhas={p.ej.slice(0, 3)} destaqueId={euId} />}
+        </Carregavel>
+        <Carregavel carga={posicao} esqueleto={<Skeleton className="h-10 rounded-2xl" />}>
+          {(p) => (
+            <p className="flex items-center gap-2 rounded-2xl bg-muted px-4 py-3 text-sm font-medium">
+              <TrophyIcon className="size-4 shrink-0 text-primary" /> {frasePosicao(p, 'ej')}
+            </p>
+          )}
+        </Carregavel>
+      </CardContent>
+    </Card>
   )
 }
 
@@ -286,13 +287,15 @@ function pctDaMeta(valor: number, meta: number): string {
 }
 
 function InicioMembro() {
+  const { eu } = useSessao()
   const ehDesktop = useEhDesktop()
   const [semana, setSemana] = useState(semanaAtual())
   const [versao, setVersao] = useState(0)
   const progresso = useCarregar(() => progressoDaSemana(semana), [semana, versao])
   const anterior = useCarregar(() => progressoDaSemana(somarDias(semana, -7)), [semana, versao])
   const porDia = useCarregar(() => horasPorDia(semana), [semana, versao])
-  const posicao = useCarregar(() => minhaPosicaoNoRanking(mesAtual()), [versao])
+  const posicao = useCarregar(() => minhaPosicaoNoRanking(mesDoRanking()), [versao])
+  const podio = useCarregar(() => podioDoMes(mesDoRanking()), [versao])
   const ehAtual = semana === semanaAtual()
   const tempo = <BarrasDeTempo progresso={progresso.status === 'conteudo' && ehAtual ? progresso.dados : undefined} />
   const cronometro = <CartaoCronometro preencher={ehDesktop} onMudou={() => setVersao((v) => v + 1)} />
@@ -356,7 +359,9 @@ function InicioMembro() {
           </Carregavel>
           <div className="lg:col-span-2 xl:col-span-1">
           <Carregavel carga={posicao} esqueleto={kpiEsqueleto}>
-            {(p) => (
+            {(p) => !p ? (
+              <KpiCard titulo="Posição no ranking" valor="—" comparacao="Você ainda não entra no ranking deste mês" linhas={[]} />
+            ) : (
               <KpiCard
                 titulo="Posição no ranking"
                 valor={
@@ -364,7 +369,7 @@ function InicioMembro() {
                     {p.posicaoEJ}º<span className="text-lg font-semibold text-muted-foreground"> de {p.totalEJ}</span>
                   </>
                 }
-                comparacao={`Na EJ, em ${rotuloMes(mesAtual()).toLowerCase()}`}
+                comparacao={`Na EJ, em ${rotuloMes(mesDoRanking()).toLowerCase()}`}
                 linhas={[
                   { icone: UsersIcon, texto: `${p.posicaoSetor}º de ${p.totalSetor} no setor` },
                   { icone: TrophyIcon, texto: 'Por horas totais' },
@@ -409,7 +414,7 @@ function InicioMembro() {
       {cronometro}
       <CartaoHorasPorDia semana={semana} progresso={progresso} porDia={porDia} />
       <GradeDoMes selecionada={semana} onSelecionar={setSemana} dica="Toque numa semana para ver o detalhe dela no cartão acima." />
-      <CartaoRanking posicao={posicao} />
+      <CartaoRanking posicao={posicao} podio={podio} euId={eu.id} />
       {tempo}
       <div className="md:col-span-2">
         <CartaoSede />

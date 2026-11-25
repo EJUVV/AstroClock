@@ -1,4 +1,6 @@
-﻿export type Json =
+// Gerado a partir do banco horas-dev (supabase gen types). Não edite à mão:
+// depois de mudar tabelas, gere de novo com `npx supabase gen types typescript --linked`.
+export type Json =
   | string
   | number
   | boolean
@@ -309,6 +311,24 @@ export type Database = {
       }
     }
     Functions: {
+      abaixo_da_meta: {
+        Args: { p_semana: string; p_setor?: string }
+        Returns: {
+          ativo: boolean
+          cumpriu: boolean
+          data_entrada: string
+          dispensada: boolean
+          email: string
+          horas_sede: number
+          horas_total: number
+          membro_id: string
+          meta_sede: number
+          meta_total: number
+          nome: string
+          perfil: Database["public"]["Enums"]["perfil"]
+          setor: string
+        }[]
+      }
       cancelar_registro_de_membro: {
         Args: { p_id: string; p_motivo: string }
         Returns: {
@@ -400,7 +420,41 @@ export type Database = {
         }
         Returns: boolean
       }
+      encerrar_cronometros_esquecidos: { Args: never; Returns: number }
       exigir_rh_com_motivo: { Args: { p_motivo: string }; Returns: undefined }
+      horas_da_semana: {
+        Args: { p_membro_id?: string; p_semana: string }
+        Returns: {
+          horas_sede: number
+          horas_total: number
+          membro_id: string
+        }[]
+      }
+      horas_do_mes: {
+        Args: { p_mes: string }
+        Returns: {
+          dispensado: boolean
+          horas_sede: number
+          horas_total: number
+          membro_id: string
+          setor_id: string
+        }[]
+      }
+      medias_da_semana: {
+        Args: { p_semana: string; p_setor?: string }
+        Returns: {
+          media_diaria: number
+          media_sede: number
+          media_total: number
+        }[]
+      }
+      meta_da_semana: {
+        Args: { p_semana: string }
+        Returns: {
+          horas_sede: number
+          horas_total: number
+        }[]
+      }
       meu_id: { Args: never; Returns: string }
       meu_perfil: {
         Args: never
@@ -419,9 +473,134 @@ export type Database = {
           setor: string
         }[]
       }
+      minha_posicao_no_ranking: {
+        Args: { p_mes: string }
+        Returns: {
+          faltam_para_podio_ej: number
+          faltam_para_podio_setor: number
+          horas_total: number
+          posicao_ej: number
+          posicao_setor: number
+          total_ej: number
+          total_setor: number
+        }[]
+      }
+      percentual_da_semana: {
+        Args: { p_semana: string; p_setor?: string }
+        Returns: number
+      }
       perfil_tem_meta: {
         Args: { p: Database["public"]["Enums"]["perfil"] }
         Returns: boolean
+      }
+      podio_do_mes: {
+        Args: { p_mes: string }
+        Returns: {
+          escopo: string
+          horas_sede: number
+          horas_total: number
+          membro_id: string
+          nome: string
+          posicao: number
+          setor: string
+        }[]
+      }
+      progresso_da_semana: {
+        Args: { p_semana: string }
+        Returns: {
+          cumpriu: boolean
+          dispensada: boolean
+          elegivel: boolean
+          horas_sede: number
+          horas_total: number
+          meta_sede: number
+          meta_total: number
+          semana: string
+        }[]
+      }
+      progresso_de_membro: {
+        Args: { p_membro_id: string; p_semana: string }
+        Returns: {
+          cumpriu: boolean
+          dispensada: boolean
+          elegivel: boolean
+          horas_sede: number
+          horas_total: number
+          meta_sede: number
+          meta_total: number
+          semana: string
+        }[]
+      }
+      progresso_do_mes: {
+        Args: { p_mes: string }
+        Returns: {
+          cumpriu: boolean
+          dispensada: boolean
+          elegivel: boolean
+          horas_sede: number
+          horas_total: number
+          meta_sede: number
+          meta_total: number
+          semana: string
+        }[]
+      }
+      ranking_do_mes: {
+        Args: { p_mes: string }
+        Returns: {
+          ativo: boolean
+          data_entrada: string
+          dispensado: boolean
+          email: string
+          horas_sede: number
+          horas_total: number
+          membro_id: string
+          nome: string
+          perfil: Database["public"]["Enums"]["perfil"]
+          posicao: number
+          setor: string
+        }[]
+      }
+      ranking_dos_setores: {
+        Args: { p_mes: string }
+        Returns: {
+          media_sede: number
+          media_total: number
+          membros_contados: number
+          posicao: number
+          setor: string
+        }[]
+      }
+      ranking_interno: {
+        Args: { p_mes: string }
+        Returns: {
+          dispensado: boolean
+          horas_sede: number
+          horas_total: number
+          membro_id: string
+          nome: string
+          posicao_ej: number
+          posicao_setor: number
+          setor: string
+          setor_id: string
+        }[]
+      }
+      resumo_da_semana: {
+        Args: { p_semana: string; p_setor?: string }
+        Returns: {
+          ativo: boolean
+          cumpriu: boolean
+          data_entrada: string
+          dispensada: boolean
+          email: string
+          horas_sede: number
+          horas_total: number
+          membro_id: string
+          meta_sede: number
+          meta_total: number
+          nome: string
+          perfil: Database["public"]["Enums"]["perfil"]
+          setor: string
+        }[]
       }
       revisar_cronometro: {
         Args: { p_aprovar: boolean; p_id: string; p_motivo?: string }
@@ -444,6 +623,20 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      segunda_da_semana: { Args: { p_dia: string }; Returns: string }
+      semanas_seguidas_abaixo: {
+        Args: { p_semana: string }
+        Returns: {
+          ativo: boolean
+          data_entrada: string
+          email: string
+          membro_id: string
+          nome: string
+          perfil: Database["public"]["Enums"]["perfil"]
+          semanas_seguidas: number
+          setor: string
+        }[]
       }
       setor_que_dirijo: { Args: never; Returns: string }
       ve_tudo: { Args: never; Returns: boolean }

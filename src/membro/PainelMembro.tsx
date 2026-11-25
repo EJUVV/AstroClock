@@ -1,5 +1,5 @@
 import { NavLink, Outlet } from 'react-router-dom'
-import { FileTextIcon, HouseIcon, LayoutDashboardIcon, ListIcon, LogOutIcon, MapPinIcon } from 'lucide-react'
+import { FileTextIcon, HouseIcon, LayoutDashboardIcon, ListIcon, LogOutIcon, MapPinIcon, TrophyIcon } from 'lucide-react'
 import { sair } from '@/compartilhado/api/auth'
 import { AvatarMembro } from '@/compartilhado/ui/AvatarMembro'
 import { BarraInferior } from '@/compartilhado/ui/BarraInferior'
@@ -17,6 +17,7 @@ const ABAS: ItemMenu[] = [
   { para: '/membro/registros', rotulo: 'Registros', icone: ListIcon },
   { para: '/membro/requerimentos', rotulo: 'Requerimentos', icone: FileTextIcon },
   { para: '/membro/sede', rotulo: 'Sede', icone: MapPinIcon },
+  { para: '/membro/ranking', rotulo: 'Ranking', icone: TrophyIcon },
 ]
 
 // Computador: mesma sidebar e topo do painel do RH.
@@ -25,6 +26,7 @@ function PainelMembroDesktop({ primeiroNome, ehRH }: { primeiroNome: string; ehR
     { prefixo: '/membro/registros', titulo: 'Registros', subtitulo: 'Suas horas, semana a semana.' },
     { prefixo: '/membro/requerimentos', titulo: 'Requerimentos', subtitulo: 'Peça para ficar só remoto ou ausente.' },
     { prefixo: '/membro/sede', titulo: 'Sede', subtitulo: 'Veja quem está lá agora e avise quando você chegar.' },
+    { prefixo: '/membro/ranking', titulo: 'Ranking', subtitulo: 'Quem mais registrou horas no mês.' },
     { prefixo: '/membro', titulo: `Olá, ${primeiroNome}`, subtitulo: 'Bem-vindo de volta. Veja como está sua semana.' },
   ]
   return (
