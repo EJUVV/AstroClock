@@ -1,5 +1,5 @@
 -- =============================================================================
--- AstroClock · teste do banco (B3, B6 e B7)
+-- AstroClock · teste do banco (B3, B6, B7, B7.1, cálculo da semana e B10)
 -- 5 perfis, membros, setores, metas, lista_de_metas, historico_setor,
 -- meus_dados(), meu_setor_id(), elegibilidade, registros (pelo site e pelas
 -- funções do RH), auditoria, 1 diretor do RH e 1 presidente
@@ -22,6 +22,11 @@ declare
   c_dsetor   constant uuid := 'a0000000-0000-4000-8000-0000000000a5';
   c_presid   constant uuid := 'a0000000-0000-4000-8000-0000000000a6';
   c_membro_b constant uuid := 'a0000000-0000-4000-8000-0000000000a7';
+  c_calc_ana  constant uuid := 'a0000000-0000-4000-8000-0000000000c1';
+  c_calc_beto constant uuid := 'a0000000-0000-4000-8000-0000000000c2';
+  c_calc_caio constant uuid := 'a0000000-0000-4000-8000-0000000000c3';
+  c_calc_duda constant uuid := 'a0000000-0000-4000-8000-0000000000c4';
+  c_calc_eva  constant uuid := 'a0000000-0000-4000-8000-0000000000c5';
   seg        constant date := date_trunc('week', now() at time zone 'America/Sao_Paulo')::date;  -- segunda desta semana
   prox       constant date := seg + 7;                                                            -- segunda que vem
   hoje       constant date := (now() at time zone 'America/Sao_Paulo')::date;
@@ -32,6 +37,12 @@ declare
   d1_04      constant timestamptz := ((hoje - 1)::timestamp  + time '04:00') at time zone 'America/Sao_Paulo';
   d3_13      constant timestamptz := ((hoje - 3)::timestamp  + time '13:00') at time zone 'America/Sao_Paulo';
   d3_23      constant timestamptz := ((hoje - 3)::timestamp  + time '23:00') at time zone 'America/Sao_Paulo';
+  d4_13      constant timestamptz := ((hoje - 4)::timestamp  + time '13:00') at time zone 'America/Sao_Paulo';
+  d4_23      constant timestamptz := ((hoje - 4)::timestamp  + time '23:00') at time zone 'America/Sao_Paulo';
+  d1_00      constant timestamptz := ((hoje - 1)::timestamp  + time '00:00') at time zone 'America/Sao_Paulo';
+  d2_20      constant timestamptz := ((hoje - 2)::timestamp  + time '20:00') at time zone 'America/Sao_Paulo';
+  d5_03      constant timestamptz := ((hoje - 5)::timestamp  + time '03:00') at time zone 'America/Sao_Paulo';
+  d6_22      constant timestamptz := ((hoje - 6)::timestamp  + time '22:00') at time zone 'America/Sao_Paulo';
   d6_01      constant timestamptz := ((hoje - 6)::timestamp  + time '01:00') at time zone 'America/Sao_Paulo';
   d6_02      constant timestamptz := ((hoje - 6)::timestamp  + time '02:00') at time zone 'America/Sao_Paulo';
   d7_01      constant timestamptz := ((hoje - 7)::timestamp  + time '01:00') at time zone 'America/Sao_Paulo';
@@ -72,6 +83,13 @@ declare
   r_site     public.registros;
   r_cron     public.registros;
   r_rev      public.registros;
+  r_rev2     public.registros;
+  r_b9       public.registros;
+  r_b9b      public.registros;
+  r_b9c      public.registros;
+  t          timestamptz;
+  ok1        boolean;
+  pr         record;
   v_meta     public.metas;
   v_meta2    public.metas;
   eu         record;
@@ -466,11 +484,29 @@ begin
   exception when insufficient_privilege then null;
   end;
 
-  -- setores: cria, renomeia e desativa
+  -- setores: cria, renomeia e desativa (só nome e ativo; id e criado_em não)
   insert into public.setores (nome) values ('zz Setor C');
   update public.setores set nome = 'zz Setor C2', ativo = false where nome = 'zz Setor C';
   get diagnostics n = row_count;
   assert n = 1, 'presidente: não conseguiu alterar setor';
+
+  begin
+    update public.setores set id = gen_random_uuid() where nome = 'zz Setor C2';
+    raise exception 'FALHOU: mudou o id de um setor';
+  exception when insufficient_privilege then null;
+  end;
+
+  begin
+    update public.setores set criado_em = now() where id = c_setor_a;
+    raise exception 'FALHOU: mudou o criado_em de um setor';
+  exception when insufficient_privilege then null;
+  end;
+
+  begin
+    insert into public.setores (id, nome) values (gen_random_uuid(), 'zz Setor Y');
+    raise exception 'FALHOU: o site escolheu o id de um setor novo';
+  exception when insufficient_privilege then null;
+  end;
 
   begin
     delete from public.setores where nome = 'zz Setor C2';
@@ -516,6 +552,10 @@ begin
         raise exception 'FALHOU: anon executou cancelar_registro_de_membro()'; exception when insufficient_privilege then null; end;
   begin perform public.revisar_cronometro(c_membro, true);
         raise exception 'FALHOU: anon executou revisar_cronometro()';          exception when insufficient_privilege then null; end;
+  begin perform public.percentual_da_semana(current_date);
+        raise exception 'FALHOU: anon executou percentual_da_semana()';        exception when insufficient_privilege then null; end;
+  begin perform public.encerrar_cronometros_esquecidos();
+        raise exception 'FALHOU: anon executou encerrar_cronometros_esquecidos()'; exception when insufficient_privilege then null; end;
 
   ---------------------------------------------------------------------------
   -- 8. Diretor do RH: cadastra e altera membros, cria metas e setores
@@ -850,7 +890,7 @@ begin
   exception when check_violation then null;
   end;
 
-  -- cronômetro: sem descrição pode, e só um ligado por membro
+  -- cronômetro: pelo SQL Editor sem descrição passa (pelo site, não), e só um ligado por membro
   insert into public.registros (membro_id, inicio, local, origem)
   values (c_membro, now() - interval '1 hour', 'online', 'cronometro');
 
@@ -911,18 +951,14 @@ begin
 
   -- parar o cronômetro esquecido vale mesmo depois de 7 dias; fica com 10h e vai para revisão
   begin
-    update public.registros set fim = now() + interval '1 hour' where id = r_esq.id;
-    raise exception 'FALHOU: parou o cronômetro no futuro';
-  exception when check_violation then null;
-  end;
-
-  begin
     update public.registros set inicio = r_esq.inicio + interval '1 hour', fim = now() where id = r_esq.id;
     raise exception 'FALHOU: mudou o início ao parar o cronômetro';
   exception when check_violation then null;
   end;
 
-  update public.registros set fim = now() where id = r_esq.id returning * into r_esq;
+  -- manda um fim qualquer (2h depois do início): o banco ignora e usa agora, e
+  -- como agora já passou de 10h, fica com 10h e vai para revisão
+  update public.registros set fim = r_esq.inicio + interval '2 hours' where id = r_esq.id returning * into r_esq;
   assert r_esq.fim = r_esq.inicio + interval '10 hours' and r_esq.precisa_revisao,
     'cronômetro com mais de 10h deveria ficar com 10h e ir para a revisão do RH';
 
@@ -980,23 +1016,52 @@ begin
   exception when check_violation then null;
   end;
 
+  -- fim no futuro não pode (folga de 1 minuto), nem ao lançar nem ao editar
+  begin
+    insert into public.registros (inicio, fim, local, descricao)
+    values (now() - interval '30 minutes', now() + interval '30 minutes', 'sede', 'zz termina no futuro');
+    raise exception 'FALHOU: membro lançou registro que termina no futuro';
+  exception when check_violation then null;
+  end;
+
+  insert into public.registros (inicio, fim, local, descricao)
+  values (now() - interval '1 hour', now() + interval '30 seconds', 'sede', 'zz dentro da folga')
+  returning * into rr;                                                       -- dentro da folga de 1 minuto: pode
+  update public.registros set cancelado = true where id = rr.id;             -- (cancela para não bater com o cronômetro abaixo)
+
+  begin
+    update public.registros set fim = now() + interval '2 hours' where id = r_site.id;
+    raise exception 'FALHOU: membro editou o fim de um registro para o futuro';
+  exception when check_violation then null;
+  end;
+
   -- cronômetro: começa agora e sem fim
   begin
-    insert into public.registros (inicio, fim, local, origem) values (now() - interval '1 hour', now(), 'online', 'cronometro');
+    insert into public.registros (inicio, fim, local, descricao, origem) values (now() - interval '1 hour', now(), 'online', 'zz cronômetro', 'cronometro');
     raise exception 'FALHOU: cronômetro nasceu com fim';
   exception when check_violation then null;
   end;
 
   begin
-    insert into public.registros (inicio, local, origem) values (now() - interval '1 hour', 'online', 'cronometro');
+    insert into public.registros (inicio, local, descricao, origem) values (now() - interval '1 hour', 'online', 'zz cronômetro', 'cronometro');
     raise exception 'FALHOU: cronômetro começou no passado';
   exception when check_violation then null;
   end;
 
-  insert into public.registros (inicio, local, origem) values (now() - interval '4 minutes', 'online', 'cronometro')
+  begin
+    insert into public.registros (inicio, local, descricao, origem) values (now(), 'online', '  ', 'cronometro');
+    raise exception 'FALHOU: cronômetro começou sem descrição';
+  exception when check_violation then null;
+  end;
+
+  insert into public.registros (inicio, local, descricao, origem) values (now() - interval '4 minutes', 'online', 'zz cronômetro', 'cronometro')
   returning * into r_cron;
-  update public.registros set fim = now() where id = r_cron.id returning * into r_cron;
-  assert r_cron.fim = now() and not r_cron.precisa_revisao, 'parar o cronômetro deveria gravar o fim';
+  -- manda um fim no futuro: o banco ignora e grava agora (ou a meia-noite, se o
+  -- teste rodar logo depois dela: aí ele divide)
+  update public.registros set fim = now() + interval '1 hour' where id = r_cron.id returning * into r_cron;
+  t := (((r_cron.inicio at time zone 'America/Sao_Paulo')::date + 1)::timestamp) at time zone 'America/Sao_Paulo';
+  assert r_cron.fim = least(now(), t) and not r_cron.precisa_revisao,
+    'parar o cronômetro deveria gravar o horário do banco (agora), não o que o site mandou';
 
   begin
     update public.registros set fim = null where id = r_cron.id;
@@ -1210,7 +1275,34 @@ begin
   select count(*) into n from public.auditoria where registro_id = rr.id and quem = c_diretora and acao = 'criar';
   assert n = 1, 'diretora: o lançamento dela deveria ir para a auditoria';
 
-  -- presidente, diretor de setor e membro não usam as funções do RH
+  -- o presidente também revisa cronômetro, e a auditoria guarda que foi ele
+  perform set_config('role', 'none', true);
+  insert into public.registros (membro_id, inicio, fim, local, descricao, origem, precisa_revisao)
+  values (c_membro_b, d4_13, d4_23, 'online', 'zz outro cronômetro esquecido', 'cronometro', true)
+  returning * into r_rev2;
+  perform set_config('role', 'authenticated', true);
+
+  perform set_config('request.jwt.claims', '{"role":"authenticated","email":"zz.teste.presidente@ejuvv.com"}', true);
+  select * into rr from public.revisar_cronometro(r_rev2.id, true);
+  assert not rr.precisa_revisao and not rr.cancelado, 'presidente: deveria conseguir aprovar cronômetro';
+  select count(*) into n from public.auditoria where registro_id = r_rev2.id and acao = 'aprovar_cronometro' and quem = c_presid;
+  assert n = 1, 'auditoria: deveria guardar que foi o presidente quem aprovou';
+
+  -- nas funções do RH o fim também não pode ser no futuro
+  perform set_config('request.jwt.claims', '{"role":"authenticated","email":"zz.teste.rh@ejuvv.com"}', true);
+  begin
+    perform public.criar_registro_de_membro(c_membro, now() + interval '2 hours', now() + interval '3 hours', 'sede', 'zz x', 'zz motivo');
+    raise exception 'FALHOU: RH lançou registro que termina no futuro';
+  exception when check_violation then null;
+  end;
+
+  begin
+    perform public.editar_registro_de_membro(p_id => r_rev2.id, p_motivo => 'zz motivo', p_fim => now() + interval '1 hour');
+    raise exception 'FALHOU: RH mudou o fim de um registro para o futuro';
+  exception when check_violation then null;
+  end;
+
+  -- presidente, diretor de setor e membro não lançam, não corrigem e não cancelam
   foreach v_email in array array['zz.teste.presidente@ejuvv.com', 'zz.teste.dsetor@ejuvv.com', 'zz.teste.membro@ejuvv.com'] loop
     perform set_config('request.jwt.claims', json_build_object('role', 'authenticated', 'email', v_email)::text, true);
     begin
@@ -1228,6 +1320,11 @@ begin
       raise exception 'FALHOU: % cancelou registro de outro membro', v_email;
     exception when insufficient_privilege then null;
     end;
+  end loop;
+
+  -- diretor de setor e membro também não revisam cronômetro
+  foreach v_email in array array['zz.teste.dsetor@ejuvv.com', 'zz.teste.membro@ejuvv.com'] loop
+    perform set_config('request.jwt.claims', json_build_object('role', 'authenticated', 'email', v_email)::text, true);
     begin
       perform public.revisar_cronometro(r_esq.id, false);
       raise exception 'FALHOU: % revisou cronômetro', v_email;
@@ -1286,7 +1383,221 @@ begin
   end loop;
 
   ---------------------------------------------------------------------------
-  -- 14. O que saiu (dispensas) e quem executa cada função
+  -- 14. Cálculo da semana (seção 8), com a conta feita à mão em 2021
+  --     Semana de 01/03/2021, meta 10h/5h:
+  --       Ana  (membro, setor A): 5h sede + 6h online = 11h -> cumpriu
+  --       Beto (rh, setor A):     6h sede + 3h online =  9h -> não (total)
+  --       Caio (membro, setor B): 6h sede + 5h online = 11h -> cumpriu
+  --       Duda (entrou na quarta 03/03) e Eva (desativada): não contam
+  --     Semana de 08/03/2021, meta 8h/0h: só a Ana cumpre (8h online)
+  ---------------------------------------------------------------------------
+  perform set_config('role', 'none', true);
+  perform set_config('request.jwt.claims', '', true);
+
+  insert into public.metas (horas_total, horas_sede, vigente_desde) values
+    (10, 5, '2021-02-22'),
+    ( 8, 0, '2021-03-08');
+
+  insert into public.membros (id, nome, email, perfil, setor_id, ativo, data_entrada) values
+    (c_calc_ana,  'zz Calc Ana',  'zz.calc.ana@ejuvv.com',  'membro', c_setor_a, true,  '2020-01-01'),
+    (c_calc_beto, 'zz Calc Beto', 'zz.calc.beto@ejuvv.com', 'rh',     c_setor_a, true,  '2021-02-20'),
+    (c_calc_caio, 'zz Calc Caio', 'zz.calc.caio@ejuvv.com', 'membro', c_setor_b, true,  '2020-01-01'),
+    (c_calc_duda, 'zz Calc Duda', 'zz.calc.duda@ejuvv.com', 'membro', c_setor_a, true,  '2021-03-03'),
+    (c_calc_eva,  'zz Calc Eva',  'zz.calc.eva@ejuvv.com',  'membro', c_setor_a, false, '2020-01-01');
+
+  insert into public.registros (membro_id, inicio, fim, local, descricao, origem, cancelado, precisa_revisao) values
+    -- Ana, semana de 01/03
+    (c_calc_ana,  '2021-03-01 09:00-03', '2021-03-01 12:00-03', 'sede',   'zz', 'manual',     false, false),
+    (c_calc_ana,  '2021-03-03 14:00-03', '2021-03-03 16:00-03', 'sede',   'zz', 'manual',     false, false),
+    (c_calc_ana,  '2021-03-04 19:00-03', '2021-03-04 23:00-03', 'online', 'zz', 'manual',     false, false),
+    (c_calc_ana,  '2021-03-06 10:00-03', '2021-03-06 11:00-03', 'online', 'zz', 'manual',     false, false),
+    (c_calc_ana,  '2021-03-07 22:00-03', '2021-03-07 23:00-03', 'online', 'zz', 'manual',     false, false),  -- domingo: mesma semana
+    (c_calc_ana,  '2021-03-05 09:00-03', '2021-03-05 12:00-03', 'sede',   'zz', 'manual',     true,  false),  -- cancelado: não conta
+    (c_calc_ana,  '2021-03-05 13:00-03', '2021-03-05 17:00-03', 'online', 'zz', 'cronometro', false, true),   -- em revisão: não conta
+    -- Ana, semana de 22/02 (2h) e de 08/03 (1h na segunda à meia-noite + 7h = 8h, sem sede)
+    (c_calc_ana,  '2021-02-22 09:00-03', '2021-02-22 11:00-03', 'sede',   'zz', 'manual',     false, false),
+    (c_calc_ana,  '2021-03-08 00:00-03', '2021-03-08 01:00-03', 'online', 'zz', 'manual',     false, false),
+    (c_calc_ana,  '2021-03-09 09:00-03', '2021-03-09 16:00-03', 'online', 'zz', 'manual',     false, false),
+    -- Beto, semana de 01/03 (9h) e de 22/02 (4h)
+    (c_calc_beto, '2021-03-02 09:00-03', '2021-03-02 15:00-03', 'sede',   'zz', 'manual',     false, false),
+    (c_calc_beto, '2021-03-03 09:00-03', '2021-03-03 12:00-03', 'online', 'zz', 'manual',     false, false),
+    (c_calc_beto, '2021-02-22 09:00-03', '2021-02-22 13:00-03', 'online', 'zz', 'manual',     false, false),
+    -- Caio, semana de 01/03 (11h)
+    (c_calc_caio, '2021-03-01 08:00-03', '2021-03-01 14:00-03', 'sede',   'zz', 'manual',     false, false),
+    (c_calc_caio, '2021-03-02 08:00-03', '2021-03-02 13:00-03', 'online', 'zz', 'manual',     false, false),
+    -- Duda: 10h na semana em que entrou (não contam) e 1h na de 08/03
+    (c_calc_duda, '2021-03-04 09:00-03', '2021-03-04 19:00-03', 'sede',   'zz', 'manual',     false, false),
+    (c_calc_duda, '2021-03-09 09:00-03', '2021-03-09 10:00-03', 'sede',   'zz', 'manual',     false, false),
+    -- Eva: desativada
+    (c_calc_eva,  '2021-03-01 09:00-03', '2021-03-01 19:00-03', 'sede',   'zz', 'manual',     false, false);
+
+  perform set_config('role', 'authenticated', true);
+  perform set_config('request.jwt.claims', '{"role":"authenticated","email":"zz.teste.rh@ejuvv.com"}', true);
+
+  -- meta da semana (qualquer dia vira a segunda); antes da primeira meta, sem meta
+  select mt.horas_total, mt.horas_sede into pr from public.meta_da_semana('2021-03-04') mt;
+  assert pr.horas_total = 10 and pr.horas_sede = 5, 'meta_da_semana: 01/03/2021 deveria ser 10h/5h';
+  select mt.horas_total, mt.horas_sede into pr from public.meta_da_semana('2021-03-08') mt;
+  assert pr.horas_total = 8 and pr.horas_sede = 0, 'meta_da_semana: 08/03/2021 deveria ser 8h/0h';
+  select mt.horas_total into x from public.meta_da_semana('2021-02-15') mt;
+  assert x is null, 'meta_da_semana: semana antes da primeira meta deveria vir sem meta';
+
+  -- resumo (os setores A e B só têm membros do teste)
+  select count(*) into n from public.resumo_da_semana('2021-03-01', 'zz Setor A');
+  assert n = 2, format('resumo do setor A em 01/03: deveria ter Ana e Beto (tem %s)', n);
+  select rs.horas_sede, rs.horas_total, rs.cumpriu into pr
+  from public.resumo_da_semana('2021-03-03', 'zz Setor A') rs where rs.membro_id = c_calc_ana;
+  assert pr.horas_sede = 5 and pr.horas_total = 11 and pr.cumpriu,
+    format('resumo: Ana deveria ter 5h na sede, 11h no total e cumprir (veio %s, %s, %s)', pr.horas_sede, pr.horas_total, pr.cumpriu);
+  select rs.horas_sede, rs.horas_total, rs.cumpriu into pr
+  from public.resumo_da_semana('2021-03-01', 'zz Setor A') rs where rs.membro_id = c_calc_beto;
+  assert pr.horas_sede = 6 and pr.horas_total = 9 and not pr.cumpriu,
+    format('resumo: Beto deveria ter 6h na sede, 9h no total e não cumprir (veio %s, %s, %s)', pr.horas_sede, pr.horas_total, pr.cumpriu);
+  select rs.horas_sede, rs.horas_total, rs.cumpriu, rs.setor into pr
+  from public.resumo_da_semana('2021-03-01', 'zz Setor B') rs where rs.membro_id = c_calc_caio;
+  assert pr.horas_sede = 6 and pr.horas_total = 11 and pr.cumpriu and pr.setor = 'zz Setor B',
+    'resumo: Caio deveria ter 6h na sede, 11h no total e cumprir';
+  select count(*) into n from public.resumo_da_semana('2021-03-01') rs where rs.membro_id in (c_calc_duda, c_calc_eva);
+  assert n = 0, 'resumo: Duda (entrou no meio da semana) e Eva (desativada) não deveriam contar';
+
+  -- percentual: por membros
+  assert public.percentual_da_semana('2021-03-01', 'zz Setor A') = 50,  'percentual do setor A em 01/03: 1 de 2 = 50';
+  assert public.percentual_da_semana('2021-03-01', 'zz Setor B') = 100, 'percentual do setor B em 01/03: 1 de 1 = 100';
+  assert public.percentual_da_semana('2021-03-08', 'zz Setor A') = 33.3, 'percentual do setor A em 08/03: 1 de 3 = 33,3';
+  assert public.percentual_da_semana('2021-03-01', 'zz Setor Que Não Existe') = 0, 'percentual de setor que não existe: 0';
+
+  -- abaixo da meta e médias
+  select string_agg(rs.nome, ', ' order by rs.nome) into v_lista from public.abaixo_da_meta('2021-03-08', 'zz Setor A') rs;
+  assert v_lista = 'zz Calc Beto, zz Calc Duda',
+    format('abaixo_da_meta do setor A em 08/03: deveria ser Beto e Duda (veio %s)', v_lista);
+  select m.media_total, m.media_sede, m.media_diaria into pr from public.medias_da_semana('2021-03-01', 'zz Setor A') m;
+  assert pr.media_total = 10 and pr.media_sede = 5.5 and pr.media_diaria = 2,
+    format('médias do setor A em 01/03: deveria ser 10 / 5,5 / 2 (veio %s / %s / %s)', pr.media_total, pr.media_sede, pr.media_diaria);
+
+  -- progresso de um membro
+  select p.* into pr from public.progresso_de_membro(c_calc_ana, '2021-03-05') p;
+  assert pr.semana = '2021-03-01' and pr.horas_sede = 5 and pr.horas_total = 11 and pr.meta_total = 10
+     and pr.meta_sede = 5 and pr.cumpriu and pr.elegivel and not pr.dispensada,
+    'progresso_de_membro: Ana na semana de 01/03 errado';
+  select p.* into pr from public.progresso_de_membro(c_calc_duda, '2021-03-01') p;
+  assert not pr.elegivel and not pr.cumpriu and pr.horas_total = 10,
+    'progresso_de_membro: Duda não deveria contar em 01/03 (entrou na quarta)';
+  select p.* into pr from public.progresso_de_membro(c_calc_ana, '2021-03-08') p;
+  assert pr.cumpriu and pr.horas_total = 8 and pr.horas_sede = 0,
+    'progresso_de_membro: Ana em 08/03 (meta 8h/0h) deveria cumprir';
+  select p.* into pr from public.progresso_de_membro(c_calc_ana, '2021-02-15') p;
+  assert not pr.elegivel, 'progresso_de_membro: semana antes da primeira meta não deveria contar';
+
+  -- semanas seguidas abaixo: Beto (22/02, 01/03 e 08/03); quem cumpriu ou acabou de entrar, não
+  select s.semanas_seguidas into n from public.semanas_seguidas_abaixo('2021-03-08') s where s.membro_id = c_calc_beto;
+  assert n = 3, format('semanas_seguidas_abaixo em 08/03: Beto deveria ter 3 (tem %s)', n);
+  select s.semanas_seguidas into n from public.semanas_seguidas_abaixo('2021-03-01') s where s.membro_id = c_calc_beto;
+  assert n = 2, format('semanas_seguidas_abaixo em 01/03: Beto deveria ter 2 (tem %s)', n);
+  select count(*) into n from public.semanas_seguidas_abaixo('2021-03-08') s
+   where s.membro_id in (c_calc_ana, c_calc_caio, c_calc_duda);
+  assert n = 0, 'semanas_seguidas_abaixo: Ana, Caio e Duda não deveriam aparecer';
+
+  -- diretor de setor: sempre o próprio setor, mesmo pedindo outro
+  perform set_config('request.jwt.claims', '{"role":"authenticated","email":"zz.teste.dsetor@ejuvv.com"}', true);
+  select string_agg(rs.nome, ', ' order by rs.nome) into v_lista from public.resumo_da_semana('2021-03-01', 'zz Setor B') rs;
+  assert v_lista = 'zz Calc Ana, zz Calc Beto',
+    format('diretor_setor pedindo o setor B deveria ver o setor A (viu %s)', v_lista);
+  assert public.percentual_da_semana('2021-03-01') = 50, 'diretor_setor: o percentual deveria ser o do setor dele (50)';
+  select count(*) into n from public.progresso_de_membro(c_calc_caio, '2021-03-01');
+  assert n = 0, 'diretor_setor: viu o progresso de alguém de outro setor';
+
+  -- presidente: o setor que pedir
+  perform set_config('request.jwt.claims', '{"role":"authenticated","email":"zz.teste.presidente@ejuvv.com"}', true);
+  select string_agg(rs.nome, ', ' order by rs.nome) into v_lista from public.resumo_da_semana('2021-03-01', 'zz Setor B') rs;
+  assert v_lista = 'zz Calc Caio', format('presidente no setor B deveria ver o Caio (viu %s)', v_lista);
+
+  -- membro: no resumo, só ele mesmo; e o painel do membro
+  perform set_config('request.jwt.claims', '{"role":"authenticated","email":"zz.calc.ana@ejuvv.com"}', true);
+  select count(*) into n from public.resumo_da_semana('2021-03-01');
+  assert n = 1, format('membro: deveria ver só a si mesmo no resumo (viu %s)', n);
+  select p.* into pr from public.progresso_da_semana('2021-03-01') p;
+  assert pr.horas_total = 11 and pr.cumpriu, 'progresso_da_semana: Ana em 01/03 errado';
+  select count(*) as semanas, count(*) filter (where p.cumpriu) as cumpridas,
+         min(p.semana) as primeira, max(p.semana) as ultima
+    into pr
+  from public.progresso_do_mes('2021-03') p;
+  assert pr.semanas = 5 and pr.cumpridas = 2 and pr.primeira = '2021-03-01' and pr.ultima = '2021-03-29',
+    format('progresso_do_mes de março/2021: 5 segundas, 2 cumpridas (veio %s, %s)', pr.semanas, pr.cumpridas);
+
+  ---------------------------------------------------------------------------
+  -- 15. Cronômetro: corta em 10h, divide na meia-noite e encerra sozinho
+  ---------------------------------------------------------------------------
+  perform set_config('role', 'none', true);
+  perform set_config('request.jwt.claims', '', true);
+
+  -- um esquecido desde anteontem às 20h (membro B) e um ligado há 3h (rh)
+  insert into public.registros (membro_id, inicio, local, descricao, origem)
+  values (c_membro_b, d2_20, 'online', 'zz esquecido', 'cronometro')
+  returning * into r_b9;
+  insert into public.registros (membro_id, inicio, local, descricao, origem)
+  values (c_rh, now() - interval '3 hours', 'sede', 'zz ligado há 3h', 'cronometro')
+  returning * into r_b9b;
+
+  n := public.encerrar_cronometros_esquecidos();     -- é o que o pg_cron roda a cada 5 minutos
+  assert n >= 1, 'encerrar_cronometros_esquecidos: deveria encerrar o cronômetro esquecido';
+
+  -- o esquecido: 10h (20h às 6h), dividido na meia-noite, as duas partes em revisão
+  select count(*), sum(extract(epoch from fim - inicio)) / 3600,
+         bool_and(precisa_revisao and descricao = 'zz esquecido' and local = 'online' and origem = 'cronometro')
+    into n, x, ok1
+  from public.registros
+  where membro_id = c_membro_b and inicio >= d2_20 and not cancelado;
+  assert n = 2 and x = 10 and ok1,
+    format('cronômetro esquecido: deveria virar 2 registros, 10h no total, em revisão (veio %s registros, %sh)', n, x);
+  select fim into t from public.registros where id = r_b9.id;
+  assert t = d1_00, 'cronômetro esquecido: o registro original deveria terminar na meia-noite';
+
+  -- o ligado há 3h continua ligado
+  select fim into t from public.registros where id = r_b9b.id;
+  assert t is null, 'cronômetro ligado há 3h não deveria ser encerrado';
+
+  -- parar pelo site: o banco usa a hora dele e divide se tiver passado da meia-noite
+  perform set_config('role', 'authenticated', true);
+  perform set_config('request.jwt.claims', '{"role":"authenticated","email":"zz.teste.rh@ejuvv.com"}', true);
+  update public.registros set fim = now() - interval '2 hours' where id = r_b9b.id returning * into rr;
+  t := (((r_b9b.inicio at time zone 'America/Sao_Paulo')::date + 1)::timestamp) at time zone 'America/Sao_Paulo';
+  assert rr.fim = least(now(), t) and not rr.precisa_revisao,
+    'parar pelo site: o update deveria devolver a primeira parte, terminando agora (ou na meia-noite)';
+  select sum(extract(epoch from fim - inicio)) / 3600 into x
+  from public.registros where membro_id = c_rh and inicio >= r_b9b.inicio and not cancelado;
+  assert x = 3, format('parar pelo site: as partes deveriam somar 3h (somaram %s)', x);
+
+  -- parar pelo site um cronômetro de anteontem às 20h: 10h, cortado na meia-noite
+  perform set_config('role', 'none', true);
+  insert into public.registros (membro_id, inicio, local, descricao, origem)
+  values (c_calc_beto, d2_20, 'sede', 'zz parado pelo site', 'cronometro')
+  returning * into r_b9;
+  perform set_config('role', 'authenticated', true);
+  perform set_config('request.jwt.claims', '{"role":"authenticated","email":"zz.calc.beto@ejuvv.com"}', true);
+  update public.registros set fim = now() where id = r_b9.id returning * into rr;
+  assert rr.fim = d1_00 and rr.precisa_revisao,
+    'parar pelo site depois de 10h: o update deveria devolver a primeira parte (até a meia-noite), em revisão';
+  select count(*), sum(extract(epoch from fim - inicio)) / 3600, bool_and(precisa_revisao)
+    into n, x, ok1
+  from public.registros where membro_id = c_calc_beto and inicio >= d2_20 and not cancelado;
+  assert n = 2 and x = 10 and ok1,
+    format('parar pelo site depois de 10h: deveria virar 2 registros, 10h no total, em revisão (veio %s, %sh)', n, x);
+
+  -- pelo SQL Editor o fim mandado vale (até 10h), e também divide na meia-noite
+  perform set_config('role', 'none', true);
+  perform set_config('request.jwt.claims', '', true);
+  insert into public.registros (membro_id, inicio, local, descricao, origem)
+  values (c_calc_caio, d6_22, 'sede', 'zz parado pelo SQL Editor', 'cronometro')
+  returning * into r_b9c;
+  update public.registros set fim = d5_03 where id = r_b9c.id;
+  select count(*), sum(extract(epoch from fim - inicio)) / 3600, bool_or(precisa_revisao)
+    into n, x, ok1
+  from public.registros where membro_id = c_calc_caio and inicio >= d6_22 and not cancelado;
+  assert n = 2 and x = 5 and not ok1,
+    format('parar pelo SQL Editor: deveria virar 2 registros, 5h no total, fora da revisão (veio %s, %sh)', n, x);
+
+  ---------------------------------------------------------------------------
+  -- 16. O que saiu (dispensas), quem executa cada função e a tarefa agendada
   ---------------------------------------------------------------------------
   perform set_config('role', 'none', true);
   assert to_regclass('public.dispensas') is null, 'a tabela dispensas deveria ter sido removida';
@@ -1304,12 +1615,21 @@ begin
   assert v_lista is null,
     format('o anon (sem login) consegue chamar estas funções: %s. Tire com revoke execute ... from public, anon', v_lista);
 
-  -- funções internas (de gatilho e a exigir_rh_com_motivo) o site não chama
+  -- funções internas (de gatilho, exigir_rh_com_motivo e a da tarefa agendada) o site não chama
   select string_agg(p.proname, ', ' order by p.proname) into v_lista
   from pg_proc p join pg_namespace ns on ns.oid = p.pronamespace
   where ns.nspname = 'public' and has_function_privilege('authenticated', p.oid, 'execute')
-    and (p.prorettype in ('trigger'::regtype, 'event_trigger'::regtype) or p.proname = 'exigir_rh_com_motivo');
+    and (p.prorettype in ('trigger'::regtype, 'event_trigger'::regtype)
+         or p.proname in ('exigir_rh_com_motivo', 'encerrar_cronometros_esquecidos'));
   assert v_lista is null, format('o site consegue chamar estas funções internas: %s', v_lista);
+
+  -- a tarefa do pg_cron está agendada (num banco sem pg_cron, pula)
+  if to_regclass('cron.job') is not null then
+    select count(*) into n from cron.job
+     where jobname = 'encerrar-cronometros-esquecidos' and schedule = '*/5 * * * *'
+       and command = 'select public.encerrar_cronometros_esquecidos()';
+    assert n = 1, 'a tarefa encerrar-cronometros-esquecidos deveria estar agendada no pg_cron';
+  end if;
 
   -- Chegou aqui = passou. Este erro é de propósito: desfaz tudo o que o teste fez.
   raise exception 'fim do teste' using errcode = 'ZZ999';
