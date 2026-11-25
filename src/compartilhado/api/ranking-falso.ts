@@ -1,7 +1,7 @@
 // FALSO: versão de demonstração, usada só com VITE_LOGIN_FALSO=true (ver ranking.ts)
 // Mesmas regras das funções do banco (migração ranking_e_podio), calculadas sobre os dados falsos.
 import type { LinhaPodio, LinhaRanking, LinhaRankingSetor, PodioDoMes, PosicaoRanking } from '../tipos.ts'
-import { atraso, calcularRanking, membroLogado } from './dados-falsos.ts'
+import { atraso, calcularRanking, estaDispensada, membroLogado, semanasDoMes } from './dados-falsos.ts'
 
 const PODIO_EJ = 5
 const PODIO_SETOR = 3
@@ -42,8 +42,18 @@ function faltam(podio: LinhaRanking[], eu: LinhaRanking, limite: number): number
   return Math.max(0.5, Math.ceil((corte - eu.horasTotal) * 2) / 2)
 }
 
+// Dispensado no mês = TODAS as semanas dispensadas (seção 12). O calcularRanking marca quem teve
+// alguma semana dispensada; aqui vale a regra do mês, como no banco.
+function linhasDoMes(mes: string): LinhaRanking[] {
+  const semanas = semanasDoMes(mes)
+  return calcularRanking(mes).map((l) => ({
+    ...l,
+    dispensado: semanas.length > 0 && semanas.every((s) => estaDispensada(l.membro.id, s)),
+  }))
+}
+
 function rankingDaEJ(mes: string): LinhaRanking[] {
-  return comPosicoes(calcularRanking(mes))
+  return comPosicoes(linhasDoMes(mes))
 }
 
 function rankingDoSetor(ej: LinhaRanking[], setor: string): LinhaRanking[] {
@@ -83,7 +93,7 @@ export async function minhaPosicaoNoRanking(mes: string): Promise<PosicaoRanking
 export async function rankingDosSetores(mes: string): Promise<LinhaRankingSetor[]> {
   await atraso()
   const porSetor = new Map<string, LinhaRanking[]>()
-  for (const linha of calcularRanking(mes)) {
+  for (const linha of linhasDoMes(mes)) {
     if (linha.dispensado) continue
     porSetor.set(linha.membro.setor, [...(porSetor.get(linha.membro.setor) ?? []), linha])
   }
