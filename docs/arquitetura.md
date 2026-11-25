@@ -244,8 +244,9 @@ export interface LinhaRanking {
   dispensado: boolean
 }
 
-// Posição do membro logado no mês. "Faltam" = horas para alcançar o último do pódio (0 se já está nele),
-// arredondadas para cima em meia hora. minhaPosicaoNoRanking devolve null se a pessoa não entra no ranking do mês.
+// Posição do membro logado no mês. "Faltam" = 0 no pódio; 0,5 se o pódio ainda tem vaga; senão, horas para
+// alcançar o último do pódio, para cima em meia hora (mínimo 0,5). minhaPosicaoNoRanking devolve null se a
+// pessoa não entra no ranking do mês.
 export interface PosicaoRanking {
   posicaoEJ: number
   totalEJ: number

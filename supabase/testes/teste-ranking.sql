@@ -87,7 +87,8 @@ begin
   select bool_or(to_jsonb(p) ? 'email' or to_jsonb(p) ? 'perfil') into ok1 from public.podio_do_mes(c_mes) p;
   assert not coalesce(ok1, false), 'Duda: o pódio trouxe e-mail ou perfil';
 
-  -- Posição: 5º de 5 na EJ, 4º de 4 no setor; faltam 6h (Eva) e 8h (Beto e Caio).
+  -- Posição: 5º de 5 na EJ, 4º de 4 no setor. O pódio da EJ tem 4 pessoas (há vaga):
+  -- faltam 0,5h. O do setor A está cheio (Ana, Beto, Caio): faltam 8h para alcançar o Beto e o Caio.
   select * into eu from public.minha_posicao_no_ranking(c_mes);
   assert found, 'Duda: deveria ter posição no ranking';
   assert eu.horas_total = 0, format('Duda: horas deveriam ser 0 (são %s)', eu.horas_total);
@@ -95,7 +96,7 @@ begin
     format('Duda: posição na EJ errada (%s de %s)', eu.posicao_ej, eu.total_ej);
   assert eu.posicao_setor = 4 and eu.total_setor = 4,
     format('Duda: posição no setor errada (%s de %s)', eu.posicao_setor, eu.total_setor);
-  assert eu.faltam_para_podio_ej = 6, format('Duda: faltam para o pódio da EJ deveria ser 6 (é %s)', eu.faltam_para_podio_ej);
+  assert eu.faltam_para_podio_ej = 0.5, format('Duda: o pódio da EJ tem vaga, faltam deveria ser 0,5 (é %s)', eu.faltam_para_podio_ej);
   assert eu.faltam_para_podio_setor = 8, format('Duda: faltam para o pódio do setor deveria ser 8 (é %s)', eu.faltam_para_podio_setor);
 
   -- O membro não vê a lista completa.
@@ -125,6 +126,12 @@ begin
   select * into eu from public.minha_posicao_no_ranking(c_mes);
   assert eu.posicao_setor = 2 and eu.faltam_para_podio_setor = 0 and eu.faltam_para_podio_ej = 0,
     format('Beto: está no pódio, faltam deveria ser 0 (%s)', to_jsonb(eu));
+
+  -- Eva: sozinha no setor B e no pódio dele.
+  perform set_config('request.jwt.claims', '{"role":"authenticated","email":"zz.rank.eva@ejuvv.com"}', true);
+  select * into eu from public.minha_posicao_no_ranking(c_mes);
+  assert eu.posicao_setor = 1 and eu.total_setor = 1 and eu.faltam_para_podio_setor = 0,
+    format('Eva: deveria ser 1ª de 1 no setor B, no pódio (%s)', to_jsonb(eu));
 
   perform set_config('request.jwt.claims', '{"role":"authenticated","email":"zz.rank.novo@ejuvv.com"}', true);
   select count(*) into n from public.minha_posicao_no_ranking(c_mes);

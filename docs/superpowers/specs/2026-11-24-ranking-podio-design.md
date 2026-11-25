@@ -95,7 +95,7 @@ A branch parte da branch do PR #9 (commit `632bdcf`), porque a migração usa fu
 
 - **Pódio só com quem tem horas no mês.** No começo do mês, um pódio com "0h" não motiva; se ninguém tiver horas, aparece a mensagem de lista vazia. A posição do membro continua aparecendo mesmo com 0h.
 - **Empate:** quem tem as mesmas horas totais e de sede divide a posição (1º, 2º, 2º, 4º). Se houver empate na última vaga do pódio, todos os empatados aparecem (o pódio pode ter mais de 5 ou de 3 nomes).
-- **"Faltam Xh":** diferença para as horas de quem está na última posição do pódio, arredondada para cima em meia hora.
+- **"Faltam Xh":** 0 para quem está no pódio; meia hora se o pódio ainda tem vaga (menos de 5 na EJ ou de 3 no setor); senão, a diferença para as horas de quem está na última posição do pódio, arredondada para cima em meia hora (mínimo de meia hora). Ajustado na revisão final.
 - **Mês:** a página do membro mostra o mês atual, com seletor dos últimos 6 meses, igual ao ranking do RH.
 - **`rankingDoMes` do RH:** a função do banco fica pronta agora, mas a troca no `rh.ts` fica para depois que a J10 entrar, para não brigar com a fila G10 → J5 → J10. Até lá, a lista completa do RH continua falsa.
 - **B12 do Bernardo:** a parte do ranking sai dela (fica nesta entrega); sobra o `horasPorDia`.

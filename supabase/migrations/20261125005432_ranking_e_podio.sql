@@ -18,9 +18,10 @@
 --     ainda não existem: ninguém está dispensado.
 --   - Pódio: até a 5ª posição na EJ e até a 3ª no setor de quem chama, só com
 --     quem tem horas e não foi dispensado. Empate na última vaga mostra todos.
---   - Faltam para o pódio: horas para alcançar o último do pódio, arredondadas
---     para cima em meia hora (mínimo de meia hora para quem está fora dele);
---     0 para quem está no pódio ou se o pódio está vazio.
+--   - Faltam para o pódio: 0 para quem está no pódio; meia hora se o pódio
+--     ainda tem vaga (menos de 5 na EJ ou de 3 no setor); senão, horas para
+--     alcançar o último do pódio, arredondadas para cima em meia hora (mínimo
+--     de meia hora).
 --   - Setores: só setores ativos com alguém que conte; média por membro, sem os
 --     dispensados; ordem pela média total, desempate pela média na sede.
 --
@@ -199,8 +200,11 @@ as $$
   podio as (
     select * from r where r.horas_total > 0 and not r.dispensado
   ),
-  corte as (   -- horas do último do pódio (null = pódio vazio)
-    select (select min(p.horas_total) from podio p where p.posicao_ej <= 5) as ej,
+  corte as (   -- quantos estão no pódio e as horas do último dele
+    select (select count(*) from podio p where p.posicao_ej <= 5) as ej_n,
+           (select min(p.horas_total) from podio p where p.posicao_ej <= 5) as ej,
+           (select count(*) from podio p, eu
+             where p.posicao_setor <= 3 and p.setor_id = eu.setor_id) as setor_n,
            (select min(p.horas_total) from podio p, eu
              where p.posicao_setor <= 3 and p.setor_id = eu.setor_id) as setor
   )
@@ -210,13 +214,13 @@ as $$
          (select count(*) from r where r.setor_id = eu.setor_id)::int,
          eu.horas_total,
          case
-           when c.ej is null then 0
            when eu.horas_total > 0 and not eu.dispensado and eu.posicao_ej <= 5 then 0
+           when c.ej_n < 5 then 0.5   -- ainda há vaga: meia hora já põe no pódio
            else greatest(0.5, ceil((c.ej - eu.horas_total) * 2) / 2)
          end,
          case
-           when c.setor is null then 0
            when eu.horas_total > 0 and not eu.dispensado and eu.posicao_setor <= 3 then 0
+           when c.setor_n < 3 then 0.5
            else greatest(0.5, ceil((c.setor - eu.horas_total) * 2) / 2)
          end
   from eu

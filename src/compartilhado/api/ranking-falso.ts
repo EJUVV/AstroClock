@@ -35,9 +35,11 @@ function paraPodio(linha: LinhaRanking): LinhaPodio {
   }
 }
 
-// Horas para alcançar o último do pódio, para cima em meia hora (mínimo de meia hora fora dele).
+// 0 no pódio; meia hora se ainda há vaga; senão, horas para alcançar o último do pódio,
+// para cima em meia hora (mínimo de meia hora).
 function faltam(podio: LinhaRanking[], eu: LinhaRanking, limite: number): number {
-  if (podio.length === 0 || noPodio(eu, limite)) return 0
+  if (noPodio(eu, limite)) return 0
+  if (podio.length < limite) return 0.5
   const corte = Math.min(...podio.map((l) => l.horasTotal))
   return Math.max(0.5, Math.ceil((corte - eu.horasTotal) * 2) / 2)
 }

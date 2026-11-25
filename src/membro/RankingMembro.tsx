@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { minhaPosicaoNoRanking, podioDoMes, rankingDosSetores } from '@/compartilhado/api/ranking'
-import { mesAtual, rotuloMes, somarMeses } from '@/compartilhado/datas'
+import { mesDoRanking, rotuloMes, somarMeses } from '@/compartilhado/datas'
 import { Carregavel, useCarregar } from '@/compartilhado/ui/demo'
 import { ListaPodio } from '@/compartilhado/ui/ListaPodio'
 import { RankingSetores } from '@/compartilhado/ui/RankingSetores'
@@ -13,8 +13,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/compartilhado/ui/sha
 
 function RankingMembro() {
   const { eu } = useSessao()
-  const [mes, setMes] = useState(mesAtual())
-  const meses = Array.from({ length: 6 }, (_, i) => somarMeses(mesAtual(), -i))
+  const [mes, setMes] = useState(mesDoRanking())
+  const meses = Array.from({ length: 6 }, (_, i) => somarMeses(mesDoRanking(), -i))
   const carga = useCarregar(() => Promise.all([podioDoMes(mes), minhaPosicaoNoRanking(mes), rankingDosSetores(mes)]), [mes])
 
   return (

@@ -19,6 +19,7 @@ import {
   formatarHoras,
   hoje,
   mesAtual,
+  mesDoRanking,
   rotuloMes,
   rotuloSemana,
   semanaAtual,
@@ -245,7 +246,7 @@ function CartaoRanking({ posicao, podio, euId }: { posicao: Carga<PosicaoRanking
     <Card>
       <CardHeader>
         <CardTitle className="text-lg">Ranking do mês</CardTitle>
-        <CardDescription>{rotuloMes(mesAtual())} · por horas totais</CardDescription>
+        <CardDescription>{rotuloMes(mesDoRanking())} · por horas totais</CardDescription>
         <CardAction>
           <Button asChild variant="outline" size="sm">
             <Link to="/membro/ranking">Ver ranking</Link>
@@ -293,8 +294,8 @@ function InicioMembro() {
   const progresso = useCarregar(() => progressoDaSemana(semana), [semana, versao])
   const anterior = useCarregar(() => progressoDaSemana(somarDias(semana, -7)), [semana, versao])
   const porDia = useCarregar(() => horasPorDia(semana), [semana, versao])
-  const posicao = useCarregar(() => minhaPosicaoNoRanking(mesAtual()), [versao])
-  const podio = useCarregar(() => podioDoMes(mesAtual()), [versao])
+  const posicao = useCarregar(() => minhaPosicaoNoRanking(mesDoRanking()), [versao])
+  const podio = useCarregar(() => podioDoMes(mesDoRanking()), [versao])
   const ehAtual = semana === semanaAtual()
   const tempo = <BarrasDeTempo progresso={progresso.status === 'conteudo' && ehAtual ? progresso.dados : undefined} />
   const cronometro = <CartaoCronometro preencher={ehDesktop} onMudou={() => setVersao((v) => v + 1)} />
@@ -368,7 +369,7 @@ function InicioMembro() {
                     {p.posicaoEJ}º<span className="text-lg font-semibold text-muted-foreground"> de {p.totalEJ}</span>
                   </>
                 }
-                comparacao={`Na EJ, em ${rotuloMes(mesAtual()).toLowerCase()}`}
+                comparacao={`Na EJ, em ${rotuloMes(mesDoRanking()).toLowerCase()}`}
                 linhas={[
                   { icone: UsersIcon, texto: `${p.posicaoSetor}º de ${p.totalSetor} no setor` },
                   { icone: TrophyIcon, texto: 'Por horas totais' },

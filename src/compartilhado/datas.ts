@@ -34,6 +34,12 @@ export function mesAtual(): string {
   return hoje().slice(0, 7)
 }
 
+// Mês do ranking que está correndo: a semana conta no mês da segunda-feira, então de 1º até
+// o primeiro domingo do mês o ranking em andamento ainda é o do mês anterior.
+export function mesDoRanking(): string {
+  return semanaAtual().slice(0, 7)
+}
+
 // O Brasil não tem horário de verão desde 2019: Brasília é sempre -03:00.
 export function instante(data: string, hora: string): string {
   return `${data}T${hora}:00-03:00`
