@@ -16,6 +16,7 @@ Itens marcados com **[PENDENTE]** ainda não foram decididos. Itens marcados com
 - As duas condições são obrigatórias. **Horas online não compensam horas faltantes na sede.**
 - A presença na sede é **autodeclarada**: o membro escolhe `sede` ou `online` em cada registro.
 - As metas (10h e 5h) são editáveis **somente pelo diretor do RH**, com histórico. O diretor **escolhe a semana** em que a nova meta começa: pode ser a semana seguinte ou uma mais adiante, nunca a atual nem uma passada. A meta vale até a próxima alteração programada. **Cada semana usa a meta vigente naquela semana** (a meta não é aplicada retroativamente).
+- O diretor do RH pode **cancelar uma meta programada** (lançada por engano), **só de semanas que ainda não começaram**. A meta cancelada fica guardada no histórico, mas some da lista e deixa de valer; volta a valer a meta anterior. Nada é apagado. Decidido pelo líder do projeto em 25/11/2026.
 - A meta é igual para todos os setores.
 - **Feriados não mudam a meta**: a semana com feriado continua com 10h no total e 5h na sede.
 

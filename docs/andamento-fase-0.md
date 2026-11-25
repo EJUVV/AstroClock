@@ -1,6 +1,6 @@
 # Andamento da Fase 0
 
-Retrato de onde a Fase 0 parou (atualizado em 24/11/2026). Ao retomar com uma IA, peça para ela ler este arquivo e o [`fase-0.md`](fase-0.md). Quando a Fase 0 terminar, este arquivo pode ser apagado (antes, passe a seção "Ambientes" para o `arquitetura.md` ou o `README.md`).
+Retrato de onde a Fase 0 parou (atualizado em 25/11/2026). Ao retomar com uma IA, peça para ela ler este arquivo e o [`fase-0.md`](fase-0.md). Quando a Fase 0 terminar, este arquivo pode ser apagado (antes, passe a seção "Ambientes" para o `arquitetura.md` ou o `README.md`).
 
 ## Próxima sessão: comece por aqui
 
@@ -20,6 +20,27 @@ As revisões de 23/11 foram feitas pelo Victor e registradas no Notion; em 24/11
 - **Tarefas novas no Notion (23/11):** G13 (parar o cronômetro do jeito da B10, até 25/11), J10 (painel do RH com o cálculo real, até 26/11), B14 (migrações no `horas-prod` com o Victor, até 26/11, depois do PR #9 na `main` e testado no dev) e G12 (a tela de Configurações da `atualDev`, como extra, até 27/11). A troca das funções do site saiu da B9: a do membro ficou na G11 (até 25/11) e a do RH na J10.
 - **Perfis da equipe no `horas-dev`:** Victor, Johannes e Guilherme como `rh`; Bernardo como `membro`. O Guilherme volta para `membro` antes do teste da G11.
 - **E-mail da EJ (relatório do Victor, 24/11):** o DNS do `ejuvv.com` foi migrado do UOL Host para a Hostinger em 24/11, às 15h16. A Hostinger criou sozinha os registros do e-mail dela, e o recebimento ficou intermitente até cerca de 19h30. Corrigido no mesmo dia (MX `smtp.google.com`, SPF do Google e DMARC) e validado às 20h14. Quem cuida de cada coisa agora: **registro do domínio no UOL Host**, **DNS e site institucional na Hostinger** (hPanel → Domínios → ejuvv.com → DNS), **e-mail no Google Workspace**. Nunca usar "Redefinir registros DNS" nem ativar o e-mail da Hostinger: isso derruba o e-mail da EJ. **Falta o DKIM**, que depende do administrador do Workspace. A falha de DNS vista em 19/11 provavelmente tem a ver com os MX do Google estarem desativados na zona antiga do UOL (ponto em aberto no relatório).
+
+### Feito em 25/11/2026
+
+- **G10 na `main`** (PR #10, aceito pelo Victor em 24/11 às 22:28). Ainda não testada no `horas-dev` (auditoria vazia): falta aprovar ou reprovar o cronômetro que espera revisão.
+- **J5:** o Johannes trouxe a `main` (conflito com a G10 resolvido) e pôs a versão de demonstração nas metas; a IA fez o ajuste que faltava (`alterarMetas` com `insert` e leitura pela `lista_de_metas`, commit `687d974` na `johannes/membros-real`). Testada pelo Victor no `horas-dev` com o login real: membros e metas sem erro. **Falta abrir o PR.** A tela de mudar o setor ainda não existe (é a J4).
+- **Perfil do Victor no `horas-dev`:** `diretor_rh` desde 25/11, para testar as metas (era `rh`). Como diretor, fica fora do cálculo e do ranking; voltar para `rh` quando quiser registrar horas.
+- **Dados de teste desfeitos:** a meta de 13h para 30/11 foi substituída por 10h/5h (vale a mais nova) e o membro "teste01 da silva" foi desativado.
+- **Cancelar meta programada (decidido em 25/11):** opção de marcar como cancelada, sem apagar. Regra na seção 1 do `regras-de-negocio.md`; tarefas novas **B15** (banco) e **J11** (botão), em `tarefas-semanas-2-a-4.md`. Enquanto não existir, desfazer uma meta programada = lançar de novo a meta certa para a mesma segunda.
+
+### Ranking com pódio (feito em 24/11/2026, na branch `feat/ranking-podio`)
+
+Funcionalidade nova pedida pelo Victor para motivar os membros a registrar mais horas. **Ainda fora da `main` e do `horas-dev`.**
+
+- **Regra nova (seção 12, só na branch até o merge):** o membro vê o pódio da EJ (5 primeiros) e o do setor (3 primeiros), com nome, setor e horas, a própria posição e quanto falta para o pódio; todos veem o ranking dos setores pela média de horas por membro no mês (sem dispensados). Período continua o mês.
+- **Na branch:** desenho e plano em `docs/superpowers/`; migração `20261125005432_ranking_e_podio.sql` (`ranking_do_mes`, `podio_do_mes`, `minha_posicao_no_ranking`, `ranking_dos_setores`) e `supabase/testes/teste-ranking.sql`; `src/compartilhado/api/ranking.ts` (e `ranking-falso.ts`); página **Ranking** do membro (abas EJ, Meu setor e Setores), item no menu, mini pódio no Início e aba **Setores** no ranking do RH. A branch parte da branch do PR #9, porque a migração usa as funções da B9.
+- **Verificado:** lint e build; navegador no modo de demonstração (computador e 360 px); revisão final por um revisor separado (nada crítico; as 2 correções importantes já entraram). Prévia do protótipo na Vercel: `astro-clock-git-feat-ranking-podio-ejuvv.vercel.app` (pede login da equipe na Vercel).
+- **Não feito ainda:** o `teste-ranking.sql` não rodou no banco; nada foi aplicado no `horas-dev`.
+- **Ordem:** só vai para a `main` **depois do PR #9** e **depois de a migração estar no `horas-dev`** (senão o cartão do ranking no Início dá erro com login real). A lista completa do RH continua falsa até a J10; a B12 encolheu (sobrou o `horasPorDia`).
+- **Decisão pendente do Victor:** em setor com 1 ou 2 membros, a média revela as horas de alguém. Opções: mostrar só setores com 3 ou mais membros (sugestão da IA), aceitar e registrar na regra, ou esconder o número de membros.
+- **Pequenos, para depois:** aba Setores com todos em 0h mostra "1º" para todos; a aba da página do membro volta para "EJ" ao trocar de mês; a demonstração não filtra quem entrou na semana.
+- **Avisar:** Guilherme (página nova na pasta do membro; `progresso.ts` reexporta `minhaPosicaoNoRanking` de `ranking.ts`, atenção na G11), Bernardo (B12 menor; a migração depende da B9) e Johannes (aba Setores no `Ranking.tsx`).
 
 ### Produção (V7), montada em 24/11/2026
 
@@ -125,6 +146,7 @@ Semana 4 (23 a 27/11). Meta: o piloto completo, em produção. O teste com membr
    - Marcar com o Bernardo e o Guilherme o dia de juntar o PR #9 e aplicar no `horas-dev` (junto com a G13).
    - V7: a produção está montada (ver "Produção (V7)"). Falta cadastrar o endereço de volta do prod no Google Cloud, o que depende do administrador do Workspace, e depois a B14.
    - V6 (validação com o RH) assim que a B9 estiver no `horas-dev` e a J10 na `main`.
+   - Ranking com pódio: decidir o caso dos setores pequenos; quando o PR #9 (com a G13) estiver no `horas-dev`, aplicar a migração do ranking com a IA, rodar o `teste-ranking.sql`, testar com login real e abrir o PR da `feat/ranking-podio` (ver "Ranking com pódio").
 
 ### Tarefas do Victor fora da IA
 
