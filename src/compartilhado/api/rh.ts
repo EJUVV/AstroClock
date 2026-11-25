@@ -149,25 +149,27 @@ export async function revisarCronometro(id: string, aprovar: boolean): Promise<v
   if (error) throw erroDoBanco(error, DE_QUEM)
 }
 
+// Linha da visão lista_de_metas (as colunas de uma visão vêm como opcionais nos tipos do banco).
 interface LinhaMeta {
-  horas_total: number | string
-  horas_sede: number | string
-  vigente_desde: string
+  horas_total: number | string | null
+  horas_sede: number | string | null
+  vigente_desde: string | null
 }
 
 function paraMetas(linha: LinhaMeta): Metas {
   return {
     horasTotal: Number(linha.horas_total),
     horasSede: Number(linha.horas_sede),
-    vigenteDesde: linha.vigente_desde,
+    vigenteDesde: linha.vigente_desde ?? '',
   }
 }
 
 // A meta que vale na semana atual: a mais recente que já começou.
 export async function metasAtuais(): Promise<Metas> {
   if (loginFalso) return falso.metasAtuais()
+  // lista_de_metas: só a versão mais nova de cada semana (a tabela guarda o histórico).
   const { data, error } = await supabase
-    .from('metas')
+    .from('lista_de_metas')
     .select('horas_total, horas_sede, vigente_desde')
     .lte('vigente_desde', semanaAtual())
     .order('vigente_desde', { ascending: false })
@@ -182,7 +184,7 @@ export async function metasAtuais(): Promise<Metas> {
 export async function listarMetas(): Promise<Metas[]> {
   if (loginFalso) return falso.listarMetas()
   const { data, error } = await supabase
-    .from('metas')
+    .from('lista_de_metas')
     .select('horas_total, horas_sede, vigente_desde')
     .order('vigente_desde', { ascending: false })
   if (error) throw erroDoBanco(error)
@@ -190,7 +192,8 @@ export async function listarMetas(): Promise<Metas[]> {
 }
 
 // O diretor escolhe a segunda-feira em que a meta começa, a partir da semana seguinte.
-// Se já houver meta programada para essa segunda, ela é substituída. Quem pode: só o diretor_rh (RLS).
+// O banco só aceita inserir (o histórico fica guardado): se já houver meta programada para essa segunda,
+// a nova passa a valer porque a lista_de_metas mostra só a mais recente. Quem pode: só o diretor_rh (RLS).
 export async function alterarMetas(horasTotal: number, horasSede: number, vigenteDesde: string): Promise<void> {
   if (loginFalso) return falso.alterarMetas(horasTotal, horasSede, vigenteDesde)
   if (!(horasTotal > 0)) throw new Error('A meta total precisa ser maior que zero')
@@ -199,9 +202,6 @@ export async function alterarMetas(horasTotal: number, horasSede: number, vigent
   if (vigenteDesde <= semanaAtual()) throw new Error('A meta só pode mudar a partir da semana seguinte')
   const { error } = await supabase
     .from('metas')
-    .upsert(
-      { horas_total: horasTotal, horas_sede: horasSede, vigente_desde: vigenteDesde },
-      { onConflict: 'vigente_desde' },
-    )
+    .insert({ horas_total: horasTotal, horas_sede: horasSede, vigente_desde: vigenteDesde })
   if (error) throw erroDoBanco(error)
 }
