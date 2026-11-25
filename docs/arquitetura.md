@@ -316,7 +316,7 @@ Funções (todas `async`; em erro, lançam `Error` com mensagem em português pr
 | `progresso.ts` | `progressoDaSemana(semana: string)` | `ProgressoSemana` | Guilherme | Começo da semana 3 |
 | `progresso.ts` | `progressoDoMes(mes: string)` | `ProgressoSemana[]` | Guilherme | Semana 3 |
 | `progresso.ts` | `horasPorDia(semana: string)` | `HorasDoDia[]` | Guilherme | Semana 4 |
-| `ranking.ts` | `minhaPosicaoNoRanking(mes: string)` | `PosicaoRanking | null` | Guilherme | Ranking com pódio (24/11); o `progresso.ts` reexporta |
+| `ranking.ts` | `minhaPosicaoNoRanking(mes: string)` | `PosicaoRanking` ou `null` | Guilherme | Ranking com pódio (24/11); o `progresso.ts` reexporta |
 | `ranking.ts` | `podioDoMes(mes: string)` | `PodioDoMes` | Guilherme | Ranking com pódio (24/11) |
 | `ranking.ts` | `rankingDosSetores(mes: string)` | `LinhaRankingSetor[]` | Guilherme, Johannes | Ranking com pódio (24/11) |
 | `membros.ts` | `listarMembros()` | `Membro[]` | Johannes | Semana 2 |
