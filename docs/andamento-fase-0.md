@@ -4,7 +4,7 @@ Retrato de onde a Fase 0 parou (atualizado em 25/11/2026). Ao retomar com uma IA
 
 ## Próxima sessão: comece por aqui
 
-Onde paramos (24/11/2026, semana 4): **o banco já tem o cálculo semanal, o corte de 10h e as correções da B7 prontos e revisados (PR #9), mas nada disso está na `main` nem no `horas-dev` ainda.** O site continua com registros e cronômetro reais (G5 e G6) e o resto falso. A ordem combinada em 23/11 para o `rh.ts` é G10, depois J5, depois J10; a G10 trava as outras duas. O acompanhamento das tarefas está no Notion (Quadro de Sprints, projeto AstroClock), que foi atualizado em 23/11. As regras estão fechadas no [`regras-de-negocio.md`](regras-de-negocio.md).
+Onde paramos (25/11/2026, semana 4): **o cálculo semanal (B9), o cronômetro que para sozinho (B10), as correções da B7 (B7.1), a G10, a J5, a G13 e o ranking com pódio estão na `main` e no `horas-dev`.** Falta trocar os painéis pelo cálculo real (G11 do membro e J10 do RH), a tela de mudar setor (J4), levar tudo para o `horas-prod` (B14) e destravar o login na produção (Google Cloud). O acompanhamento das tarefas está no Notion (Quadro de Sprints, projeto AstroClock). As regras estão fechadas no [`regras-de-negocio.md`](regras-de-negocio.md).
 
 ### Revisão de 23/11 e conferência de 24/11/2026 (início da semana 4)
 
@@ -23,21 +23,22 @@ As revisões de 23/11 foram feitas pelo Victor e registradas no Notion; em 24/11
 
 ### Feito em 25/11/2026
 
-- **G10 na `main`** (PR #10, aceito pelo Victor em 24/11 às 22:28). Ainda não testada no `horas-dev` (auditoria vazia): falta aprovar ou reprovar o cronômetro que espera revisão.
-- **J5:** o Johannes trouxe a `main` (conflito com a G10 resolvido) e pôs a versão de demonstração nas metas; a IA fez o ajuste que faltava (`alterarMetas` com `insert` e leitura pela `lista_de_metas`, commit `687d974` na `johannes/membros-real`). Testada pelo Victor no `horas-dev` com o login real: membros e metas sem erro. **Falta abrir o PR.** A tela de mudar o setor ainda não existe (é a J4).
-- **Perfil do Victor no `horas-dev`:** `diretor_rh` desde 25/11, para testar as metas (era `rh`). Como diretor, fica fora do cálculo e do ranking; voltar para `rh` quando quiser registrar horas.
+- **G10 na `main`** (PR #10, aceito pelo Victor em 24/11 às 22:28). Falta testar a revisão de cronômetros no `horas-dev` (auditoria vazia; em 25/11 havia 3 cronômetros esperando revisão, 2 deles encerrados sozinhos pela B10).
+- **J5 na `main`:** o Johannes trouxe a `main` e pôs a versão de demonstração nas metas; a IA fez o ajuste que faltava (`alterarMetas` com `insert` e leitura pela `lista_de_metas`, commit `687d974`). Testada pelo Victor com o login real (membros e metas sem erro). **Entrou na `main` sem PR, por erro da IA:** a branch `docs/cancelar-meta` foi criada a partir da `johannes/membros-real` (aberta no GitHub Desktop para o teste) e levou a J5 junto no merge. Ficou na `main`. O Johannes segue a J4 e a J10 a partir da `main`; a `johannes/membros-real` pode ser apagada. A tela de mudar o setor ainda não existe (é a J4).
+- **Perfil do Victor no `horas-dev`:** foi `diretor_rh` para testar as metas e voltou para `rh` (o próprio Victor trocou) para testar o cronômetro. Hoje não há diretor do RH ativo no dev.
 - **Dados de teste desfeitos:** a meta de 13h para 30/11 foi substituída por 10h/5h (vale a mais nova) e o membro "teste01 da silva" foi desativado.
 - **Cancelar meta programada (decidido em 25/11):** opção de marcar como cancelada, sem apagar. Regra na seção 1 do `regras-de-negocio.md`; tarefas novas **B15** (banco) e **J11** (botão), em `tarefas-semanas-2-a-4.md`. Enquanto não existir, desfazer uma meta programada = lançar de novo a meta certa para a mesma segunda.
+- **PR #9 e G13 na `main` e no `horas-dev`:** a G13 (o `pararCronometro` só manda o update; o banco divide na meia-noite e corta em 10h) foi feita pelo Victor com a IA, para destravar o PR #9 (commit `f1c7922`). PR #9 e G13 juntados na `main`; as 3 migrações aplicadas com `npx supabase db push --linked`. A `teste.sql` do Bernardo passou no SQL Editor, a tarefa agendada `encerrar-cronometros-esquecidos` está ativa e o Victor testou parar o cronômetro com o login real. **B7.1, B9, B10 e G13 marcadas como concluídas no Notion.**
+- **Ranking na `main` e no `horas-dev`:** migração `ranking_e_podio` aplicada, `teste-ranking.sql` passando ("OK: ranking passou"), tipos do banco gerados de novo, testado pelo Victor com o login real e juntado na `main` (commit `7c1b03f`).
 
-### Ranking com pódio (feito em 24/11/2026, na branch `feat/ranking-podio`)
+### Ranking com pódio (feito em 24/11, na `main` e no `horas-dev` desde 25/11/2026)
 
-Funcionalidade nova pedida pelo Victor para motivar os membros a registrar mais horas. **Ainda fora da `main` e do `horas-dev`.**
+Funcionalidade nova pedida pelo Victor para motivar os membros a registrar mais horas.
 
-- **Regra nova (seção 12, só na branch até o merge):** o membro vê o pódio da EJ (5 primeiros) e o do setor (3 primeiros), com nome, setor e horas, a própria posição e quanto falta para o pódio; todos veem o ranking dos setores pela média de horas por membro no mês (sem dispensados). Período continua o mês.
-- **Na branch:** desenho e plano em `docs/superpowers/`; migração `20261125005432_ranking_e_podio.sql` (`ranking_do_mes`, `podio_do_mes`, `minha_posicao_no_ranking`, `ranking_dos_setores`) e `supabase/testes/teste-ranking.sql`; `src/compartilhado/api/ranking.ts` (e `ranking-falso.ts`); página **Ranking** do membro (abas EJ, Meu setor e Setores), item no menu, mini pódio no Início e aba **Setores** no ranking do RH. A branch parte da branch do PR #9, porque a migração usa as funções da B9.
-- **Verificado:** lint e build; navegador no modo de demonstração (computador e 360 px); revisão final por um revisor separado (nada crítico; as 2 correções importantes já entraram). Prévia do protótipo na Vercel: `astro-clock-git-feat-ranking-podio-ejuvv.vercel.app` (pede login da equipe na Vercel).
-- **Não feito ainda:** o `teste-ranking.sql` não rodou no banco; nada foi aplicado no `horas-dev`.
-- **Ordem:** só vai para a `main` **depois do PR #9** e **depois de a migração estar no `horas-dev`** (senão o cartão do ranking no Início dá erro com login real). A lista completa do RH continua falsa até a J10; a B12 encolheu (sobrou o `horasPorDia`).
+- **Regra nova (seção 12):** o membro vê o pódio da EJ (5 primeiros) e o do setor (3 primeiros), com nome, setor e horas, a própria posição e quanto falta para o pódio; todos veem o ranking dos setores pela média de horas por membro no mês (sem dispensados). Período continua o mês.
+- **O que entrou:** desenho e plano em `docs/superpowers/`; migração `20261125005432_ranking_e_podio.sql` (`ranking_do_mes`, `podio_do_mes`, `minha_posicao_no_ranking`, `ranking_dos_setores`) e `supabase/testes/teste-ranking.sql`; `src/compartilhado/api/ranking.ts` (e `ranking-falso.ts`); página **Ranking** do membro (abas EJ, Meu setor e Setores), item no menu, mini pódio no Início e aba **Setores** no ranking do RH.
+- **Verificado:** lint e build; navegador no modo de demonstração (computador e 360 px); revisão final por um revisor separado (nada crítico; as 2 correções importantes entraram); `teste-ranking.sql` no `horas-dev`; login real pelo Victor.
+- A lista completa do RH continua falsa até a J10 (a função `ranking_do_mes` já está no banco); a B12 encolheu (sobrou o `horasPorDia`).
 - **Decisão pendente do Victor:** em setor com 1 ou 2 membros, a média revela as horas de alguém. Opções: mostrar só setores com 3 ou mais membros (sugestão da IA), aceitar e registrar na regra, ou esconder o número de membros.
 - **Pequenos, para depois:** aba Setores com todos em 0h mostra "1º" para todos; a aba da página do membro volta para "EJ" ao trocar de mês; a demonstração não filtra quem entrou na semana.
 - **Avisar:** Guilherme (página nova na pasta do membro; `progresso.ts` reexporta `minhaPosicaoNoRanking` de `ranking.ts`, atenção na G11), Bernardo (B12 menor; a migração depende da B9) e Johannes (aba Setores no `Ranking.tsx`).
@@ -138,15 +139,14 @@ Conferido no GitHub, no Notion, no código e no `horas-dev` (só leitura):
 
 Semana 4 (23 a 27/11). Meta: o piloto completo, em produção. O teste com membros começa em 07/12. Tarefas e prazos no Notion (Quadro de Sprints).
 
-1. **Guilherme:** G10 com as 3 correções e PR até 24/11 (trava a J5 e a J10); G13 até 25/11, junto com a aplicação da B10 no `horas-dev`; G11 até 25/11, depois da B9 no `horas-dev`; G12 (extra) até 27/11. Pode herdar a J10 se ela não andar até 25/11.
-2. **Johannes:** J5 com os 3 ajustes e PR até 24/11, depois da G10; J10 até 26/11; J4 até 25/11.
-3. **Bernardo:** PR #9 já revisado. Aplicar no `horas-dev` junto com a G13 (combinar o dia com o Guilherme e o Victor); depois B14 com o Victor até 26/11.
+1. **Guilherme:** G11 (painel do membro com o cálculo real; já pode testar, gerando os tipos de novo na branch) e G12 (extra) até 27/11. Pode herdar a J10 se ela não andar.
+2. **Johannes:** J4 (tela de mudar o setor) e J10 (painel do RH com o cálculo real), a partir da `main` atual. A J5 já está na `main`.
+3. **Bernardo:** B14 com o Victor (26/11): aplicar no `horas-prod` todas as migrações da `main` (sem o seed) e cadastrar o primeiro diretor do RH. Depois, B15 (cancelar meta).
 4. **Victor:**
-   - Cobrar a G10 hoje; se não chegar até 25/11 cedo, terminar as 3 correções com a IA e abrir o PR (avisando o Guilherme).
-   - Marcar com o Bernardo e o Guilherme o dia de juntar o PR #9 e aplicar no `horas-dev` (junto com a G13).
+   - Testar a revisão de cronômetros (G10) com o perfil `rh`: aprovar um e reprovar outro; depois marcar a G10 como concluída.
    - V7: a produção está montada (ver "Produção (V7)"). Falta cadastrar o endereço de volta do prod no Google Cloud, o que depende do administrador do Workspace, e depois a B14.
    - V6 (validação com o RH) assim que a B9 estiver no `horas-dev` e a J10 na `main`.
-   - Ranking com pódio: decidir o caso dos setores pequenos; quando o PR #9 (com a G13) estiver no `horas-dev`, aplicar a migração do ranking com a IA, rodar o `teste-ranking.sql`, testar com login real e abrir o PR da `feat/ranking-podio` (ver "Ranking com pódio").
+   - Ranking com pódio: decidir o caso dos setores pequenos (mostrar só setores com 3 ou mais membros, ou deixar como está).
 
 ### Tarefas do Victor fora da IA
 
