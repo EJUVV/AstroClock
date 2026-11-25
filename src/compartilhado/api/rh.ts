@@ -82,6 +82,8 @@ export async function editarRegistroDeMembro(id: string, dados: NovoRegistro, mo
   const { data: antes, error: erroLeitura } = await supabase.from('registros').select('*').eq('id', id).maybeSingle()
   if (erroLeitura) throw erroDoBanco(erroLeitura)
   if (!antes || antes.cancelado) throw new Error('Registro não encontrado')
+  // Editar o fim de um cronômetro ligado o pararia por fora, sem o membro saber.
+  if (antes.fim === null) throw new Error('Este cronômetro ainda está ligado. Peça ao membro para pará-lo antes de corrigir.')
 
   const [primeira, ...resto] = partesPorDia(dados.inicio, dados.fim)
   const descricao = dados.descricao.trim()
@@ -112,7 +114,7 @@ export async function editarRegistroDeMembro(id: string, dados: NovoRegistro, mo
         p_id: id,
         p_motivo: `Desfeito: ${motivo.trim()}`,
         p_inicio: antes.inicio,
-        p_fim: antes.fim ?? undefined,
+        p_fim: antes.fim,
         p_local: antes.local,
         p_descricao: antes.descricao,
       })

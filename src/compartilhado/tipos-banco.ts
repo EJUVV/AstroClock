@@ -1,6 +1,4 @@
-// Gerado a partir do banco horas-dev (supabase gen types). Não edite à mão:
-// depois de mudar tabelas, gere de novo com `npx supabase gen types typescript --linked`.
-export type Json =
+﻿export type Json =
   | string
   | number
   | boolean
@@ -14,44 +12,71 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "14.18"
   }
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   public: {
     Tables: {
-      dispensas: {
+      auditoria: {
         Row: {
-          criado_em: string
+          acao: string
+          antes: Json | null
+          depois: Json | null
           id: string
-          membro_id: string
           motivo: string
-          registrado_por: string | null
-          semana: string
+          quando: string
+          quem: string | null
+          registro_id: string
+          tabela: string
         }
         Insert: {
-          criado_em?: string
+          acao: string
+          antes?: Json | null
+          depois?: Json | null
           id?: string
-          membro_id: string
           motivo: string
-          registrado_por?: string | null
-          semana: string
+          quando?: string
+          quem?: string | null
+          registro_id: string
+          tabela: string
         }
         Update: {
-          criado_em?: string
+          acao?: string
+          antes?: Json | null
+          depois?: Json | null
           id?: string
-          membro_id?: string
           motivo?: string
-          registrado_por?: string | null
-          semana?: string
+          quando?: string
+          quem?: string | null
+          registro_id?: string
+          tabela?: string
         }
         Relationships: [
           {
-            foreignKeyName: "dispensas_membro_id_fkey"
-            columns: ["membro_id"]
-            isOneToOne: false
-            referencedRelation: "membros"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "dispensas_registrado_por_fkey"
-            columns: ["registrado_por"]
+            foreignKeyName: "auditoria_quem_fkey"
+            columns: ["quem"]
             isOneToOne: false
             referencedRelation: "membros"
             referencedColumns: ["id"]
@@ -286,7 +311,25 @@ export type Database = {
     Functions: {
       cancelar_registro_de_membro: {
         Args: { p_id: string; p_motivo: string }
-        Returns: Database["public"]["Tables"]["registros"]["Row"]
+        Returns: {
+          atualizado_em: string
+          cancelado: boolean
+          criado_em: string
+          descricao: string
+          fim: string | null
+          id: string
+          inicio: string
+          local: Database["public"]["Enums"]["local_registro"]
+          membro_id: string
+          origem: Database["public"]["Enums"]["origem_registro"]
+          precisa_revisao: boolean
+        }
+        SetofOptions: {
+          from: "*"
+          to: "registros"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       criar_registro_de_membro: {
         Args: {
@@ -297,7 +340,25 @@ export type Database = {
           p_membro_id: string
           p_motivo: string
         }
-        Returns: Database["public"]["Tables"]["registros"]["Row"]
+        Returns: {
+          atualizado_em: string
+          cancelado: boolean
+          criado_em: string
+          descricao: string
+          fim: string | null
+          id: string
+          inicio: string
+          local: Database["public"]["Enums"]["local_registro"]
+          membro_id: string
+          origem: Database["public"]["Enums"]["origem_registro"]
+          precisa_revisao: boolean
+        }
+        SetofOptions: {
+          from: "*"
+          to: "registros"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       editar_registro_de_membro: {
         Args: {
@@ -308,7 +369,25 @@ export type Database = {
           p_local?: Database["public"]["Enums"]["local_registro"]
           p_motivo: string
         }
-        Returns: Database["public"]["Tables"]["registros"]["Row"]
+        Returns: {
+          atualizado_em: string
+          cancelado: boolean
+          criado_em: string
+          descricao: string
+          fim: string | null
+          id: string
+          inicio: string
+          local: Database["public"]["Enums"]["local_registro"]
+          membro_id: string
+          origem: Database["public"]["Enums"]["origem_registro"]
+          precisa_revisao: boolean
+        }
+        SetofOptions: {
+          from: "*"
+          to: "registros"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       eh_diretor_rh: { Args: never; Returns: boolean }
       eh_rh: { Args: never; Returns: boolean }
@@ -321,11 +400,13 @@ export type Database = {
         }
         Returns: boolean
       }
+      exigir_rh_com_motivo: { Args: { p_motivo: string }; Returns: undefined }
       meu_id: { Args: never; Returns: string }
       meu_perfil: {
         Args: never
         Returns: Database["public"]["Enums"]["perfil"]
       }
+      meu_setor_id: { Args: never; Returns: string }
       meus_dados: {
         Args: never
         Returns: {
@@ -344,7 +425,25 @@ export type Database = {
       }
       revisar_cronometro: {
         Args: { p_aprovar: boolean; p_id: string; p_motivo?: string }
-        Returns: Database["public"]["Tables"]["registros"]["Row"]
+        Returns: {
+          atualizado_em: string
+          cancelado: boolean
+          criado_em: string
+          descricao: string
+          fim: string | null
+          id: string
+          inicio: string
+          local: Database["public"]["Enums"]["local_registro"]
+          membro_id: string
+          origem: Database["public"]["Enums"]["origem_registro"]
+          precisa_revisao: boolean
+        }
+        SetofOptions: {
+          from: "*"
+          to: "registros"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       setor_que_dirijo: { Args: never; Returns: string }
       ve_tudo: { Args: never; Returns: boolean }
@@ -478,6 +577,9 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {
       local_registro: ["sede", "online"],

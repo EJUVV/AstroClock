@@ -96,6 +96,7 @@ export async function editarRegistroDeMembro(id: string, dados: NovoRegistro, mo
   exigirCorrecao()
   exigirMotivo(motivo)
   const registro = registroDeMembro(id)
+  if (registro.fim === null) throw new Error('Este cronômetro ainda está ligado. Peça ao membro para pará-lo antes de corrigir.')
   validarRegistro(registro.membroId, dados, id, 'deste membro')
   aplicarEdicao(registro, dados)
   dividirNaMeiaNoite(registro)
