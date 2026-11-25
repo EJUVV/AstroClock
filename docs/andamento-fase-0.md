@@ -19,7 +19,17 @@ As revisões de 23/11 foram feitas pelo Victor e registradas no Notion; em 24/11
 - **Ordem do `rh.ts`:** G10 → J5 → J10. A J10 passa para o Guilherme se não andar até 25/11.
 - **Tarefas novas no Notion (23/11):** G13 (parar o cronômetro do jeito da B10, até 25/11), J10 (painel do RH com o cálculo real, até 26/11), B14 (migrações no `horas-prod` com o Victor, até 26/11, depois do PR #9 na `main` e testado no dev) e G12 (a tela de Configurações da `atualDev`, como extra, até 27/11). A troca das funções do site saiu da B9: a do membro ficou na G11 (até 25/11) e a do RH na J10.
 - **Perfis da equipe no `horas-dev`:** Victor, Johannes e Guilherme como `rh`; Bernardo como `membro`. O Guilherme volta para `membro` antes do teste da G11.
-- **E-mail da EJ:** o DNS do `ejuvv.com` caiu quando o plano da HostGator expirou (os servidores `ns944`/`ns945.hostgator.com.br` deixaram de responder, e os e-mails pararam de chegar). Resolvido pelo Victor: em 24/11 o domínio aponta para `byte` e `pixel.dns-parking.com`, com o MX `smtp.google.com`, o SPF do Google e um DMARC. **Falta o DKIM** (`google._domainkey`), que se gera no painel do Google Workspace e ajuda a não cair no spam. A conta da UOL usada nessa busca tem e-mail de contato `@ejuvv.com` e estava com o cadastro pendente de validação (prazo de 3 dias a partir de 19/11).
+- **E-mail da EJ (relatório do Victor, 24/11):** o DNS do `ejuvv.com` foi migrado do UOL Host para a Hostinger em 24/11, às 15h16. A Hostinger criou sozinha os registros do e-mail dela, e o recebimento ficou intermitente até cerca de 19h30. Corrigido no mesmo dia (MX `smtp.google.com`, SPF do Google e DMARC) e validado às 20h14. Quem cuida de cada coisa agora: **registro do domínio no UOL Host**, **DNS e site institucional na Hostinger** (hPanel → Domínios → ejuvv.com → DNS), **e-mail no Google Workspace**. Nunca usar "Redefinir registros DNS" nem ativar o e-mail da Hostinger: isso derruba o e-mail da EJ. **Falta o DKIM**, que depende do administrador do Workspace. A falha de DNS vista em 19/11 provavelmente tem a ver com os MX do Google estarem desativados na zona antiga do UOL (ponto em aberto no relatório).
+
+### Produção (V7), montada em 24/11/2026
+
+- **Vercel:** projeto novo **`astroclock-prod`** (time EJUVV), ligado ao repositório, com deploy automático da `main`. Variáveis só de produção: `VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY` (chave publishable) do `horas-prod`, **sem** `VITE_LOGIN_FALSO` e **sem** `VITE_MOSTRAR_DEMO`. O protótipo `astro-clock` continua como estava.
+- **Domínio:** **`https://astroclock.ejuvv.com`**, com o CNAME `astroclock` → `6fa0201913852cd0.vercel-dns-017.com` na zona da Hostinger. A Vercel reconheceu e emitiu o certificado. Os registros do e-mail não foram tocados.
+- **Primeiro deploy:** commit `0cc32c4`. A tela de login abre sem erros e o site fala com o `horas-prod`.
+- **Supabase `horas-prod`:** provedor Google ligado; Site URL `https://astroclock.ejuvv.com`; Redirect URL `https://astroclock.ejuvv.com/inicio`.
+- **Teste de login:** **falhou com `redirect_uri_mismatch`** (Google). O endereço `https://gzjmavrrkqfqtqjycdnq.supabase.co/auth/v1/callback` **não está** no cliente OAuth "AstroClock Supabase". Para cadastrar, é preciso entrar no console do Google Cloud, que desde 20/10/2026 exige verificação em duas etapas; a organização `ejuvv.com` ainda não permite ativar, e a `victor.gomes@ejuvv.com` não é administradora do Workspace.
+- **Atenção:** a partir de agora, **todo envio para a `main` vai para a produção**. Enquanto o banco do prod estiver vazio não tem efeito, mas depois do piloto a `main` precisa estar sempre estável.
+- **Falta para a produção:** (1) o cadastro do endereço no Google Cloud; (2) a B14 (migrações e primeiro diretor do RH no `horas-prod`); (3) testar de novo o login, que deve entrar no painel certo.
 
 ### Conferência de 17/11/2026
 
@@ -113,7 +123,7 @@ Semana 4 (23 a 27/11). Meta: o piloto completo, em produção. O teste com membr
 4. **Victor:**
    - Cobrar a G10 hoje; se não chegar até 25/11 cedo, terminar as 3 correções com a IA e abrir o PR (avisando o Guilherme).
    - Marcar com o Bernardo e o Guilherme o dia de juntar o PR #9 e aplicar no `horas-dev` (junto com a G13).
-   - Adiantar a V7 (produção) no que não depende da B14: projeto de produção na Vercel sem o login falso, endereço de volta do Google no `horas-prod` e provedor Google ligado no `horas-prod`.
+   - V7: a produção está montada (ver "Produção (V7)"). Falta cadastrar o endereço de volta do prod no Google Cloud, o que depende do administrador do Workspace, e depois a B14.
    - V6 (validação com o RH) assim que a B9 estiver no `horas-dev` e a J10 na `main`.
 
 ### Tarefas do Victor fora da IA
@@ -125,10 +135,10 @@ Semana 4 (23 a 27/11). Meta: o piloto completo, em produção. O teste com membr
 - **V6:** validação com o RH depois que a B9 estiver no `horas-dev` e a J10 na `main` (a reunião de 19/11 não ficou registrada aqui; o plano da semana 4 seguiu o Notion de 23/11).
 - **Regra do cronômetro na meia-noite:** resolvida pela B10 (o banco divide na meia-noite e corta em 10h). Falta a G13 no site.
 - **Resend:** revogar a chave criada antes da decisão de usar o Gmail da EJ.
-- **Google Cloud:** antes de ligar o login na produção (semana 4), trocar o URI de redirecionamento do prod antigo (`zetjgqdagnlkodbexnoe`, apagado) pelo novo: `https://gzjmavrrkqfqtqjycdnq.supabase.co/auth/v1/callback`.
-- **V5:** criar a conta `@ejuvv.com` que envia os e-mails e a senha de app (semana 3). Decidido em 11/11/2026: e-mail pelo Gmail da EJ, sem Resend.
-- **Domínio e DNS:** o `ejuvv.com` vale até 21/02/2027 (registro pela Tucows). O DNS saiu da HostGator (expirada) e, em 24/11, está em `dns-parking.com` com MX, SPF e DMARC do Google. Falta: gerar o DKIM no Google Workspace; anotar quem tem acesso ao painel do domínio e do DNS e quem renova; trocar o e-mail de contato da conta da UOL para um que não seja `@ejuvv.com`.
-- **Hospedagem:** decidido em 10/11/2026 que a produção fica na **Vercel** (a Hostinger fica como possibilidade para depois).
+- **Google Cloud (trava o login na produção):** descobrir quem administra o Workspace da EJ (testar se a `projetos@ejuvv.com` abre o `admin.google.com`). O administrador libera em Segurança → Autenticação → Verificação em duas etapas ("Permitir que os usuários ativem", sem obrigar). Depois, ativar a verificação na `victor.gomes@ejuvv.com`, entrar no console e adicionar `https://gzjmavrrkqfqtqjycdnq.supabase.co/auth/v1/callback` no cliente "AstroClock Supabase" (manter o do dev; tirar o do prod antigo `zetjgqdagnlkodbexnoe`, se ainda estiver lá).
+- **V5:** criar a conta `@ejuvv.com` que envia os e-mails e a senha de app. A senha de app exige a verificação em duas etapas, então também depende do administrador do Workspace. Decidido em 11/11/2026: e-mail pelo Gmail da EJ, sem Resend.
+- **Domínio e DNS:** o `ejuvv.com` vale até 21/02/2027 (registro no UOL Host, pela Tucows). DNS na Hostinger desde 24/11, com MX, SPF e DMARC do Google e o CNAME `astroclock` da produção. Falta: o DKIM (administrador do Workspace); ligar a renovação automática no UOL Host; trocar o e-mail de contato da conta do UOL para um que não seja `@ejuvv.com`. Detalhes no relatório do Victor de 24/11 ("Relatório técnico: migração de DNS e restabelecimento do e-mail").
+- **Hospedagem:** decidido em 10/11/2026 que a produção fica na **Vercel**. Montada em 24/11 no projeto `astroclock-prod`. A Hostinger hospeda só o site institucional da EJ.
 - **Segredos:** o Victor optou por guardar o ID do cliente e a chave secreta do Google num bloco de notas no computador (a IA recomendou um gerenciador de senhas).
 
 ## Já feito (Claude Code)
@@ -200,18 +210,23 @@ Para o Bernardo (semana 1):
 - Como "expose new tables" está desligado, cada migração precisa de `grant` nas tabelas que o site usa; senão o site recebe "permission denied".
 - O `.env.local` usa a chave **publishable** do dev (`sb_publishable_...`). Nunca usar a chave `secret`/`service_role` no front.
 
+### Vercel
+
+- Time EJUVV. **`astro-clock`**: site de protótipo (`astro-clock-ejuvv.vercel.app`), com login falso e painel de demonstração. **`astroclock-prod`**: produção, em `https://astroclock.ejuvv.com`, apontando para o `horas-prod`. Os dois fazem deploy da `main`.
+
 ### Google Cloud
 
 - Projeto `astroclock-512918` (nome AstroClock), na organização ejuvv.com, conta `victor.gomes@ejuvv.com`.
+- **Acesso ao console:** desde 20/10/2026 o Google Cloud exige verificação em duas etapas. Quem libera para a organização é o administrador do Workspace (a `victor.gomes` não é).
 - Tela de consentimento (Google Auth Platform): app "AstroClock", público **Interno** (só contas `@ejuvv.com` entram).
 - Cliente OAuth "AstroClock Supabase" (Aplicativo da Web), com os URIs de redirecionamento:
   - `https://cwvnzzqpqohvqjzigalu.supabase.co/auth/v1/callback`
-  - `https://gzjmavrrkqfqtqjycdnq.supabase.co/auth/v1/callback` (prod em São Paulo; trocar no Google Cloud antes de ligar o login na produção)
+  - O do prod (`https://gzjmavrrkqfqtqjycdnq.supabase.co/auth/v1/callback`) **ainda não está cadastrado** (teste de 24/11 deu `redirect_uri_mismatch`). Ver "Produção (V7)".
 - O ID do cliente e a chave secreta estão no gerenciador de senhas.
 
 ### Login com Google (M5)
 
-No `horas-dev` (o prod fica para antes do piloto):
+No `horas-dev` (feito em 10/11) e no `horas-prod` (feito em 24/11, com Site URL `https://astroclock.ejuvv.com` e Redirect URL `https://astroclock.ejuvv.com/inicio`):
 
 1. Authentication → Sign In / Providers → Google: ligar e colar o ID do cliente e a chave secreta.
 2. Authentication → URL Configuration: Site URL `http://localhost:5173`; Redirect URLs `http://localhost:5173/inicio` e `https://*-ejuvv.vercel.app/inicio` (prévias da Vercel).
