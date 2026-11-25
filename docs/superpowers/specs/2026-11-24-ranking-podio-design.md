@@ -74,7 +74,7 @@ Criada com `npx supabase migration new ranking_e_podio`, por PR, aplicada no `ho
   - Funções novas em `src/compartilhado/api/ranking.ts`: `podioDoMes(mes)`, `rankingDosSetores(mes)` e a real de `minhaPosicaoNoRanking(mes)` (o `progresso.ts` passa a reexportar esta última, para não mudar quem já importa de lá).
   - Versões falsas em `ranking-falso.ts`, usadas com `VITE_LOGIN_FALSO=true` (mesmo padrão da G6), para o site de protótipo continuar funcionando.
 - **Painel do membro** (`src/membro/`):
-  - Página nova **Ranking** (`/membro/ranking`, `RankingMembro.tsx`), com três abas: **EJ**, **Meu setor** e **Setores**. Na EJ e no setor: o pódio e, embaixo, "Você: 12º de 40 · faltam 6h para o 5º" (ou "Você está no pódio"). Em Setores: gráfico de barras com a média de cada setor (recharts, carregado só quando a aba abre) e a lista em ordem, com o setor do membro destacado.
+  - Página nova **Ranking** (`/membro/ranking`, `RankingMembro.tsx`), com três abas: **EJ**, **Meu setor** e **Setores**. Na EJ e no setor: o pódio e, embaixo, "Você: 12º de 40 · faltam 6h para o 5º" (ou "Você está no pódio"). Em Setores: gráfico de barras com a média de cada setor (o `CapsuleBarChart` que o painel já usa, sem precisar do recharts) e a lista em ordem, com o setor do membro destacado.
   - Item **Ranking** no menu do membro (`ABAS` do `PainelMembro.tsx`, que também é a barra de baixo no celular).
   - O cartão "Sua posição no ranking" do Início ganha o mini pódio (3 primeiros da EJ) e o link "Ver ranking".
 - **Painel do RH** (`src/rh/Ranking.tsx`): aba nova **Setores**, com o mesmo gráfico e a mesma lista, para RH, presidência e diretores.
