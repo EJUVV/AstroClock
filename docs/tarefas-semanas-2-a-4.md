@@ -343,6 +343,21 @@ Decidido em 11/11/2026: os e-mails saem por uma conta `@ejuvv.com` do Google Wor
 **Depende de**
 - Todas as migrações anteriores aprovadas.
 
+#### B15. Cancelar meta programada (decidido em 25/11/2026)
+
+**O que fazer**
+- Migração nova: coluna `cancelada` (boolean, padrão `false`) em `metas`, e a visão `lista_de_metas` passa a ignorar as canceladas (vale de novo a versão anterior da mesma semana, se houver, ou a meta anterior).
+- Função `cancelar_meta(p_vigente_desde date)`: só o `diretor_rh`, só para semanas que ainda não começaram (`vigente_desde` maior que a segunda-feira da semana atual), cancelando todas as versões daquela semana. Nada é apagado (seção 1 do `regras-de-negocio.md`).
+- Conferir que o cálculo da B9 (`meta_da_semana`) usa a `lista_de_metas` e, portanto, ignora as canceladas.
+- Casos na `teste.sql`: o `rh` não cancela; meta da semana atual ou passada não cancela; depois de cancelar, a meta anterior volta a valer.
+
+**Como saber que terminou**
+- O diretor do RH cancela uma meta da semana que vem e a lista mostra a anterior de novo.
+- PR aprovado pelo Victor.
+
+**Depende de**
+- PR #9 (B9) no `horas-dev`.
+
 ### Guilherme (painel do membro)
 
 #### G9. Presença na sede real
@@ -373,6 +388,20 @@ Decidido em 11/11/2026: os e-mails saem por uma conta `@ejuvv.com` do Google Wor
 
 **Depende de**
 - J6 e J7.
+
+#### J11. Botão de cancelar meta programada (decidido em 25/11/2026)
+
+**O que fazer**
+- Na tela de Metas, um botão "Cancelar" nas metas de semanas que ainda não começaram, só para o `diretor_rh`, com confirmação (`ConfirmDialog`).
+- Função nova `cancelarMeta(vigenteDesde: string)` em `rh.ts` (real, com `supabase.rpc('cancelar_meta', ...)`, e falsa em `rh-falso.ts`), erros em português com o `erroDoBanco`.
+
+**Como saber que terminou**
+- Cancelar uma meta programada tira ela da lista e a meta anterior volta a aparecer como a que vai valer.
+- O site de protótipo continua funcionando com o login falso.
+- PR aprovado pelo Victor.
+
+**Depende de**
+- B15 e J5.
 
 ### Victor
 

@@ -1,7 +1,7 @@
-// Registros corrigidos pelo RH e revisão de cronômetros já são reais. O resto deste painel
-// (progresso, ranking, requerimentos, metas) ainda é falso e vem de rh-falso.ts.
-import type { Registro, NovoRegistro } from '../tipos.ts'
-import { instante, partesPorDia, somarDias } from '../datas.ts'
+// Registros corrigidos pelo RH, revisão de cronômetros e metas já são reais. O resto deste painel
+// (progresso, ranking, requerimentos) ainda é falso e vem de rh-falso.ts.
+import type { Metas, Registro, NovoRegistro } from '../tipos.ts'
+import { instante, partesPorDia, segundaDaSemana, semanaAtual, somarDias } from '../datas.ts'
 import { supabase } from '../supabase.ts'
 import { loginFalso } from './auth.ts'
 import { erroDoBanco, paraRegistro } from './banco.ts'
@@ -9,11 +9,8 @@ import * as falso from './rh-falso.ts'
 
 export {
   abaixoDaMeta,
-  alterarMetas,
-  listarMetas,
   listarRequerimentos,
   mediasDaSemana,
-  metasAtuais,
   percentualDaSemana,
   progressoDeMembro,
   rankingDoMes,
@@ -150,4 +147,61 @@ export async function revisarCronometro(id: string, aprovar: boolean): Promise<v
   if (loginFalso) return falso.revisarCronometro(id, aprovar)
   const { error } = await supabase.rpc('revisar_cronometro', { p_id: id, p_aprovar: aprovar })
   if (error) throw erroDoBanco(error, DE_QUEM)
+}
+
+// Linha da visão lista_de_metas (as colunas de uma visão vêm como opcionais nos tipos do banco).
+interface LinhaMeta {
+  horas_total: number | string | null
+  horas_sede: number | string | null
+  vigente_desde: string | null
+}
+
+function paraMetas(linha: LinhaMeta): Metas {
+  return {
+    horasTotal: Number(linha.horas_total),
+    horasSede: Number(linha.horas_sede),
+    vigenteDesde: linha.vigente_desde ?? '',
+  }
+}
+
+// A meta que vale na semana atual: a mais recente que já começou.
+export async function metasAtuais(): Promise<Metas> {
+  if (loginFalso) return falso.metasAtuais()
+  // lista_de_metas: só a versão mais nova de cada semana (a tabela guarda o histórico).
+  const { data, error } = await supabase
+    .from('lista_de_metas')
+    .select('horas_total, horas_sede, vigente_desde')
+    .lte('vigente_desde', semanaAtual())
+    .order('vigente_desde', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+  if (error) throw erroDoBanco(error)
+  if (!data) throw new Error('Nenhuma meta cadastrada')
+  return paraMetas(data)
+}
+
+// Todas as metas, inclusive as programadas para semanas futuras, da mais recente para a mais antiga.
+export async function listarMetas(): Promise<Metas[]> {
+  if (loginFalso) return falso.listarMetas()
+  const { data, error } = await supabase
+    .from('lista_de_metas')
+    .select('horas_total, horas_sede, vigente_desde')
+    .order('vigente_desde', { ascending: false })
+  if (error) throw erroDoBanco(error)
+  return (data ?? []).map(paraMetas)
+}
+
+// O diretor escolhe a segunda-feira em que a meta começa, a partir da semana seguinte.
+// O banco só aceita inserir (o histórico fica guardado): se já houver meta programada para essa segunda,
+// a nova passa a valer porque a lista_de_metas mostra só a mais recente. Quem pode: só o diretor_rh (RLS).
+export async function alterarMetas(horasTotal: number, horasSede: number, vigenteDesde: string): Promise<void> {
+  if (loginFalso) return falso.alterarMetas(horasTotal, horasSede, vigenteDesde)
+  if (!(horasTotal > 0)) throw new Error('A meta total precisa ser maior que zero')
+  if (!(horasSede >= 0)) throw new Error('A meta de sede não pode ser negativa')
+  if (segundaDaSemana(vigenteDesde) !== vigenteDesde) throw new Error('Escolha a segunda-feira da semana')
+  if (vigenteDesde <= semanaAtual()) throw new Error('A meta só pode mudar a partir da semana seguinte')
+  const { error } = await supabase
+    .from('metas')
+    .insert({ horas_total: horasTotal, horas_sede: horasSede, vigente_desde: vigenteDesde })
+  if (error) throw erroDoBanco(error)
 }
