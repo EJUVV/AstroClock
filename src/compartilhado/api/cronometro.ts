@@ -1,5 +1,4 @@
 import type { Local, Registro } from '../tipos.ts'
-import { partesPorDia } from '../datas.ts'
 import { supabase } from '../supabase.ts'
 import { loginFalso } from './auth.ts'
 import { erroDoBanco, meuId, paraRegistro } from './banco.ts'
@@ -50,35 +49,15 @@ export async function iniciarCronometro(local: Local, descricao: string): Promis
   return paraRegistro(data)
 }
 
-// Se passou da meia-noite, o cronômetro fica com a primeira parte e o resto vira outro registro. Devolve a primeira parte.
-// O banco só aceita registro novo de origem "cronometro" ligado e sem fim, então as outras partes entram como "manual".
+// O banco grava o fim com a hora do servidor, divide na meia-noite (as outras partes continuam
+// como cronômetro) e corta em 10h, mandando para a revisão do RH (B7.1 e B10). O site só manda o
+// update, que devolve a primeira parte.
 export async function pararCronometro(): Promise<Registro> {
   if (loginFalso) return falso.pararCronometro()
   const ativo = await ativoDoMembro()
   if (!ativo) throw new Error('Nenhum cronômetro ativo')
-  const agora = new Date().toISOString()
-  const [primeira, ...resto] = partesPorDia(ativo.inicio, agora)
-
-  const { data, error } = await supabase.from('registros').update({ fim: primeira.fim }).eq('id', ativo.id).select()
+  const { data, error } = await supabase.from('registros').update({ fim: new Date().toISOString() }).eq('id', ativo.id).select()
   if (error) throw erroDoBanco(error)
   if (data.length === 0) throw new Error('Nenhum cronômetro ativo')
-
-  if (resto.length > 0) {
-    const { error: erroPartes } = await supabase.from('registros').insert(
-      resto.map((p) => ({
-        membro_id: ativo.membroId,
-        inicio: p.inicio,
-        fim: p.fim,
-        local: ativo.local,
-        descricao: ativo.descricao.trim() || 'Cronômetro',
-        origem: 'manual' as const,
-      })),
-    )
-    if (erroPartes) {
-      // Não perde o tempo: o cronômetro para agora, inteiro, e o RH pode dividir depois.
-      await supabase.from('registros').update({ fim: agora }).eq('id', ativo.id)
-      throw erroDoBanco(erroPartes)
-    }
-  }
   return paraRegistro(data[0])
 }
