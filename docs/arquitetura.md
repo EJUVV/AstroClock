@@ -297,6 +297,7 @@ Funções (todas `async`; em erro, lançam `Error` com mensagem em português pr
 | `rh.ts` | `metasAtuais()` | `Metas` | Johannes, Guilherme | Semana 2 |
 | `rh.ts` | `listarMetas()` | `Metas[]` | Johannes | Semana 2 |
 | `rh.ts` | `alterarMetas(horasTotal: number, horasSede: number, vigenteDesde: string)` | `void` | Johannes | Semana 2 |
+| `rh.ts` | `cancelarMeta(vigenteDesde: string)` | `void` | Johannes | Depois da B15 (decidido em 25/11/2026) |
 | `rh.ts` | `percentualDaSemana(semana: string, setor?: string)` | `number` (0 a 100) | Johannes | Semana 3 |
 | `rh.ts` | `resumoDaSemana(semana: string, setor?: string)` | `ResumoMembroSemana[]` | Johannes | Semana 3 |
 | `rh.ts` | `abaixoDaMeta(semana: string, setor?: string)` | `ResumoMembroSemana[]` | Johannes | Semana 3 |

@@ -1,6 +1,6 @@
 # Andamento da Fase 0
 
-Retrato de onde a Fase 0 parou (atualizado em 24/11/2026). Ao retomar com uma IA, peça para ela ler este arquivo e o [`fase-0.md`](fase-0.md). Quando a Fase 0 terminar, este arquivo pode ser apagado (antes, passe a seção "Ambientes" para o `arquitetura.md` ou o `README.md`).
+Retrato de onde a Fase 0 parou (atualizado em 25/11/2026). Ao retomar com uma IA, peça para ela ler este arquivo e o [`fase-0.md`](fase-0.md). Quando a Fase 0 terminar, este arquivo pode ser apagado (antes, passe a seção "Ambientes" para o `arquitetura.md` ou o `README.md`).
 
 ## Próxima sessão: comece por aqui
 
@@ -20,6 +20,14 @@ As revisões de 23/11 foram feitas pelo Victor e registradas no Notion; em 24/11
 - **Tarefas novas no Notion (23/11):** G13 (parar o cronômetro do jeito da B10, até 25/11), J10 (painel do RH com o cálculo real, até 26/11), B14 (migrações no `horas-prod` com o Victor, até 26/11, depois do PR #9 na `main` e testado no dev) e G12 (a tela de Configurações da `atualDev`, como extra, até 27/11). A troca das funções do site saiu da B9: a do membro ficou na G11 (até 25/11) e a do RH na J10.
 - **Perfis da equipe no `horas-dev`:** Victor, Johannes e Guilherme como `rh`; Bernardo como `membro`. O Guilherme volta para `membro` antes do teste da G11.
 - **E-mail da EJ (relatório do Victor, 24/11):** o DNS do `ejuvv.com` foi migrado do UOL Host para a Hostinger em 24/11, às 15h16. A Hostinger criou sozinha os registros do e-mail dela, e o recebimento ficou intermitente até cerca de 19h30. Corrigido no mesmo dia (MX `smtp.google.com`, SPF do Google e DMARC) e validado às 20h14. Quem cuida de cada coisa agora: **registro do domínio no UOL Host**, **DNS e site institucional na Hostinger** (hPanel → Domínios → ejuvv.com → DNS), **e-mail no Google Workspace**. Nunca usar "Redefinir registros DNS" nem ativar o e-mail da Hostinger: isso derruba o e-mail da EJ. **Falta o DKIM**, que depende do administrador do Workspace. A falha de DNS vista em 19/11 provavelmente tem a ver com os MX do Google estarem desativados na zona antiga do UOL (ponto em aberto no relatório).
+
+### Feito em 25/11/2026
+
+- **G10 na `main`** (PR #10, aceito pelo Victor em 24/11 às 22:28). Ainda não testada no `horas-dev` (auditoria vazia): falta aprovar ou reprovar o cronômetro que espera revisão.
+- **J5:** o Johannes trouxe a `main` (conflito com a G10 resolvido) e pôs a versão de demonstração nas metas; a IA fez o ajuste que faltava (`alterarMetas` com `insert` e leitura pela `lista_de_metas`, commit `687d974` na `johannes/membros-real`). Testada pelo Victor no `horas-dev` com o login real: membros e metas sem erro. **Falta abrir o PR.** A tela de mudar o setor ainda não existe (é a J4).
+- **Perfil do Victor no `horas-dev`:** `diretor_rh` desde 25/11, para testar as metas (era `rh`). Como diretor, fica fora do cálculo e do ranking; voltar para `rh` quando quiser registrar horas.
+- **Dados de teste desfeitos:** a meta de 13h para 30/11 foi substituída por 10h/5h (vale a mais nova) e o membro "teste01 da silva" foi desativado.
+- **Cancelar meta programada (decidido em 25/11):** opção de marcar como cancelada, sem apagar. Regra na seção 1 do `regras-de-negocio.md`; tarefas novas **B15** (banco) e **J11** (botão), em `tarefas-semanas-2-a-4.md`. Enquanto não existir, desfazer uma meta programada = lançar de novo a meta certa para a mesma segunda.
 
 ### Ranking com pódio (feito em 24/11/2026, na branch `feat/ranking-podio`)
 
