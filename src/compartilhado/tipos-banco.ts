@@ -284,6 +284,58 @@ export type Database = {
       }
     }
     Functions: {
+      // Funções do ranking escritas à mão no formato do gen types: gerar de novo
+      // depois de aplicar a migração ranking_e_podio no horas-dev.
+      minha_posicao_no_ranking: {
+        Args: { p_mes: string }
+        Returns: {
+          faltam_para_podio_ej: number
+          faltam_para_podio_setor: number
+          horas_total: number
+          posicao_ej: number
+          posicao_setor: number
+          total_ej: number
+          total_setor: number
+        }[]
+      }
+      podio_do_mes: {
+        Args: { p_mes: string }
+        Returns: {
+          escopo: string
+          horas_sede: number
+          horas_total: number
+          membro_id: string
+          nome: string
+          posicao: number
+          setor: string
+        }[]
+      }
+      ranking_do_mes: {
+        Args: { p_mes: string }
+        Returns: {
+          ativo: boolean
+          data_entrada: string
+          dispensado: boolean
+          email: string
+          horas_sede: number
+          horas_total: number
+          membro_id: string
+          nome: string
+          perfil: Database["public"]["Enums"]["perfil"]
+          posicao: number
+          setor: string
+        }[]
+      }
+      ranking_dos_setores: {
+        Args: { p_mes: string }
+        Returns: {
+          media_sede: number
+          media_total: number
+          membros_contados: number
+          posicao: number
+          setor: string
+        }[]
+      }
       eh_diretor_rh: { Args: never; Returns: boolean }
       eh_rh: { Args: never; Returns: boolean }
       elegivel_na_semana: {

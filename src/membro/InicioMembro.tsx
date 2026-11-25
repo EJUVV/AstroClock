@@ -235,10 +235,10 @@ function CartaoHorasPorDia({
   )
 }
 
-function CartaoRanking({ posicao }: { posicao: Carga<PosicaoRanking> }) {
+function CartaoRanking({ posicao }: { posicao: Carga<PosicaoRanking | null> }) {
   return (
     <Carregavel carga={posicao} esqueleto={<Skeleton className="h-32 rounded-[24px]" />}>
-      {(p) => (
+      {(p) => !p ? null : (
         <Card>
           <CardHeader>
             <CardTitle className="text-lg">Sua posição no ranking</CardTitle>
@@ -356,7 +356,9 @@ function InicioMembro() {
           </Carregavel>
           <div className="lg:col-span-2 xl:col-span-1">
           <Carregavel carga={posicao} esqueleto={kpiEsqueleto}>
-            {(p) => (
+            {(p) => !p ? (
+              <KpiCard titulo="Posição no ranking" valor="—" comparacao="Você ainda não entra no ranking deste mês" linhas={[]} />
+            ) : (
               <KpiCard
                 titulo="Posição no ranking"
                 valor={
