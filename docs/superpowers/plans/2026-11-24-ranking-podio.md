@@ -35,7 +35,7 @@ Cada ponto tem teste ou conferência na tarefa dona (2, 4 e 5).
 
 ---
 
-### Tarefa 1: Regra e contrato atualizados
+### Task 1: Regra e contrato atualizados
 
 **Arquivos:**
 - Modificar: `docs/regras-de-negocio.md` (seção 12, trecho "Ranking")
@@ -57,7 +57,7 @@ Cada ponto tem teste ou conferência na tarefa dona (2, 4 e 5).
 
 ---
 
-### Tarefa 2: Migração do banco e testes
+### Task 2: Migração do banco e testes
 
 **Arquivos:**
 - Criar: `supabase/migrations/<timestamp>_ranking_e_podio.sql` (com `npx supabase migration new ranking_e_podio`; o timestamp tem de ser maior que `20261119111100`)
@@ -97,7 +97,7 @@ Regras de cálculo (todas `p_mes = 'AAAA-MM'`):
 
 ---
 
-### Tarefa 3: Tipos e funções de dados do site
+### Task 3: Tipos e funções de dados do site
 
 **Arquivos:**
 - Modificar: `src/compartilhado/tipos.ts` (tipos da Tarefa 1)
@@ -124,7 +124,7 @@ Regras de cálculo (todas `p_mes = 'AAAA-MM'`):
 
 ---
 
-### Tarefa 4: Página Ranking e cartão do Início (painel do membro)
+### Task 4: Página Ranking e cartão do Início (painel do membro)
 
 **Arquivos:**
 - Criar: `src/membro/RankingMembro.tsx`
@@ -148,7 +148,7 @@ Regras de cálculo (todas `p_mes = 'AAAA-MM'`):
 
 ---
 
-### Tarefa 5: Aba Setores no ranking do RH
+### Task 5: Aba Setores no ranking do RH
 
 **Arquivos:**
 - Modificar: `src/rh/Ranking.tsx`
@@ -163,7 +163,7 @@ Regras de cálculo (todas `p_mes = 'AAAA-MM'`):
 
 ---
 
-### Tarefa 6: Integração (depois do PR #9)
+### Task 6: Integração (depois do PR #9)
 
 **Arquivos:**
 - Modificar: `src/compartilhado/tipos-banco.ts` (gerado de novo)
