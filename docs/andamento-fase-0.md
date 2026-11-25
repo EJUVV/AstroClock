@@ -21,6 +21,19 @@ As revisões de 23/11 foram feitas pelo Victor e registradas no Notion; em 24/11
 - **Perfis da equipe no `horas-dev`:** Victor, Johannes e Guilherme como `rh`; Bernardo como `membro`. O Guilherme volta para `membro` antes do teste da G11.
 - **E-mail da EJ (relatório do Victor, 24/11):** o DNS do `ejuvv.com` foi migrado do UOL Host para a Hostinger em 24/11, às 15h16. A Hostinger criou sozinha os registros do e-mail dela, e o recebimento ficou intermitente até cerca de 19h30. Corrigido no mesmo dia (MX `smtp.google.com`, SPF do Google e DMARC) e validado às 20h14. Quem cuida de cada coisa agora: **registro do domínio no UOL Host**, **DNS e site institucional na Hostinger** (hPanel → Domínios → ejuvv.com → DNS), **e-mail no Google Workspace**. Nunca usar "Redefinir registros DNS" nem ativar o e-mail da Hostinger: isso derruba o e-mail da EJ. **Falta o DKIM**, que depende do administrador do Workspace. A falha de DNS vista em 19/11 provavelmente tem a ver com os MX do Google estarem desativados na zona antiga do UOL (ponto em aberto no relatório).
 
+### Ranking com pódio (feito em 24/11/2026, na branch `feat/ranking-podio`)
+
+Funcionalidade nova pedida pelo Victor para motivar os membros a registrar mais horas. **Ainda fora da `main` e do `horas-dev`.**
+
+- **Regra nova (seção 12, só na branch até o merge):** o membro vê o pódio da EJ (5 primeiros) e o do setor (3 primeiros), com nome, setor e horas, a própria posição e quanto falta para o pódio; todos veem o ranking dos setores pela média de horas por membro no mês (sem dispensados). Período continua o mês.
+- **Na branch:** desenho e plano em `docs/superpowers/`; migração `20261125005432_ranking_e_podio.sql` (`ranking_do_mes`, `podio_do_mes`, `minha_posicao_no_ranking`, `ranking_dos_setores`) e `supabase/testes/teste-ranking.sql`; `src/compartilhado/api/ranking.ts` (e `ranking-falso.ts`); página **Ranking** do membro (abas EJ, Meu setor e Setores), item no menu, mini pódio no Início e aba **Setores** no ranking do RH. A branch parte da branch do PR #9, porque a migração usa as funções da B9.
+- **Verificado:** lint e build; navegador no modo de demonstração (computador e 360 px); revisão final por um revisor separado (nada crítico; as 2 correções importantes já entraram). Prévia do protótipo na Vercel: `astro-clock-git-feat-ranking-podio-ejuvv.vercel.app` (pede login da equipe na Vercel).
+- **Não feito ainda:** o `teste-ranking.sql` não rodou no banco; nada foi aplicado no `horas-dev`.
+- **Ordem:** só vai para a `main` **depois do PR #9** e **depois de a migração estar no `horas-dev`** (senão o cartão do ranking no Início dá erro com login real). A lista completa do RH continua falsa até a J10; a B12 encolheu (sobrou o `horasPorDia`).
+- **Decisão pendente do Victor:** em setor com 1 ou 2 membros, a média revela as horas de alguém. Opções: mostrar só setores com 3 ou mais membros (sugestão da IA), aceitar e registrar na regra, ou esconder o número de membros.
+- **Pequenos, para depois:** aba Setores com todos em 0h mostra "1º" para todos; a aba da página do membro volta para "EJ" ao trocar de mês; a demonstração não filtra quem entrou na semana.
+- **Avisar:** Guilherme (página nova na pasta do membro; `progresso.ts` reexporta `minhaPosicaoNoRanking` de `ranking.ts`, atenção na G11), Bernardo (B12 menor; a migração depende da B9) e Johannes (aba Setores no `Ranking.tsx`).
+
 ### Produção (V7), montada em 24/11/2026
 
 - **Vercel:** projeto novo **`astroclock-prod`** (time EJUVV), ligado ao repositório, com deploy automático da `main`. Variáveis só de produção: `VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY` (chave publishable) do `horas-prod`, **sem** `VITE_LOGIN_FALSO` e **sem** `VITE_MOSTRAR_DEMO`. O protótipo `astro-clock` continua como estava.
@@ -125,6 +138,7 @@ Semana 4 (23 a 27/11). Meta: o piloto completo, em produção. O teste com membr
    - Marcar com o Bernardo e o Guilherme o dia de juntar o PR #9 e aplicar no `horas-dev` (junto com a G13).
    - V7: a produção está montada (ver "Produção (V7)"). Falta cadastrar o endereço de volta do prod no Google Cloud, o que depende do administrador do Workspace, e depois a B14.
    - V6 (validação com o RH) assim que a B9 estiver no `horas-dev` e a J10 na `main`.
+   - Ranking com pódio: decidir o caso dos setores pequenos; quando o PR #9 (com a G13) estiver no `horas-dev`, aplicar a migração do ranking com a IA, rodar o `teste-ranking.sql`, testar com login real e abrir o PR da `feat/ranking-podio` (ver "Ranking com pódio").
 
 ### Tarefas do Victor fora da IA
 
