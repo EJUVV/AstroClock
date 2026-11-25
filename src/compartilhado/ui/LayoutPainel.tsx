@@ -1,17 +1,17 @@
 import { useState, type ReactNode } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
-import { LifeBuoyIcon, LogOutIcon, MenuIcon, PanelLeftCloseIcon, PanelLeftOpenIcon, type LucideIcon } from 'lucide-react'
+import { LifeBuoyIcon, LogOutIcon, MenuIcon, PanelLeftCloseIcon, PanelLeftOpenIcon, SettingsIcon, type LucideIcon } from 'lucide-react'
 import { toast } from 'sonner'
 import { sair } from '@/compartilhado/api/auth'
 import { AvatarMembro } from '@/compartilhado/ui/AvatarMembro'
 import { BarraInferior } from '@/compartilhado/ui/BarraInferior'
 import { BotaoInstalarApp } from '@/compartilhado/ui/instalarApp'
 import { Logo } from '@/compartilhado/ui/Logo'
+import { useMinhaFoto } from '@/compartilhado/ui/preferencias'
 import { useSessao } from '@/compartilhado/ui/RotaProtegida'
 import { Button } from '@/compartilhado/ui/shadcn/button'
 import { Drawer, DrawerContent, DrawerTitle } from '@/compartilhado/ui/shadcn/drawer'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/compartilhado/ui/shadcn/tooltip'
-import { SeletorTema } from '@/compartilhado/ui/tema'
 import { cn } from '@/compartilhado/ui/utils'
 
 export interface ItemMenu {
@@ -106,6 +106,7 @@ export function LayoutPainel({
   children: ReactNode
 }) {
   const { eu } = useSessao()
+  const foto = useMinhaFoto(eu.email)
   const location = useLocation()
   const [recolhido, setRecolhido] = useState(false)
   const [menuAberto, setMenuAberto] = useState(false)
@@ -117,7 +118,7 @@ export function LayoutPainel({
 
   const rodapeMenu = (recolher: boolean, onNavegar?: () => void) => (
     <div className="flex flex-col gap-1">
-      {itensRodape.length > 0 && <Menu itens={itensRodape} recolhido={recolher} onNavegar={onNavegar} />}
+      <Menu itens={[...itensRodape, { para: `${inicio}/configuracoes`, rotulo: 'Configurações', icone: SettingsIcon }]} recolhido={recolher} onNavegar={onNavegar} />
       <BotaoInstalarApp compacto={recolher} />
       <button
         type="button"
@@ -164,9 +165,7 @@ export function LayoutPainel({
           </div>
           <div className="flex flex-col gap-3">
             {rodapeMenu(recolhido)}
-            <div className={cn('flex items-center gap-2', recolhido ? 'flex-col' : 'justify-between px-1')}>
-              {/* Recolhido, a sidebar tem 56px úteis: o seletor fica em pé para caber. */}
-              <SeletorTema className={cn(recolhido && 'flex-col')} />
+            <div className={cn('flex items-center', recolhido ? 'justify-center' : 'justify-end px-1')}>
               <Button
                 variant="outline"
                 size="icon-sm"
@@ -194,13 +193,19 @@ export function LayoutPainel({
           </div>
           <div className="ml-auto flex items-center gap-2 sm:ml-0">
             {acoesTopo}
-            <div className="flex items-center gap-2.5 rounded-full border bg-card py-1 pr-4 pl-1">
-              <AvatarMembro nome={eu.nome} className="size-9" />
+            {/* Clicar na foto abre as Configurações (foto, tema e fundo). */}
+            <Link
+              to={`${inicio}/configuracoes`}
+              aria-label="Abrir configurações"
+              title="Configurações"
+              className="flex items-center gap-2.5 rounded-full border bg-card py-1 pr-4 pl-1 transition-colors outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50"
+            >
+              <AvatarMembro nome={eu.nome} foto={foto} className="size-9" />
               <div className="hidden leading-tight md:block">
                 <p className="text-sm font-semibold">{eu.nome}</p>
                 <p className="text-xs text-muted-foreground">{eu.email}</p>
               </div>
-            </div>
+            </Link>
           </div>
         </header>
 
@@ -224,7 +229,6 @@ export function LayoutPainel({
               <nav aria-label={`${secao}: mais opções`} className="flex flex-col gap-3 overflow-y-auto px-4 pt-2 pb-[max(1rem,env(safe-area-inset-bottom))]">
                 <Menu itens={itensMais} recolhido={false} onNavegar={() => setMenuAberto(false)} />
                 <div className="border-t pt-3">{rodapeMenu(false, () => setMenuAberto(false))}</div>
-                <SeletorTema className="self-start" />
               </nav>
             </DrawerContent>
           </Drawer>
@@ -238,7 +242,6 @@ export function LayoutPainel({
               <Menu itens={itens} recolhido={false} onNavegar={() => setMenuAberto(false)} />
               <div className="flex flex-col gap-3">
                 {rodapeMenu(false, () => setMenuAberto(false))}
-                <SeletorTema className="self-start" />
               </div>
             </nav>
           </DrawerContent>
