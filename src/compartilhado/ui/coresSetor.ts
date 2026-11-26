@@ -1,12 +1,13 @@
-// Uma cor para cada setor, na identidade visual (decidido pelo Victor em 25/11/2026; o time ainda pode trocar).
-// Validadas para daltonismo e contraste nos dois temas (guia de gráficos): azul e roxo ficam parecidos para
-// quem tem daltonismo, por isso a cor nunca aparece sozinha, sempre com o nome do setor ao lado.
+// Uma cor para cada setor, na identidade visual (decidido pelo Victor em 25/11/2026; RH verde e Gestão e
+// Qualidade laranja em 26/11/2026; o time ainda pode trocar).
+// Contraste conferido nos dois temas. Para quem tem daltonismo, azul e roxo ficam parecidos, e vermelho, verde
+// e laranja também: por isso a cor nunca aparece sozinha, sempre com o nome do setor ao lado.
 // Setor que não está aqui (criado depois pelo diretor do RH) fica cinza: nunca gerar uma cor nova automaticamente.
 const CORES: Record<string, string> = {
   projetos: '#2563eb', // azul
   comercial: '#e03131', // vermelho (pedido do Victor; perto do vermelho de "abaixo da meta", por isso só na bolinha ao lado do nome)
-  rh: '#e05ab4', // rosa (um pouco mais quente, para não se confundir com o vermelho do Comercial)
-  'gestao e qualidade': '#16a888', // verde-água (diferente do verde de "cumpriu")
+  rh: '#2f9e44', // verde (pedido do Victor em 26/11; perto do verde de "cumpriu", por isso só ao lado do nome)
+  'gestao e qualidade': '#f08c00', // laranja (pedido do Victor em 26/11; mais vivo que o âmbar de "alerta")
   marketing: '#a855f7', // roxo
 }
 
