@@ -113,6 +113,31 @@ export const membros: Membro[] = [
   { id: 'm9', nome: 'Igor Martins', email: 'igor.martins@ejuvv.com', perfil: 'membro', setor: 'Marketing', ativo: true, dataEntrada: segundaAtual },
 ]
 
+// Diretorias de demonstração (setor -> quem dirige). O diretor de setor falso dirige o próprio setor
+// e mais um; o diretor do RH falso dirige o RH. Quem dirige o RH tem os poderes do diretor do RH.
+export const setorRH = 'RH'
+export const diretoriasFalsas: { setor: string; membroId: string; desde: string }[] = [
+  { setor: 'Projetos', membroId: 'm47', desde: '2026-02-02T09:00:00-03:00' },
+  { setor: 'Comercial', membroId: 'm47', desde: '2026-08-03T09:00:00-03:00' },
+  { setor: setorRH, membroId: 'm4', desde: '2026-02-02T09:00:00-03:00' },
+]
+
+// Perfil que vale para as permissões do membro logado: quem dirige o RH age como diretor_rh e um
+// diretor_rh sem o RH age como diretor de setor (mesma regra de perfilEfetivo, no site).
+export function perfilEfetivoFalso(): Perfil | null {
+  const perfil = perfilFalso()
+  if (!perfil) return null
+  const id = membroLogado().id
+  const dirigeRH = diretoriasFalsas.some((d) => d.membroId === id && d.setor === setorRH)
+  return dirigeRH ? 'diretor_rh' : perfil === 'diretor_rh' ? 'diretor_setor' : perfil
+}
+
+// Setores que o membro logado dirige na demonstração.
+export function setoresDirigidosFalso(): string[] {
+  const id = membroLogado().id
+  return diretoriasFalsas.filter((d) => d.membroId === id).map((d) => d.setor)
+}
+
 // semanasAtras: 0 = semana atual. dia: 0 = segunda ... 6 = domingo. ate '24:00' = meia-noite do dia seguinte.
 function reg(
   id: string,

@@ -2,9 +2,11 @@
 -- AstroClock · teste do banco (B3, B6, B7, B7.1, cálculo da semana e B10)
 -- 5 perfis, membros, setores, metas, lista_de_metas, historico_setor,
 -- meus_dados(), meu_setor_id(), elegibilidade, registros (pelo site e pelas
--- funções do RH), auditoria, 1 diretor do RH e 1 presidente
+-- funções do RH), auditoria, 1 presidente e (desde as diretorias acumuladas)
+-- o diretor do RH e o diretor de setor pelas diretorias registradas. O teste
+-- próprio das diretorias é a teste-diretorias.sql.
 -- =============================================================================
--- Rode DEPOIS da migração da B7, no SQL Editor (não muda nada no banco). Cria dados de teste (prefixo zz), confere
+-- Rode DEPOIS da migração diretorias_acumuladas, no SQL Editor (não muda nada no banco). Cria dados de teste (prefixo zz), confere
 -- pelos dois lados (quem deve ver, vê; quem não deve, não vê) e desfaz tudo no
 -- final: não suja o banco.
 -- Terminou com "OK: todos os testes passaram" = passou. Se falhar, a mensagem
@@ -15,6 +17,7 @@ do $$
 declare
   c_setor_a  constant uuid := 'a0000000-0000-4000-8000-000000000001';
   c_setor_b  constant uuid := 'a0000000-0000-4000-8000-000000000002';
+  c_setor_rh constant uuid := 'a0000000-0000-4000-8000-000000000003';
   c_membro   constant uuid := 'a0000000-0000-4000-8000-0000000000a1';
   c_rh       constant uuid := 'a0000000-0000-4000-8000-0000000000a2';
   c_diretora constant uuid := 'a0000000-0000-4000-8000-0000000000a3';
@@ -96,13 +99,16 @@ declare
 begin
   begin   -- tudo o que o teste faz fica neste bloco e é desfeito no fim
 
-  -- Só pode ter 1 diretor do RH e 1 presidente ativos, e o teste cria os dele.
-  -- Os do seed ficam desativados só durante o teste.
+  -- Só pode ter 1 presidente ativo, e o teste cria o dele (e o diretor do RH
+  -- dele). O presidente e o diretor do RH do seed ficam desativados só durante
+  -- o teste, e o setor RH de verdade fica desmarcado: o zz Setor RH faz o papel.
   update public.membros set ativo = false where ativo and perfil in ('diretor_rh', 'presidente');
+  update public.setores set eh_rh = false where eh_rh;
 
-  insert into public.setores (id, nome) values
-    (c_setor_a, 'zz Setor A'),
-    (c_setor_b, 'zz Setor B');
+  insert into public.setores (id, nome, eh_rh) values
+    (c_setor_a,  'zz Setor A',  false),
+    (c_setor_b,  'zz Setor B',  false),
+    (c_setor_rh, 'zz Setor RH', true);
 
   insert into public.membros (id, nome, email, perfil, setor_id, ativo) values
     (c_membro,   'zz Membro',        'zz.teste.membro@ejuvv.com',     'membro',        c_setor_a, true),
@@ -112,6 +118,15 @@ begin
     (c_dsetor,   'zz Diretor Setor', 'zz.teste.dsetor@ejuvv.com',     'diretor_setor', c_setor_a, true),
     (c_presid,   'zz Presidente',    'zz.teste.presidente@ejuvv.com', 'presidente',    c_setor_b, true),
     (c_membro_b, 'zz Membro B',      'zz.teste.membrob@ejuvv.com',    'membro',        c_setor_b, true);
+
+  -- Diretorias acumuladas: o perfil sozinho não dirige. A diretora dirige o
+  -- setor RH (é o que dá os poderes do diretor do RH) e o diretor de setor, o A.
+  insert into public.diretorias (setor_id, membro_id) values
+    (c_setor_rh, c_diretora),
+    (c_setor_a,  c_dsetor);
+  insert into public.historico_diretorias (setor_id, membro_id, inicio) values
+    (c_setor_rh, c_diretora, now()),
+    (c_setor_a,  c_dsetor,   now());
 
   select count(*) into total     from public.membros;                          -- dono do banco: vê tudo
   select count(*) into n_setor_a from public.membros where setor_id = c_setor_a;
@@ -139,7 +154,7 @@ begin
   assert not public.eh_rh(),              'membro: eh_rh() deveria ser false';
   assert not public.eh_diretor_rh(),      'membro: eh_diretor_rh() deveria ser false';
   assert not public.ve_tudo(),            'membro: ve_tudo() deveria ser false';
-  assert public.setor_que_dirijo() is null, 'membro: setor_que_dirijo() deveria ser null';
+  assert not exists (select 1 from public.setores_que_dirijo()), 'membro: setores_que_dirijo() deveria vir vazio';
   assert public.meu_setor_id() = c_setor_a, 'membro: meu_setor_id() errado';
 
   select count(*) into n from public.membros;
@@ -237,7 +252,7 @@ begin
   assert public.meu_perfil() is null,  'sem cadastro: meu_perfil() deveria ser null';
   assert not public.eh_rh(),           'sem cadastro: eh_rh() deveria ser false';
   assert not public.ve_tudo(),         'sem cadastro: ve_tudo() deveria ser false';
-  assert public.setor_que_dirijo() is null, 'sem cadastro: setor_que_dirijo() deveria ser null';
+  assert not exists (select 1 from public.setores_que_dirijo()), 'sem cadastro: setores_que_dirijo() deveria vir vazio';
   assert public.meu_setor_id() is null,     'sem cadastro: meu_setor_id() deveria ser null';
   select count(*) into n from public.membros;
   assert n = 0, format('sem cadastro: deveria ver 0 membros (viu %s)', n);
@@ -393,7 +408,8 @@ begin
 
   assert public.meu_id() = c_dsetor,               'diretor_setor: meu_id() errado';
   assert public.meu_perfil() = 'diretor_setor',    'diretor_setor: meu_perfil() errado';
-  assert public.setor_que_dirijo() = c_setor_a,    'diretor_setor: setor_que_dirijo() errado';
+  assert (select array_agg(q.setor_id) from public.setores_que_dirijo() q(setor_id)) = array[c_setor_a],
+                                                   'diretor_setor: setores_que_dirijo() errado';
   assert not public.eh_rh(),                       'diretor_setor: eh_rh() deveria ser false';
   assert not public.ve_tudo(),                     'diretor_setor: ve_tudo() deveria ser false';
   assert not public.eh_diretor_rh(),               'diretor_setor: eh_diretor_rh() deveria ser false';
@@ -452,7 +468,7 @@ begin
   assert public.ve_tudo(),                   'presidente: ve_tudo() deveria ser true';
   assert not public.eh_rh(),                 'presidente: eh_rh() deveria ser false';
   assert not public.eh_diretor_rh(),         'presidente: eh_diretor_rh() deveria ser false';
-  assert public.setor_que_dirijo() is null,  'presidente: setor_que_dirijo() deveria ser null';
+  assert not exists (select 1 from public.setores_que_dirijo()), 'presidente: setores_que_dirijo() deveria vir vazio';
   assert public.meu_setor_id() = c_setor_b,  'presidente: meu_setor_id() errado';
   select count(*) into n from public.membros;
   assert n = total, format('presidente: deveria ver todos os %s membros (viu %s)', total, n);
@@ -538,7 +554,11 @@ begin
   begin perform public.meu_perfil();           raise exception 'FALHOU: anon executou meu_perfil()';           exception when insufficient_privilege then null; end;
   begin perform public.eh_diretor_rh();        raise exception 'FALHOU: anon executou eh_diretor_rh()';        exception when insufficient_privilege then null; end;
   begin perform public.ve_tudo();              raise exception 'FALHOU: anon executou ve_tudo()';              exception when insufficient_privilege then null; end;
-  begin perform public.setor_que_dirijo();     raise exception 'FALHOU: anon executou setor_que_dirijo()';     exception when insufficient_privilege then null; end;
+  begin perform * from public.setores_que_dirijo(); raise exception 'FALHOU: anon executou setores_que_dirijo()'; exception when insufficient_privilege then null; end;
+  begin perform * from public.minhas_diretorias();  raise exception 'FALHOU: anon executou minhas_diretorias()';  exception when insufficient_privilege then null; end;
+  begin perform public.atribuir_diretoria('zz Setor A', c_dsetor);
+        raise exception 'FALHOU: anon executou atribuir_diretoria()';  exception when insufficient_privilege then null; end;
+  begin perform 1 from public.diretorias;      raise exception 'FALHOU: anon leu diretorias';      exception when insufficient_privilege then null; end;
   begin perform public.perfil_tem_meta('rh');  raise exception 'FALHOU: anon executou perfil_tem_meta()';      exception when insufficient_privilege then null; end;
   begin perform * from public.meus_dados();    raise exception 'FALHOU: anon executou meus_dados()';           exception when insufficient_privilege then null; end;
   begin perform public.elegivel_na_semana('membro', true, '2026-10-01', '2026-11-02');
@@ -603,23 +623,22 @@ begin
   get diagnostics n = row_count;
   assert n = 1, 'diretora: não conseguiu reativar membro';
 
-  -- no máximo 1 diretor do RH e 1 presidente ativos
-  begin
-    update public.membros set perfil = 'diretor_rh' where id = c_membro;
-    raise exception 'FALHOU: ficaram 2 diretores do RH ativos';
-  exception when unique_violation then null;
-  end;
+  -- no máximo 1 presidente ativo. Um 2º diretor_rh ativo pode (diretorias
+  -- acumuladas): o poder do diretor do RH vem da diretoria do setor RH, e quem
+  -- só tem o perfil não ganha os poderes.
+  update public.membros set perfil = 'diretor_rh' where id = c_membro;
+  get diagnostics n = row_count;
+  assert n = 1, 'diretora: não conseguiu dar o perfil diretor_rh a outro membro';
+  perform set_config('request.jwt.claims', '{"role":"authenticated","email":"zz.teste.membro@ejuvv.com"}', true);
+  assert not public.eh_diretor_rh(), 'diretor_rh sem a diretoria do RH: eh_diretor_rh() deveria ser false';
+  assert not public.eh_rh(),         'diretor_rh sem a diretoria do RH: eh_rh() deveria ser false';
+  assert not public.ve_tudo(),       'diretor_rh sem a diretoria do RH: ve_tudo() deveria ser false';
+  perform set_config('request.jwt.claims', '{"role":"authenticated","email":"zz.teste.diretora@ejuvv.com"}', true);
+  update public.membros set perfil = 'rh' where id = c_membro;
 
   begin
     update public.membros set perfil = 'presidente' where id = c_membro;
     raise exception 'FALHOU: ficaram 2 presidentes ativos';
-  exception when unique_violation then null;
-  end;
-
-  begin
-    insert into public.membros (nome, email, perfil, setor_id)
-    values ('zz Outra Diretora', 'zz.outra.diretora@ejuvv.com', 'diretor_rh', c_setor_a);
-    raise exception 'FALHOU: cadastrou um 2º diretor do RH ativo';
   exception when unique_violation then null;
   end;
 
@@ -650,48 +669,44 @@ begin
   select count(*) into n from public.historico_setor where membro_id = c_dsetor and alterado_por = c_diretora;
   assert n = 2, format('historico_setor: deveria ter 2 trocas feitas pela diretora (tem %s)', n);
 
-  -- no máximo 1 diretor de setor ativo por setor
-  begin
-    update public.membros set perfil = 'diretor_setor' where id = c_membro;      -- setor A já tem o c_dsetor ativo
-    raise exception 'FALHOU: setor A ficou com 2 diretores de setor ativos';
-  exception when unique_violation then null;
-  end;
-
-  begin
-    insert into public.membros (nome, email, perfil, setor_id)
-    values ('zz Outro Diretor', 'zz.outro.dsetor@ejuvv.com', 'diretor_setor', c_setor_a);
-    raise exception 'FALHOU: cadastrou 2º diretor de setor ativo no mesmo setor';
-  exception when unique_violation then null;
-  end;
-
-  update public.membros set perfil = 'diretor_setor' where id = c_membro_b;      -- setor B não tem diretor
+  -- um diretor por setor: desde as diretorias acumuladas, a vaga está na
+  -- tabela diretorias (chave = setor), não no perfil
+  update public.membros set perfil = 'diretor_setor' where id = c_membro_b;
   get diagnostics n = row_count;
   assert n = 1, 'diretora: não conseguiu nomear diretor de setor no setor B';
+
+  -- atribuir o setor A (que tem o c_dsetor) ao membro B troca o diretor
+  perform public.atribuir_diretoria('zz Setor A', c_membro_b);
+  select count(*) into n from public.diretorias where setor_id = c_setor_a and membro_id = c_membro_b;
+  assert n = 1, 'diretora: atribuir o setor A deveria trocar o diretor';
+  select count(*) into n from public.diretorias where membro_id = c_dsetor;
+  assert n = 0, 'o diretor antigo do setor A continuou dirigindo';
+
+  -- devolve o setor A ao c_dsetor; o membro B volta a ser membro
+  perform public.atribuir_diretoria('zz Setor A', c_dsetor);
   update public.membros set perfil = 'membro' where id = c_membro_b;
 
-  -- diretor desativado libera a vaga; reativar o antigo com a vaga ocupada falha
+  -- diretor desativado perde a diretoria (o histórico fecha); reativar não devolve
   update public.membros set ativo = false where id = c_dsetor;
 
   perform set_config('request.jwt.claims', '{"role":"authenticated","email":"zz.teste.dsetor@ejuvv.com"}', true);
-  assert public.setor_que_dirijo() is null, 'diretor_setor desativado ainda dirige o setor';
+  assert not exists (select 1 from public.setores_que_dirijo()), 'diretor_setor desativado ainda dirige o setor';
   select count(*) into n from public.membros;
   assert n = 0, format('diretor_setor desativado: deveria ver 0 membros (viu %s)', n);
   perform set_config('request.jwt.claims', '{"role":"authenticated","email":"zz.teste.diretora@ejuvv.com"}', true);
 
-  update public.membros set perfil = 'diretor_setor' where id = c_membro;
-  get diagnostics n = row_count;
-  assert n = 1, 'diretora: vaga de diretor de setor não foi liberada pela desativação';
+  select count(*) into n from public.diretorias where setor_id = c_setor_a;
+  assert n = 0, 'desativar o diretor deveria deixar o setor A vago';
+  select count(*) into n from public.historico_diretorias
+   where setor_id = c_setor_a and membro_id = c_dsetor and fim is not null and encerrado_por = c_diretora;
+  assert n = 2, format('historico_diretorias: o c_dsetor deveria ter 2 diretorias do setor A fechadas pela diretora (tem %s)', n);
 
-  begin
-    update public.membros set ativo = true where id = c_dsetor;
-    raise exception 'FALHOU: reativou diretor de setor com a vaga ocupada';
-  exception when unique_violation then null;
-  end;
-
-  update public.membros set perfil = 'membro' where id = c_membro;
   update public.membros set ativo = true where id = c_dsetor;
   get diagnostics n = row_count;
-  assert n = 1, 'diretora: não conseguiu reativar o diretor de setor com a vaga livre';
+  assert n = 1, 'diretora: não conseguiu reativar o diretor de setor';
+  select count(*) into n from public.diretorias where membro_id = c_dsetor;
+  assert n = 0, 'reativar não deveria devolver a diretoria sozinho';
+  perform public.atribuir_diretoria('zz Setor A', c_dsetor);   -- as próximas seções usam
 
   -- metas: só da próxima semana em diante; o banco guarda quem criou
   insert into public.metas (horas_total, horas_sede, vigente_desde) values (10, 5, prox)
@@ -788,10 +803,18 @@ begin
   select count(*) into n from public.historico_setor where membro_id = c_membro_b and alterado_por is null;
   assert n = 2, format('historico_setor: troca pelo SQL Editor deveria gravar 2 linhas sem autor (gravou %s)', n);
 
-  -- 1 diretor do RH ativo vale aqui também
+  -- 1 presidente ativo vale aqui também (desde as diretorias acumuladas, o
+  -- índice é só do presidente)
   begin
-    update public.membros set perfil = 'diretor_rh' where id = c_membro;
-    raise exception 'FALHOU: ficaram 2 diretores do RH ativos (SQL Editor)';
+    update public.membros set perfil = 'presidente' where id = c_membro;
+    raise exception 'FALHOU: ficaram 2 presidentes ativos (SQL Editor)';
+  exception when unique_violation then null;
+  end;
+
+  -- um diretor por setor vale aqui também (chave de diretorias)
+  begin
+    insert into public.diretorias (setor_id, membro_id) values (c_setor_a, c_presid);
+    raise exception 'FALHOU: o setor A ficou com 2 diretores (SQL Editor)';
   exception when unique_violation then null;
   end;
 

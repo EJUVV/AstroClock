@@ -3,9 +3,10 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { EllipsisVerticalIcon, EyeIcon, PlusIcon, SearchIcon, UserMinusIcon } from 'lucide-react'
 import { toast } from 'sonner'
 import { alterarPerfil, cadastrarMembro, desativarMembro, listarMembros, listarSetores } from '@/compartilhado/api/membros'
+import { situacaoDosSetores } from '@/compartilhado/api/diretorias'
 import { hoje } from '@/compartilhado/datas'
-import { corrigeRegistros, NOME_PERFIL } from '@/compartilhado/perfis'
-import type { Membro, Perfil } from '@/compartilhado/tipos'
+import { corrigeRegistros, juntarSetores, NOME_PERFIL } from '@/compartilhado/perfis'
+import type { Membro, Perfil, SituacaoSetor } from '@/compartilhado/tipos'
 import { AvatarMembro } from '@/compartilhado/ui/AvatarMembro'
 import { ConfirmDialog } from '@/compartilhado/ui/ConfirmDialog'
 import { Carregavel, useCarregar } from '@/compartilhado/ui/demo'
@@ -152,14 +153,29 @@ function CadastroMembro({
   )
 }
 
+// Setores sem diretor e diretores sem setor: o que falta cadastrar nas diretorias.
+function AvisosDiretorias({ membros, situacao }: { membros: Membro[]; situacao: SituacaoSetor[] }) {
+  const vagos = situacao.filter((s) => !s.diretor).map((s) => s.setor)
+  const comSetor = new Set(situacao.flatMap((s) => (s.diretor ? [s.diretor.id] : [])))
+  const semSetor = membros.filter((m) => m.ativo && (m.perfil === 'diretor_setor' || m.perfil === 'diretor_rh') && !comSetor.has(m.id)).map((m) => m.nome)
+  if (vagos.length === 0 && semSetor.length === 0) return null
+  return (
+    <div className="flex flex-col gap-1 rounded-2xl border border-alerta/40 bg-alerta-fundo px-4 py-3 text-sm">
+      {vagos.length > 0 && <p><strong>Setores vagos:</strong> {juntarSetores(vagos)}</p>}
+      {semSetor.length > 0 && <p><strong>Diretores sem setor:</strong> {juntarSetores(semSetor)}</p>}
+    </div>
+  )
+}
+
 function Membros() {
-  const { perfil } = useSessao()
+  const { perfil, cargo } = useSessao()
+  const veDiretorias = perfil === 'diretor_rh' || cargo === 'presidente'
   const veTodosOsSetores = perfil !== 'diretor_setor'
   const navigate = useNavigate()
   const [params] = useSearchParams()
   const busca = useRef<HTMLInputElement>(null)
   const [versao, setVersao] = useState(0)
-  const carga = useCarregar(() => Promise.all([listarMembros(), listarSetores()]), [versao])
+  const carga = useCarregar(() => Promise.all([listarMembros(), listarSetores(), veDiretorias ? situacaoDosSetores() : Promise.resolve([])]), [versao])
   const [texto, setTexto] = useState('')
   const [setor, setSetor] = useState('todos')
   const [status, setStatus] = useState('ativos')
@@ -213,6 +229,8 @@ function Membros() {
           </Button>
         )}
       </div>
+
+      {veDiretorias && carga.atual && <AvisosDiretorias membros={carga.atual[0]} situacao={carga.atual[2]} />}
 
       <Card>
         <CardContent>

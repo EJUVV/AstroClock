@@ -156,3 +156,19 @@ export interface HorasDoDia {
   horasSede: number
   horasTotal: number
 }
+
+// Setor dirigido por quem está logado. ehRH: é o setor RH (quem o dirige tem os poderes do diretor do RH).
+export interface Diretoria {
+  setor: string
+  ehRH: boolean
+  diretorId: string
+  diretorNome: string
+  desde: string         // ISO datetime
+}
+
+// Um setor com o diretor atual; diretor = null quando o setor está vago.
+export interface SituacaoSetor {
+  setor: string
+  ehRH: boolean
+  diretor: { id: string; nome: string; desde: string } | null
+}

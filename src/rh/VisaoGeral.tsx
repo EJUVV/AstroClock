@@ -108,7 +108,7 @@ function variacaoDeHoras(atual: number, anterior: number) {
 }
 
 function VisaoGeral() {
-  const { perfil, eu } = useSessao()
+  const { perfil, setoresQueDirijo } = useSessao()
   const ehDesktop = useEhDesktop()
   const navigate = useNavigate()
   // Padrão: a última semana encerrada. A semana atual ainda está em andamento.
@@ -116,7 +116,8 @@ function VisaoGeral() {
   // RH e presidente: a EJ toda ou um setor. O diretor de setor já vê só o dele.
   const [setor, setSetor] = useState('todos')
   const filtro = setor === 'todos' ? undefined : setor
-  const escolheSetor = perfil !== 'diretor_setor'
+  const doSetor = perfil === 'diretor_setor'
+  const escolheSetor = !doSetor || setoresQueDirijo.length > 1
   const setores = useCarregar(() => listarSetores(), [])
   const resumo = useCarregar(() => resumoGeral(semana, filtro), [semana, filtro])
   const serie = useCarregar(() => serieDePercentuais(semana, filtro), [semana, filtro])
@@ -144,8 +145,8 @@ function VisaoGeral() {
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup>
-                  <SelectItem value="todos">Toda a EJ</SelectItem>
-                  {(setores.atual ?? []).map((s) => (
+                  <SelectItem value="todos">{doSetor ? 'Meus setores' : 'Toda a EJ'}</SelectItem>
+                  {(doSetor ? setoresQueDirijo : (setores.atual ?? [])).map((s) => (
                     <SelectItem key={s} value={s}>
                       {s}
                     </SelectItem>
@@ -271,7 +272,7 @@ function VisaoGeral() {
             </CardHeader>
             <CardContent>
               <Carregavel carga={rankingSetores} esqueleto={esqueletoGrafico}>
-                {(linhas) => <RankingSetores linhas={linhas} meuSetor={perfil === 'diretor_setor' ? eu.setor : undefined} />}
+                {(linhas) => <RankingSetores linhas={linhas} meuSetor={doSetor ? setoresQueDirijo[0] : undefined} />}
               </Carregavel>
             </CardContent>
           </Card>

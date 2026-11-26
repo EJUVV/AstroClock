@@ -8,6 +8,7 @@ import { BarraInferior } from '@/compartilhado/ui/BarraInferior'
 import { BotaoInstalarApp } from '@/compartilhado/ui/instalarApp'
 import { Logo } from '@/compartilhado/ui/Logo'
 import { useMinhaFoto } from '@/compartilhado/ui/preferencias'
+import { nomeDoCargo } from '@/compartilhado/perfis'
 import { useSessao } from '@/compartilhado/ui/RotaProtegida'
 import { Button } from '@/compartilhado/ui/shadcn/button'
 import { Drawer, DrawerContent, DrawerTitle } from '@/compartilhado/ui/shadcn/drawer'
@@ -105,7 +106,7 @@ export function LayoutPainel({
   acoesTopo?: ReactNode
   children: ReactNode
 }) {
-  const { eu } = useSessao()
+  const { eu, cargo, diretorias } = useSessao()
   const foto = useMinhaFoto(eu.email)
   const location = useLocation()
   const [recolhido, setRecolhido] = useState(false)
@@ -203,7 +204,7 @@ export function LayoutPainel({
               <AvatarMembro nome={eu.nome} foto={foto} className="size-9" />
               <div className="hidden leading-tight md:block">
                 <p className="text-sm font-semibold">{eu.nome}</p>
-                <p className="text-xs text-muted-foreground">{eu.email}</p>
+                <p className="text-xs text-muted-foreground">{nomeDoCargo(cargo, diretorias)}</p>
               </div>
             </Link>
           </div>

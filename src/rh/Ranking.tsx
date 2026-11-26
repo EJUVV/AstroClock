@@ -22,7 +22,7 @@ import { EtiquetaSetor } from '@/compartilhado/ui/EtiquetaSetor'
 const CORES_PODIO = ['bg-[#FDE68A] text-[#92400E]', 'bg-[#E5E7EB] text-[#374151]', 'bg-[#FED7AA] text-[#9A3412]']
 
 function Ranking() {
-  const { perfil, eu } = useSessao()
+  const { perfil, setoresQueDirijo } = useSessao()
   const doSetor = perfil === 'diretor_setor'
   const [mes, setMes] = useState(mesAtual())
   const [setor, setSetor] = useState('todos')
@@ -48,15 +48,15 @@ function Ranking() {
             </SelectGroup>
           </SelectContent>
         </Select>
-        {!doSetor && aba === 'membros' && (
+        {(!doSetor || setoresQueDirijo.length > 1) && aba === 'membros' && (
         <Select value={setor} onValueChange={setSetor}>
           <SelectTrigger size="sm" aria-label="Setor">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
-              <SelectItem value="todos">Todos os setores</SelectItem>
-              {(carga.atual?.[1] ?? []).map((s) => (
+              <SelectItem value="todos">{doSetor ? 'Meus setores' : 'Todos os setores'}</SelectItem>
+              {(doSetor ? setoresQueDirijo : (carga.atual?.[1] ?? [])).map((s) => (
                 <SelectItem key={s} value={s}>
                   {s}
                 </SelectItem>
@@ -175,7 +175,7 @@ function Ranking() {
                 <p className="text-sm text-muted-foreground">Média de horas por membro no mês. Quem foi dispensado não entra na conta.</p>
               </div>
               <Carregavel carga={setores} esqueleto={<Skeleton className="h-72 rounded-[24px]" />}>
-                {(linhas) => <RankingSetores linhas={linhas} meuSetor={doSetor ? eu.setor : undefined} />}
+                {(linhas) => <RankingSetores linhas={linhas} meuSetor={doSetor ? setoresQueDirijo[0] : undefined} />}
               </Carregavel>
             </CardContent>
           </Card>

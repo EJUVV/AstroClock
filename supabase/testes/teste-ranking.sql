@@ -2,8 +2,8 @@
 -- AstroClock · teste do ranking com pódio e do ranking dos setores
 -- (seção 12 do regras-de-negocio.md; migração ranking_e_podio)
 -- =============================================================================
--- Rode DEPOIS das migrações do PR #9 (cálculo da semana) e da ranking_e_podio,
--- no SQL Editor. Cria dados de teste (prefixo zz) num mês antigo (março de 2021,
+-- Rode DEPOIS das migrações do PR #9 (cálculo da semana), da ranking_e_podio e
+-- da diretorias_acumuladas, no SQL Editor. Cria dados de teste (prefixo zz) num mês antigo (março de 2021,
 -- com meta própria), confere pelos dois lados (quem deve ver, vê; quem não deve,
 -- não vê) e desfaz tudo no final: não suja o banco.
 -- Terminou com "OK: ranking passou" = passou. Se falhar, a mensagem diz o que
@@ -53,6 +53,10 @@ begin
     (c_dsetor, 'zz Dir A',  'zz.rank.dsetor@ejuvv.com', 'diretor_setor', c_setor_a, true, '2020-01-01'),
     (c_eva,    'zz Eva',    'zz.rank.eva@ejuvv.com',    'membro',        c_setor_b, true, '2020-01-01'),
     (c_rh,     'zz RH',     'zz.rank.rh@ejuvv.com',     'rh',            c_setor_b, true, '2021-03-29');
+
+  -- Desde as diretorias acumuladas, o perfil sozinho não dirige: o diretor do
+  -- setor A precisa da diretoria registrada.
+  insert into public.diretorias (setor_id, membro_id) values (c_setor_a, c_dsetor);
 
   insert into public.metas (horas_total, horas_sede, vigente_desde) values (10, 5, '2021-02-22');
 

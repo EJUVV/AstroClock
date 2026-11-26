@@ -11,6 +11,7 @@ import {
   useFotoEscolhida,
   useFundoAnimado,
 } from '@/compartilhado/ui/preferencias'
+import { nomeDoCargo } from '@/compartilhado/perfis'
 import { useSessao } from '@/compartilhado/ui/RotaProtegida'
 import { Button } from '@/compartilhado/ui/shadcn/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/compartilhado/ui/shadcn/card'
@@ -22,7 +23,7 @@ import { EtiquetaSetor } from '@/compartilhado/ui/EtiquetaSetor'
 const TAMANHO_MAXIMO = 15 * 1024 * 1024
 
 function Configuracoes() {
-  const { eu } = useSessao()
+  const { eu, cargo, diretorias } = useSessao()
   const { pathname } = useLocation()
   const ehDesktop = useEhDesktop()
   const escolhida = useFotoEscolhida(eu.email)
@@ -73,6 +74,7 @@ function Configuracoes() {
               <div className="min-w-0 flex-1">
                 <p className="truncate font-semibold">{eu.nome}</p>
                 <p className="truncate text-sm text-muted-foreground">{eu.email}</p>
+                <p className="truncate text-sm text-muted-foreground">{nomeDoCargo(cargo, diretorias)}</p>
                 <EtiquetaSetor setor={eu.setor} className="max-w-full text-sm text-muted-foreground" />
               </div>
             </div>

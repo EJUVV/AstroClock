@@ -331,12 +331,32 @@ Decidido em 11/11/2026: os e-mails saem por uma conta `@ejuvv.com` do Google Wor
 #### B14. Migrações no `horas-prod`
 
 **O que fazer**
-- Com o Victor, aplicar todas as migrações no `horas-prod`. **Sem o seed.**
-- Cadastrar o primeiro diretor do RH direto no banco (seção 5 do `regras-de-negocio.md`), junto com o Victor.
+- Com o Victor, aplicar todas as migrações no `horas-prod`, **inclusive** a `diretorias_acumuladas` e a `encerrar_diretoria_setor_inativo` (26/11/2026), **antes** de publicar o site de produção: o site novo lê as diretorias no login e, sem elas, ninguém entra. **Sem o seed.**
+- Criar os setores reais (seção 6 do `regras-de-negocio.md`) pelo SQL Editor.
+- Cadastrar o primeiro diretor do RH direto no banco (seção 5 do `regras-de-negocio.md`), junto com o Victor. Desde as diretorias acumuladas, **o perfil `diretor_rh` sozinho não dá os poderes do RH**: os poderes vêm da diretoria do setor RH. Como o `horas-prod` começa vazio, a migração não marcou o setor RH nem registrou diretoria nenhuma. Então, no SQL Editor, depois de criar os setores e o cadastro:
+  1. Marcar o setor RH (pelo site ninguém consegue; conferir antes o nome exato do setor):
+     ```sql
+     update public.setores set eh_rh = true where lower(nome) = 'rh';
+     ```
+  2. Registrar a diretoria do RH do primeiro diretor do RH, com a linha aberta no histórico (`registrado_por` null = direto no banco):
+     ```sql
+     insert into public.diretorias (setor_id, membro_id)
+     select s.id, m.id
+     from public.setores s, public.membros m
+     where s.eh_rh and m.email = '<e-mail do diretor do RH>@ejuvv.com';
+
+     insert into public.historico_diretorias (setor_id, membro_id, inicio)
+     select d.setor_id, d.membro_id, d.desde
+     from public.diretorias d
+     join public.setores s on s.id = d.setor_id
+     where s.eh_rh;
+     ```
+  3. Conferir: `select * from public.diretorias;` mostra 1 linha (o setor RH). **Sem estes passos, ninguém tem os poderes do RH** (cadastrar membros, perfis, metas, férias, requerimentos) e nem o presidente consegue corrigir pelo site, porque marcar o setor RH é só no banco. Os demais diretores de setor o próprio diretor do RH (ou o presidente) atribui depois, pelo site (seção Diretorias, no detalhe do membro).
 
 **Como saber que terminou**
 - `npx supabase migration list` mostra as mesmas migrações no dev e no prod.
 - O prod não tem nenhum dado de teste.
+- O primeiro diretor do RH entra no site de produção com o cargo "Diretor do RH" e consegue cadastrar um membro.
 
 **Depende de**
 - Todas as migrações anteriores aprovadas.

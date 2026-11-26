@@ -1,7 +1,7 @@
 // FALSO: trocar pela versão real (ver docs/arquitetura.md)
 import type { NovoRequerimento, Requerimento } from '../tipos.ts'
 import { ehDiretor, veRequerimentos } from '../perfis.ts'
-import { anexos, apagarAnexosVencidos, atraso, copia, membroLogado, perfilFalso, requerimentos } from './dados-falsos.ts'
+import { anexos, apagarAnexosVencidos, atraso, copia, membroLogado, perfilEfetivoFalso, requerimentos } from './dados-falsos.ts'
 
 const TIPOS_DE_ANEXO = ['application/pdf', 'image/jpeg', 'image/png']
 const TAMANHO_MAXIMO_DO_ANEXO = 5 * 1024 * 1024 // 5 MB
@@ -54,7 +54,7 @@ export async function linkDoAnexo(id: string): Promise<string> {
   await atraso()
   const requerimento = requerimentos.find((q) => q.id === id)
   if (!requerimento) throw new Error('Requerimento não encontrado')
-  const perfil = perfilFalso()
+  const perfil = perfilEfetivoFalso()
   if (requerimento.membroId !== membroLogado().id && !(perfil && veRequerimentos(perfil))) {
     throw new Error('Você não pode abrir este anexo')
   }
