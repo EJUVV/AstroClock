@@ -2,6 +2,7 @@ import { formatarHoras } from '@/compartilhado/datas'
 import type { LinhaPodio } from '@/compartilhado/tipos'
 import { AvatarMembro } from '@/compartilhado/ui/AvatarMembro'
 import { cn } from '@/compartilhado/ui/utils'
+import { EtiquetaSetor } from '@/compartilhado/ui/EtiquetaSetor'
 
 // Ouro, prata e bronze (as mesmas cores do pódio do ranking do RH).
 const CORES_POSICAO = ['bg-[#FDE68A] text-[#92400E]', 'bg-[#E5E7EB] text-[#374151]', 'bg-[#FED7AA] text-[#9A3412]']
@@ -35,7 +36,7 @@ export function ListaPodio({ linhas, destaqueId }: { linhas: LinhaPodio[]; desta
               {l.nome}
               {l.membroId === destaqueId && <span className="font-normal text-muted-foreground"> (você)</span>}
             </p>
-            <p className="truncate text-xs text-muted-foreground">{l.setor}</p>
+            <EtiquetaSetor setor={l.setor} className="max-w-full text-xs text-muted-foreground" />
           </div>
           <span className="shrink-0 text-sm font-bold tabular-nums">{formatarHoras(l.horasTotal)}</span>
         </li>

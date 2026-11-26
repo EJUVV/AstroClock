@@ -33,6 +33,7 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 import { Skeleton } from '@/compartilhado/ui/shadcn/skeleton'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/compartilhado/ui/shadcn/table'
 import { StatusPill } from '@/compartilhado/ui/StatusPill'
+import { EtiquetaSetor } from '@/compartilhado/ui/EtiquetaSetor'
 
 function CadastroMembro({
   aberto,
@@ -260,7 +261,11 @@ function Membros() {
                             </span>
                           </span>
                         </TableCell>
-                        {veTodosOsSetores && <TableCell className="hidden text-muted-foreground md:table-cell">{m.setor}</TableCell>}
+                        {veTodosOsSetores && (
+                          <TableCell className="hidden text-muted-foreground md:table-cell">
+                            <EtiquetaSetor setor={m.setor} />
+                          </TableCell>
+                        )}
                         <TableCell className="hidden md:table-cell">
                           <StatusPill tom={m.perfil === 'membro' ? 'neutro' : 'roxo'}>{NOME_PERFIL[m.perfil]}</StatusPill>
                         </TableCell>

@@ -14,7 +14,7 @@ import {
 import { diaMes, formatarHoras, rotuloSemana, semanaAtual, somarDias } from '@/compartilhado/datas'
 import type { NovoRegistro, Registro } from '@/compartilhado/tipos'
 import { AvatarMembro } from '@/compartilhado/ui/AvatarMembro'
-import { CapsuleBarChart } from '@/compartilhado/ui/CapsuleBarChart'
+import { GraficoColunas } from '@/compartilhado/ui/GraficoColunas'
 import { Carregavel, useCarregar } from '@/compartilhado/ui/demo'
 import { EstadoVazio } from '@/compartilhado/ui/EstadoVazio'
 import { ReasonDialog } from '@/compartilhado/ui/ReasonDialog'
@@ -28,6 +28,7 @@ import { ItemRegistro } from '@/compartilhado/ui/ItemRegistro'
 import { ItemRequerimento } from '@/compartilhado/ui/ItemRequerimento'
 import { corrigeRegistros, ehDiretor, NOME_PERFIL } from '@/compartilhado/perfis'
 import { useSessao } from '@/compartilhado/ui/RotaProtegida'
+import { EtiquetaSetor } from '@/compartilhado/ui/EtiquetaSetor'
 
 const SEMANAS = 8
 
@@ -92,7 +93,7 @@ function DetalheMembro() {
                   </p>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  <StatusPill tom="roxo">{m.setor}</StatusPill>
+                  <EtiquetaSetor setor={m.setor} pilula />
                   <StatusPill tom="neutro">{NOME_PERFIL[m.perfil]}</StatusPill>
                   {m.ativo ? <StatusPill tom="sucesso">Ativo</StatusPill> : <StatusPill tom="neutro">Desativado</StatusPill>}
                 </div>
@@ -115,7 +116,7 @@ function DetalheMembro() {
           <CardContent>
             <Carregavel carga={historico} esqueleto={<Skeleton className="h-56 rounded-2xl" />}>
               {(semanas) => (
-                <CapsuleBarChart
+                <GraficoColunas
                   altura={200}
                   dias={semanas.map((p) => {
                     const s = situacaoDaSemana(p)

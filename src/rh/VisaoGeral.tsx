@@ -30,6 +30,7 @@ import { AvatarMembro } from '@/compartilhado/ui/AvatarMembro'
 import { Carregavel, useCarregar } from '@/compartilhado/ui/demo'
 import { Horas } from '@/compartilhado/ui/Horas'
 import { KpiCard } from '@/compartilhado/ui/KpiCard'
+import { CartaoPico } from '@/compartilhado/ui/CartaoPico'
 import { useSessao } from '@/compartilhado/ui/RotaProtegida'
 import { useEhDesktop } from '@/compartilhado/ui/useEhDesktop'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/compartilhado/ui/shadcn/select'
@@ -40,6 +41,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { StatusPill } from '@/compartilhado/ui/StatusPill'
 import { cn } from '@/compartilhado/ui/utils'
 import { SeletorSemana } from './SeletorSemana'
+import { EtiquetaSetor } from '@/compartilhado/ui/EtiquetaSetor'
 
 // Os gráficos (recharts) são o pacote mais pesado do site: só são baixados no computador, quando aparecem.
 const AreaChartCard = lazy(() => import('@/compartilhado/ui/AreaChartCard').then((m) => ({ default: m.AreaChartCard })))
@@ -158,16 +160,26 @@ function VisaoGeral() {
 
       {/* 4 cartões em telas largas; sem requerimentos (diretor de setor), 3. */}
       <div className={cn('grid grid-cols-1 gap-4 md:grid-cols-2', comRequerimentos ? '2xl:grid-cols-4' : 'xl:grid-cols-3')}>
+        {/* O cartão do pico é mais alto: ocupa duas linhas, e os outros cartões se empilham ao lado dele.
+            Quando todos cabem numa linha só (telas bem largas), volta a ocupar uma. */}
+        <div className={cn('md:row-span-2 [&>*]:h-full', comRequerimentos ? '2xl:row-span-1' : 'xl:row-span-1')}>
         <Carregavel carga={resumo} esqueleto={kpiEsqueleto}>
           {(r) => {
             const diferenca = Math.round((r.pct - r.pctAnterior) * 10) / 10
             const pessoas = r.cumpriu - r.anterior.cumpriu
+            // Estilo "pico" (25/11): o % grande e, em cima, a linha das últimas semanas com a melhor marcada.
+            // Assim o celular também ganha a tendência, que antes só aparecia no gráfico do computador.
             return (
-              <KpiCard
+              <CartaoPico
                 titulo="Cumpriram a meta"
-                valor={`${r.pct.toLocaleString('pt-BR')}%`}
+                descricao={`Últimas ${SEMANAS_NO_GRAFICO} semanas até ${rotuloSemana(semana)}`}
+                valor={r.pct}
+                formatar={(v) => `${(Math.round(v * 10) / 10).toLocaleString('pt-BR')}%`}
+                pontos={serie.status === 'conteudo' ? serie.dados.map((d) => ({ rotulo: d.rotulo, valor: d.valor })) : []}
+                formatarPonto={(v) => `${Math.round(v)}%`}
+                dominioMaximo={100}
                 variacao={{ texto: `${Math.abs(diferenca).toLocaleString('pt-BR')} p.p.`, positiva: diferenca >= 0 }}
-                comparacao={
+                legenda={
                   pessoas === 0
                     ? 'Mesmo número de pessoas que a semana anterior'
                     : `${Math.abs(pessoas)} ${Math.abs(pessoas) === 1 ? 'pessoa' : 'pessoas'} a ${pessoas > 0 ? 'mais' : 'menos'} que a semana anterior`
@@ -181,6 +193,7 @@ function VisaoGeral() {
             )
           }}
         </Carregavel>
+        </div>
 
         <Carregavel carga={resumo} esqueleto={kpiEsqueleto}>
           {(r) => (
@@ -353,7 +366,9 @@ function VisaoGeral() {
                             <span className="font-semibold">{l.membro.nome}</span>
                           </span>
                         </TableCell>
-                        <TableCell className="hidden text-muted-foreground xl:table-cell">{l.membro.setor}</TableCell>
+                        <TableCell className="hidden text-muted-foreground xl:table-cell">
+                          <EtiquetaSetor setor={l.membro.setor} />
+                        </TableCell>
                         <TableCell className="text-right">
                           <Horas valor={l.horasSede} className={cn(l.horasSede < l.meta.metaSede && 'text-perigo')} />
                           <span className="text-muted-foreground"> / {l.meta.metaSede === 0 ? 'não exigida' : formatarHoras(l.meta.metaSede)}</span>

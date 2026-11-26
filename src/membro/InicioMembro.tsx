@@ -9,12 +9,12 @@ import {
   MapPinOffIcon,
   SigmaIcon,
   TrophyIcon,
-  UsersIcon,
 } from 'lucide-react'
 import { horasPorDia, minhaPosicaoNoRanking, progressoDaSemana, progressoDoMes } from '@/compartilhado/api/progresso'
 import { quemEstaNaSede } from '@/compartilhado/api/presenca'
 import { podioDoMes } from '@/compartilhado/api/ranking'
 import {
+  diaMes,
   diasCurtos,
   formatarHoras,
   hoje,
@@ -29,7 +29,8 @@ import {
 } from '@/compartilhado/datas'
 import type { HorasDoDia, PodioDoMes, PosicaoRanking, ProgressoSemana } from '@/compartilhado/tipos'
 import { AvatarMembro } from '@/compartilhado/ui/AvatarMembro'
-import { CapsuleBarChart } from '@/compartilhado/ui/CapsuleBarChart'
+import { CartaoPico } from '@/compartilhado/ui/CartaoPico'
+import { GraficoColunas } from '@/compartilhado/ui/GraficoColunas'
 import { CartaoSemana, PilulaSituacao, situacaoDaSemana } from '@/compartilhado/ui/CartaoSemana'
 import { Carregavel, useCarregar, type Carregamento } from '@/compartilhado/ui/demo'
 import { Horas } from '@/compartilhado/ui/Horas'
@@ -223,7 +224,7 @@ function CartaoHorasPorDia({
           ehVazio={(d) => d.every((x) => x.horasTotal === 0)}
         >
           {(dias) => (
-            <CapsuleBarChart
+            <GraficoColunas
               altura={altura}
               dias={dias.map((d, i) => ({
                 rotulo: diasCurtos[i],
@@ -266,6 +267,33 @@ function CartaoRanking({ posicao, podio, euId }: { posicao: Carga<PosicaoRanking
         </Carregavel>
       </CardContent>
     </Card>
+  )
+}
+
+// Total do mês no estilo "pico" (25/11): o número grande e a linha semana a semana, com a melhor semana marcada.
+// Só as semanas que já começaram: as futuras (0h) fariam a linha despencar no fim.
+function CartaoHorasNoMes() {
+  const mes = mesAtual()
+  const carga = useCarregar(() => progressoDoMes(mes), [mes])
+  return (
+    <Carregavel carga={carga} esqueleto={<Skeleton className="h-72 rounded-[24px]" />}>
+      {(semanas) => {
+        const ate = semanas.filter((s) => s.semana <= semanaAtual())
+        const total = ate.reduce((soma, s) => soma + s.horasTotal, 0)
+        const sede = ate.reduce((soma, s) => soma + s.horasSede, 0)
+        return (
+          <CartaoPico
+            titulo="Horas no mês"
+            descricao={`${rotuloMes(mes)} · semana a semana`}
+            valor={total}
+            formatar={formatarHoras}
+            pontos={ate.map((s) => ({ rotulo: diaMes(s.semana), valor: s.horasTotal }))}
+            formatarPonto={formatarHoras}
+            legenda={`${formatarHoras(sede)} na sede e ${formatarHoras(Math.max(0, total - sede))} online`}
+          />
+        )
+      }}
+    </Carregavel>
   )
 }
 
@@ -357,26 +385,9 @@ function InicioMembro() {
               />
             )}
           </Carregavel>
+          {/* Ranking no topo (pedido do Victor em 25/11): o mini pódio já traz a posição de quem está logado. */}
           <div className="lg:col-span-2 xl:col-span-1">
-          <Carregavel carga={posicao} esqueleto={kpiEsqueleto}>
-            {(p) => !p ? (
-              <KpiCard titulo="Posição no ranking" valor="—" comparacao="Você ainda não entra no ranking deste mês" linhas={[]} />
-            ) : (
-              <KpiCard
-                titulo="Posição no ranking"
-                valor={
-                  <>
-                    {p.posicaoEJ}º<span className="text-lg font-semibold text-muted-foreground"> de {p.totalEJ}</span>
-                  </>
-                }
-                comparacao={`Na EJ, em ${rotuloMes(mesDoRanking()).toLowerCase()}`}
-                linhas={[
-                  { icone: UsersIcon, texto: `${p.posicaoSetor}º de ${p.totalSetor} no setor` },
-                  { icone: TrophyIcon, texto: 'Por horas totais' },
-                ]}
-              />
-            )}
-          </Carregavel>
+            <CartaoRanking posicao={posicao} podio={podio} euId={eu.id} />
           </div>
         </div>
 
@@ -385,20 +396,20 @@ function InicioMembro() {
           {cronometro}
         </div>
 
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           <GradeDoMes selecionada={semana} onSelecionar={setSemana} dica="Clique numa semana para ver os números dela acima." />
+          <CartaoHorasNoMes />
           {tempo}
-          <div className="lg:col-span-2 xl:col-span-1">
-            <CartaoSede comBotao={false} />
-          </div>
+          <CartaoSede comBotao={false} />
         </div>
       </>
     )
   }
 
-  // Celular: cartões empilhados. No tablet, em duas colunas.
+  // Celular: cartões empilhados, com o ranking no topo (pedido do Victor em 25/11). No tablet, em duas colunas.
   return (
     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+      <CartaoRanking posicao={posicao} podio={podio} euId={eu.id} />
       <Carregavel carga={progresso} esqueleto={<Skeleton className="h-64 rounded-[24px]" />}>
         {(p) => (
           <div className="flex flex-col gap-2">
@@ -414,7 +425,7 @@ function InicioMembro() {
       {cronometro}
       <CartaoHorasPorDia semana={semana} progresso={progresso} porDia={porDia} />
       <GradeDoMes selecionada={semana} onSelecionar={setSemana} dica="Toque numa semana para ver o detalhe dela no cartão acima." />
-      <CartaoRanking posicao={posicao} podio={podio} euId={eu.id} />
+      <CartaoHorasNoMes />
       {tempo}
       <div className="md:col-span-2">
         <CartaoSede />

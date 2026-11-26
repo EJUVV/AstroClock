@@ -7,6 +7,7 @@ import { Carregavel, useCarregar } from '@/compartilhado/ui/demo'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/compartilhado/ui/shadcn/card'
 import { Skeleton } from '@/compartilhado/ui/shadcn/skeleton'
 import { usePresenca } from './usePresenca'
+import { EtiquetaSetor } from '@/compartilhado/ui/EtiquetaSetor'
 
 function SedeMembro() {
   const { naSede, enviando, alternar } = usePresenca()
@@ -82,7 +83,7 @@ function SedeMembro() {
                       <AvatarMembro nome={p.nome} />
                       <div className="min-w-0 flex-1">
                         <p className="truncate font-semibold">{p.nome}</p>
-                        <p className="text-xs text-muted-foreground">{p.setor}</p>
+                        <EtiquetaSetor setor={p.setor} className="max-w-full text-xs text-muted-foreground" />
                       </div>
                       <span className="rounded-full bg-muted px-2.5 py-1 text-xs font-medium text-muted-foreground">
                         desde {horaDe(p.desde)}

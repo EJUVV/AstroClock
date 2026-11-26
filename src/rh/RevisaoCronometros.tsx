@@ -13,6 +13,7 @@ import { Button } from '@/compartilhado/ui/shadcn/button'
 import { Card, CardContent } from '@/compartilhado/ui/shadcn/card'
 import { Skeleton } from '@/compartilhado/ui/shadcn/skeleton'
 import { StatusPill } from '@/compartilhado/ui/StatusPill'
+import { EtiquetaSetor } from '@/compartilhado/ui/EtiquetaSetor'
 
 function RevisaoCronometros() {
   const [versao, setVersao] = useState(0)
@@ -55,7 +56,7 @@ function RevisaoCronometros() {
                         <AvatarMembro nome={membro?.nome ?? '?'} className="size-11" />
                         <div className="min-w-0 flex-1">
                           <p className="font-semibold">{membro?.nome}</p>
-                          <p className="text-xs text-muted-foreground">{membro?.setor}</p>
+                          {membro && <EtiquetaSetor setor={membro.setor} className="max-w-full text-xs text-muted-foreground" />}
                         </div>
                         <StatusPill tom="alerta">
                           <TimerIcon /> Parou sozinho após 10h
