@@ -29,7 +29,7 @@ import {
 } from '@/compartilhado/datas'
 import type { HorasDoDia, PodioDoMes, PosicaoRanking, ProgressoSemana } from '@/compartilhado/tipos'
 import { AvatarMembro } from '@/compartilhado/ui/AvatarMembro'
-import { CapsuleBarChart } from '@/compartilhado/ui/CapsuleBarChart'
+import { GraficoColunas } from '@/compartilhado/ui/GraficoColunas'
 import { CartaoSemana, PilulaSituacao, situacaoDaSemana } from '@/compartilhado/ui/CartaoSemana'
 import { Carregavel, useCarregar, type Carregamento } from '@/compartilhado/ui/demo'
 import { Horas } from '@/compartilhado/ui/Horas'
@@ -223,7 +223,7 @@ function CartaoHorasPorDia({
           ehVazio={(d) => d.every((x) => x.horasTotal === 0)}
         >
           {(dias) => (
-            <CapsuleBarChart
+            <GraficoColunas
               altura={altura}
               dias={dias.map((d, i) => ({
                 rotulo: diasCurtos[i],

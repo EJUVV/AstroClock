@@ -17,6 +17,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/compartilhado/ui/shadcn/tabs'
 import { StatusPill } from '@/compartilhado/ui/StatusPill'
 import { cn } from '@/compartilhado/ui/utils'
+import { EtiquetaSetor } from '@/compartilhado/ui/EtiquetaSetor'
 
 const CORES_PODIO = ['bg-[#FDE68A] text-[#92400E]', 'bg-[#E5E7EB] text-[#374151]', 'bg-[#FED7AA] text-[#9A3412]']
 
@@ -143,7 +144,9 @@ function Ranking() {
                                   )}
                                 </span>
                               </TableCell>
-                              <TableCell className="hidden text-muted-foreground md:table-cell">{l.membro.setor}</TableCell>
+                              <TableCell className="hidden text-muted-foreground md:table-cell">
+                                <EtiquetaSetor setor={l.membro.setor} />
+                              </TableCell>
                               <TableCell className="text-right">
                                 <Horas valor={l.horasTotal} />
                                 <span className="block text-xs text-muted-foreground sm:hidden">

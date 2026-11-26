@@ -17,6 +17,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Switch } from '@/compartilhado/ui/shadcn/switch'
 import { SeletorTema } from '@/compartilhado/ui/tema'
 import { useEhDesktop } from '@/compartilhado/ui/useEhDesktop'
+import { EtiquetaSetor } from '@/compartilhado/ui/EtiquetaSetor'
 
 const TAMANHO_MAXIMO = 15 * 1024 * 1024
 
@@ -72,7 +73,7 @@ function Configuracoes() {
               <div className="min-w-0 flex-1">
                 <p className="truncate font-semibold">{eu.nome}</p>
                 <p className="truncate text-sm text-muted-foreground">{eu.email}</p>
-                <p className="text-sm text-muted-foreground">{eu.setor}</p>
+                <EtiquetaSetor setor={eu.setor} className="max-w-full text-sm text-muted-foreground" />
               </div>
             </div>
             <input ref={campo} type="file" accept="image/*" className="sr-only" onChange={(e) => void escolher(e)} tabIndex={-1} />

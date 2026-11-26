@@ -40,6 +40,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { StatusPill } from '@/compartilhado/ui/StatusPill'
 import { cn } from '@/compartilhado/ui/utils'
 import { SeletorSemana } from './SeletorSemana'
+import { EtiquetaSetor } from '@/compartilhado/ui/EtiquetaSetor'
 
 // Os gráficos (recharts) são o pacote mais pesado do site: só são baixados no computador, quando aparecem.
 const AreaChartCard = lazy(() => import('@/compartilhado/ui/AreaChartCard').then((m) => ({ default: m.AreaChartCard })))
@@ -353,7 +354,9 @@ function VisaoGeral() {
                             <span className="font-semibold">{l.membro.nome}</span>
                           </span>
                         </TableCell>
-                        <TableCell className="hidden text-muted-foreground xl:table-cell">{l.membro.setor}</TableCell>
+                        <TableCell className="hidden text-muted-foreground xl:table-cell">
+                          <EtiquetaSetor setor={l.membro.setor} />
+                        </TableCell>
                         <TableCell className="text-right">
                           <Horas valor={l.horasSede} className={cn(l.horasSede < l.meta.metaSede && 'text-perigo')} />
                           <span className="text-muted-foreground"> / {l.meta.metaSede === 0 ? 'não exigida' : formatarHoras(l.meta.metaSede)}</span>
