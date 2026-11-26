@@ -1,11 +1,16 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
 import { Navigate } from 'react-router-dom'
 import { meusDados, meuPerfil } from '@/compartilhado/api/auth'
-import type { Membro, Perfil } from '@/compartilhado/tipos'
+import { minhasDiretorias } from '@/compartilhado/api/diretorias'
+import { perfilEfetivo } from '@/compartilhado/perfis'
+import type { Diretoria, Membro, Perfil } from '@/compartilhado/tipos'
 import { LogoIcone } from '@/compartilhado/ui/Logo'
 
 interface Sessao {
-  perfil: Perfil
+  perfil: Perfil // efetivo: quem dirige o setor RH conta como diretor_rh
+  cargo: Perfil // o perfil do cadastro
+  diretorias: Diretoria[]
+  setoresQueDirijo: string[]
   eu: Membro
 }
 
@@ -35,7 +40,14 @@ export function RotaProtegida({ perfis, children }: { perfis: Perfil[]; children
     meuPerfil()
       .then(async (perfil) => {
         if (!perfil || !permitidos.split(',').includes(perfil)) return setSessao('negado')
-        setSessao({ perfil, eu: await meusDados() })
+        const [eu, diretorias] = await Promise.all([meusDados(), minhasDiretorias()])
+        setSessao({
+          perfil: perfilEfetivo(perfil, diretorias),
+          cargo: perfil,
+          diretorias,
+          setoresQueDirijo: diretorias.map((d) => d.setor),
+          eu,
+        })
       })
       .catch(() => setSessao('negado'))
   }, [permitidos])

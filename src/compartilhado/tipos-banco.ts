@@ -311,6 +311,13 @@ export type Database = {
       }
     }
     Functions: {
+      // As 4 funções de diretorias (atribuir_diretoria, minhas_diretorias, remover_diretoria,
+      // situacao_dos_setores) foram escritas à mão, a partir da migração diretorias_acumuladas,
+      // ainda não aplicada ao banco. Gere os tipos de novo depois de aplicá-la.
+      atribuir_diretoria: {
+        Args: { p_membro_id: string; p_setor: string }
+        Returns: undefined
+      }
       abaixo_da_meta: {
         Args: { p_semana: string; p_setor?: string }
         Returns: {
@@ -485,6 +492,16 @@ export type Database = {
           total_setor: number
         }[]
       }
+      minhas_diretorias: {
+        Args: never
+        Returns: {
+          desde: string
+          diretor_id: string
+          diretor_nome: string
+          eh_rh: boolean
+          setor: string
+        }[]
+      }
       percentual_da_semana: {
         Args: { p_semana: string; p_setor?: string }
         Returns: number
@@ -624,6 +641,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      remover_diretoria: { Args: { p_setor: string }; Returns: undefined }
       segunda_da_semana: { Args: { p_dia: string }; Returns: string }
       semanas_seguidas_abaixo: {
         Args: { p_semana: string }
@@ -635,6 +653,16 @@ export type Database = {
           nome: string
           perfil: Database["public"]["Enums"]["perfil"]
           semanas_seguidas: number
+          setor: string
+        }[]
+      }
+      situacao_dos_setores: {
+        Args: never
+        Returns: {
+          desde: string | null
+          diretor_id: string | null
+          diretor_nome: string | null
+          eh_rh: boolean
           setor: string
         }[]
       }
