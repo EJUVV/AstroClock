@@ -24,6 +24,11 @@ export async function meuNome(): Promise<string> {
   return membroLogado().nome
 }
 
+// Na demonstração não há conta Google: o avatar mostra as iniciais (ou a foto escolhida nas Configurações).
+export async function minhaFotoDoGoogle(): Promise<string | null> {
+  return null
+}
+
 export async function meusDados(): Promise<Membro> {
   await atraso()
   return copia(membroLogado())

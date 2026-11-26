@@ -3,7 +3,14 @@ import { useLocation } from 'react-router-dom'
 import { CameraIcon, Trash2Icon } from 'lucide-react'
 import { toast } from 'sonner'
 import { AvatarMembro } from '@/compartilhado/ui/AvatarMembro'
-import { definirFundoAnimado, reduzirImagem, salvarFoto, useFundoAnimado, useMinhaFoto } from '@/compartilhado/ui/preferencias'
+import {
+  definirFundoAnimado,
+  reduzirImagem,
+  salvarFoto,
+  useFotoDoGoogle,
+  useFotoEscolhida,
+  useFundoAnimado,
+} from '@/compartilhado/ui/preferencias'
 import { useSessao } from '@/compartilhado/ui/RotaProtegida'
 import { Button } from '@/compartilhado/ui/shadcn/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/compartilhado/ui/shadcn/card'
@@ -17,7 +24,9 @@ function Configuracoes() {
   const { eu } = useSessao()
   const { pathname } = useLocation()
   const ehDesktop = useEhDesktop()
-  const foto = useMinhaFoto(eu.email)
+  const escolhida = useFotoEscolhida(eu.email)
+  const doGoogle = useFotoDoGoogle()
+  const foto = escolhida ?? doGoogle
   const fundoLigado = useFundoAnimado()
   const campo = useRef<HTMLInputElement>(null)
   const [enviando, setEnviando] = useState(false)
@@ -30,8 +39,8 @@ function Configuracoes() {
     if (arquivo.size > TAMANHO_MAXIMO) return void toast.error('A imagem é muito grande. Use uma de até 15 MB.')
     setEnviando(true)
     try {
-      salvarFoto(eu.email, await reduzirImagem(arquivo))
-      toast.success('Foto de perfil atualizada')
+      if (salvarFoto(eu.email, await reduzirImagem(arquivo))) toast.success('Foto de perfil atualizada')
+      else toast.error('Não foi possível salvar a foto neste navegador. Se estiver numa aba anônima, use uma aba normal.')
     } catch (erro) {
       toast.error((erro as Error).message)
     } finally {
@@ -53,7 +62,9 @@ function Configuracoes() {
         <Card>
           <CardHeader>
             <CardTitle className="text-lg">Perfil</CardTitle>
-            <CardDescription>A foto aparece no topo e no seu painel. Fica salva neste aparelho.</CardDescription>
+            <CardDescription>
+              Por padrão, é a foto da sua conta Google. Se escolher outra, ela fica salva só neste aparelho.
+            </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col gap-5">
             <div className="flex flex-wrap items-center gap-4">
@@ -68,12 +79,17 @@ function Configuracoes() {
             <div className="flex flex-wrap gap-2">
               <Button onClick={() => campo.current?.click()} disabled={enviando}>
                 <CameraIcon />
-                {enviando ? 'Enviando...' : foto ? 'Trocar foto' : 'Escolher foto do computador'}
+                {enviando ? 'Enviando...' : foto ? 'Trocar foto' : 'Escolher foto'}
               </Button>
-              {foto && (
-                <Button variant="outline" onClick={() => salvarFoto(eu.email, null)}>
+              {escolhida && (
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    if (!salvarFoto(eu.email, null)) toast.error('Não foi possível remover a foto neste navegador.')
+                  }}
+                >
                   <Trash2Icon />
-                  Remover foto
+                  {doGoogle ? 'Voltar para a foto do Google' : 'Remover foto'}
                 </Button>
               )}
             </div>

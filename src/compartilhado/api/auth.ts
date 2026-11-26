@@ -56,6 +56,15 @@ export async function meuNome(): Promise<string> {
   return (await meusDados()).nome
 }
 
+// Foto da conta Google de quem entrou (vem na sessão, sem ir ao servidor). null se a conta não tiver foto.
+export async function minhaFotoDoGoogle(): Promise<string | null> {
+  if (loginFalso) return falso.minhaFotoDoGoogle()
+  const { data } = await supabase.auth.getSession()
+  const dados = data.session?.user.user_metadata
+  const foto = dados?.avatar_url ?? dados?.picture
+  return typeof foto === 'string' && foto.startsWith('https://') ? foto : null
+}
+
 export async function meusDados(): Promise<Membro> {
   if (loginFalso) return falso.meusDados()
   const { data, error } = await supabase.rpc('meus_dados').maybeSingle()

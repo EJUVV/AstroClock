@@ -1,7 +1,8 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/compartilhado/ui/shadcn/avatar'
 import { cn } from '@/compartilhado/ui/utils'
 
-// Sem foto, iniciais com um tom fixo por pessoa. A foto da própria pessoa vem das Configurações.
+// Sem foto, iniciais com um tom fixo por pessoa. A foto da própria pessoa é a da conta Google,
+// ou a que ela escolheu nas Configurações (ver useMinhaFoto em preferencias.ts).
 const TONS = [
   'bg-[#EFEAFF] text-[#5B3FD9]',
   'bg-[#E0F2FE] text-[#0369A1]',
@@ -25,7 +26,8 @@ function tom(nome: string): string {
 export function AvatarMembro({ nome, foto, className }: { nome: string; foto?: string | null; className?: string }) {
   return (
     <Avatar className={cn('size-10', className)}>
-      {foto && <AvatarImage src={foto} alt={nome} />}
+      {/* no-referrer: a foto do Google às vezes não carrega quando o navegador diz de qual site veio. */}
+      {foto && <AvatarImage src={foto} alt={nome} referrerPolicy="no-referrer" />}
       <AvatarFallback className={cn('font-semibold', tom(nome))}>{iniciais(nome)}</AvatarFallback>
     </Avatar>
   )

@@ -1,7 +1,8 @@
-import { useSyncExternalStore } from 'react'
+import { useEffect, useState, useSyncExternalStore } from 'react'
+import { minhaFotoDoGoogle } from '@/compartilhado/api/auth'
 
 // Preferências da pessoa guardadas neste aparelho (localStorage). Quando o banco tiver
-// um lugar para foto de perfil, a foto passa a ser enviada para lá.
+// um lugar para foto de perfil, a foto escolhida passa a ser enviada para lá.
 const EVENTO = 'preferencias-mudou'
 
 function ler(chave: string): string | null {
@@ -12,14 +13,17 @@ function ler(chave: string): string | null {
   }
 }
 
-function gravar(chave: string, valor: string | null) {
+// Devolve false se o navegador não deixou gravar (aba anônima, espaço cheio): quem chamou avisa a pessoa.
+function gravar(chave: string, valor: string | null): boolean {
+  let gravou = true
   try {
     if (valor === null) localStorage.removeItem(chave)
     else localStorage.setItem(chave, valor)
   } catch {
-    // Sem localStorage (aba anônima cheia, por exemplo): vale só até recarregar.
+    gravou = false
   }
   window.dispatchEvent(new Event(EVENTO))
+  return gravou
 }
 
 function assinar(aviso: () => void) {
@@ -32,12 +36,40 @@ function assinar(aviso: () => void) {
 }
 
 // ---- Foto de perfil ----
-export function useMinhaFoto(email: string): string | null {
+// Por padrão, a foto da conta Google (regras-de-negocio.md, seção dos selos). A pessoa pode
+// escolher outra nas Configurações; essa fica só neste aparelho.
+
+// A foto que a pessoa escolheu neste aparelho (null = usa a do Google).
+export function useFotoEscolhida(email: string): string | null {
   return useSyncExternalStore(assinar, () => ler(`fotoPerfil:${email}`), () => null)
 }
 
-export function salvarFoto(email: string, foto: string | null) {
-  gravar(`fotoPerfil:${email}`, foto)
+// Lida uma vez por carregamento da página: não muda enquanto a pessoa está logada.
+let fotoDoGoogle: Promise<string | null> | null = null
+
+export function useFotoDoGoogle(): string | null {
+  const [foto, setFoto] = useState<string | null>(null)
+  useEffect(() => {
+    let ativo = true
+    fotoDoGoogle ??= minhaFotoDoGoogle().catch(() => null)
+    void fotoDoGoogle.then((f) => ativo && setFoto(f))
+    return () => {
+      ativo = false
+    }
+  }, [])
+  return foto
+}
+
+// A foto que aparece no avatar: a escolhida, senão a do Google, senão null (iniciais).
+export function useMinhaFoto(email: string): string | null {
+  const escolhida = useFotoEscolhida(email)
+  const doGoogle = useFotoDoGoogle()
+  return escolhida ?? doGoogle
+}
+
+// null volta para a foto do Google. Devolve false se não deu para gravar neste aparelho.
+export function salvarFoto(email: string, foto: string | null): boolean {
+  return gravar(`fotoPerfil:${email}`, foto)
 }
 
 // Corta a imagem em quadrado e reduz para 256 px: a foto do celular tem vários MB e não cabe no localStorage.
