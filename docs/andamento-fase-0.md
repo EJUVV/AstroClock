@@ -1,6 +1,6 @@
 # Andamento da Fase 0
 
-Retrato de onde a Fase 0 parou (atualizado em 25/11/2026). Ao retomar com uma IA, peça para ela ler este arquivo e o [`fase-0.md`](fase-0.md). Quando a Fase 0 terminar, este arquivo pode ser apagado (antes, passe a seção "Ambientes" para o `arquitetura.md` ou o `README.md`).
+Retrato de onde a Fase 0 parou (atualizado em 26/11/2026). Ao retomar com uma IA, peça para ela ler este arquivo e o [`fase-0.md`](fase-0.md). Quando a Fase 0 terminar, este arquivo pode ser apagado (antes, passe a seção "Ambientes" para o `arquitetura.md` ou o `README.md`).
 
 ## Próxima sessão: comece por aqui
 
@@ -38,7 +38,7 @@ As revisões de 23/11 foram feitas pelo Victor e registradas no Notion; em 24/11
   - **Cor de cada setor:** Projetos azul (`#2563eb`), Comercial vermelho (`#e03131`), RH rosa (`#e05ab4`), Gestão e Qualidade verde-água (`#16a888`), Marketing roxo (`#a855f7`). Validadas para daltonismo e contraste nos dois temas (azul e roxo ficam parecidos para quem tem daltonismo, por isso a cor sempre aparece com o nome do setor). Aparecem como bolinha ao lado do nome do setor (`EtiquetaSetor`) no pódio, na sede, em membros, no ranking, na visão geral, na revisão de cronômetros e nas Configurações. Setor criado depois fica cinza. **Ainda podem mudar** depois da conversa do Victor com o time (uma linha em `src/compartilhado/ui/coresSetor.ts`). O vermelho do Comercial é quase o de "abaixo da meta": dá para conviver porque só aparece na bolinha.
   - **Gráficos:** "Horas por dia" e "Últimas 8 semanas" viraram colunas finas com escala em horas e linhas de grade, a partir do zero (`GraficoColunas`, no lugar do `CapsuleBarChart`, que foi apagado). O ranking dos setores virou uma lista com barras horizontais na cor de cada setor.
   - **Ranking do mês no topo do Início do membro:** primeiro cartão no celular; no computador, no lugar do número "Posição no ranking", agora com o mini pódio.
-  - **Cartão no estilo "pico"** (`CartaoPico`, inspirado no "Peak Chart" do 21st.dev, feito à mão em SVG e CSS): "Cumpriram a meta" na Visão geral do RH, com as últimas 8 semanas (o celular passa a ver a tendência), e o cartão novo "Horas no mês" no Início do membro. O gráfico de área do RH no computador continua (compara com o período anterior); se ficar repetitivo, pode sair.
+  - **Cartão no estilo "pico"** (`CartaoPico`, inspirado no "Peak Chart" do 21st.dev, feito à mão em SVG e CSS): "Cumpriram a meta" na Visão geral do RH, com as últimas 8 semanas (o celular passa a ver a tendência), e o cartão novo "Horas no mês" no Início do membro. **Em 26/11 (PR #14, commit `e504741`):** o gráfico de área das 8 semanas do RH no computador saiu, por decisão do Victor (repetia o cartão do pico); no lugar entrou o "Ranking dos setores" do mês, ao lado da rosca "Situação da semana". A série do "Cumpriram a meta" passou a buscar só as 8 semanas que mostra (metade das consultas), e o `AreaChartCard.tsx` foi apagado.
   - Sem biblioteca nova e sem desfoque; com "reduzir movimento", as animações ficam paradas. Testado no navegador (celular e computador, temas claro e escuro).
 
 ### Ranking com pódio (feito em 24/11, na `main` e no `horas-dev` desde 25/11/2026)
