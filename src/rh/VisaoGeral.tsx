@@ -23,9 +23,10 @@ import {
   semanasSeguidasAbaixo,
 } from '@/compartilhado/api/rh'
 import { listarMembros, listarSetores } from '@/compartilhado/api/membros'
+import { rankingDosSetores } from '@/compartilhado/api/ranking'
 import { veRequerimentos } from '@/compartilhado/perfis'
 import type { Perfil } from '@/compartilhado/tipos'
-import { diaMes, formatarHoras, rotuloSemana, semanaAtual, somarDias } from '@/compartilhado/datas'
+import { diaMes, formatarHoras, mesDoRanking, rotuloMes, rotuloSemana, semanaAtual, somarDias } from '@/compartilhado/datas'
 import { AvatarMembro } from '@/compartilhado/ui/AvatarMembro'
 import { Carregavel, useCarregar } from '@/compartilhado/ui/demo'
 import { Horas } from '@/compartilhado/ui/Horas'
@@ -42,9 +43,9 @@ import { StatusPill } from '@/compartilhado/ui/StatusPill'
 import { cn } from '@/compartilhado/ui/utils'
 import { SeletorSemana } from './SeletorSemana'
 import { EtiquetaSetor } from '@/compartilhado/ui/EtiquetaSetor'
+import { RankingSetores } from '@/compartilhado/ui/RankingSetores'
 
 // Os gráficos (recharts) são o pacote mais pesado do site: só são baixados no computador, quando aparecem.
-const AreaChartCard = lazy(() => import('@/compartilhado/ui/AreaChartCard').then((m) => ({ default: m.AreaChartCard })))
 const DonutCard = lazy(() => import('@/compartilhado/ui/DonutCard').then((m) => ({ default: m.DonutCard })))
 const esqueletoGrafico = <Skeleton className="h-80 rounded-[24px]" />
 
@@ -76,11 +77,8 @@ async function resumoGeral(semana: string, setor?: string) {
 
 async function serieDePercentuais(semana: string, setor?: string) {
   const semanas = Array.from({ length: SEMANAS_NO_GRAFICO }, (_, i) => somarDias(semana, -7 * (SEMANAS_NO_GRAFICO - 1 - i)))
-  const [atuais, anteriores] = await Promise.all([
-    Promise.all(semanas.map((s) => percentualDaSemana(s, setor))),
-    Promise.all(semanas.map((s) => percentualDaSemana(somarDias(s, -7 * SEMANAS_NO_GRAFICO), setor))),
-  ])
-  return semanas.map((s, i) => ({ rotulo: diaMes(s), valor: atuais[i], comparacao: anteriores[i] }))
+  const valores = await Promise.all(semanas.map((s) => percentualDaSemana(s, setor)))
+  return semanas.map((s, i) => ({ rotulo: diaMes(s), valor: valores[i] }))
 }
 
 async function quemFicouAbaixo(semana: string, setor?: string) {
@@ -110,7 +108,7 @@ function variacaoDeHoras(atual: number, anterior: number) {
 }
 
 function VisaoGeral() {
-  const { perfil } = useSessao()
+  const { perfil, eu } = useSessao()
   const ehDesktop = useEhDesktop()
   const navigate = useNavigate()
   // Padrão: a última semana encerrada. A semana atual ainda está em andamento.
@@ -124,6 +122,8 @@ function VisaoGeral() {
   const serie = useCarregar(() => serieDePercentuais(semana, filtro), [semana, filtro])
   const abaixo = useCarregar(() => quemFicouAbaixo(semana, filtro), [semana, filtro])
   const pend = useCarregar(() => pendencias(perfil), [perfil])
+  // Só no computador (o cartão não aparece no celular): não busca à toa.
+  const rankingSetores = useCarregar(() => (ehDesktop ? rankingDosSetores(mesDoRanking()) : Promise.resolve([])), [ehDesktop])
   const comRequerimentos = veRequerimentos(perfil)
   const emAndamento = semana === semanaAtual()
 
@@ -255,25 +255,26 @@ function VisaoGeral() {
         </div>
       </div>
 
-      {/* Gráficos: só no computador. No celular, o painel fica com KPIs, pendências e a lista. */}
+      {/* Só no computador. No celular, o painel fica com KPIs, pendências e a lista.
+          O gráfico de área das 8 semanas saiu em 26/11 (repetia o cartão "Cumpriram a meta"); no lugar, o ranking dos setores. */}
       {ehDesktop && (
         <div className="grid gap-4 xl:grid-cols-[1fr_360px]">
-          <Carregavel carga={serie} esqueleto={esqueletoGrafico}>
-            {(dados) => (
-              <Suspense fallback={esqueletoGrafico}>
-                <AreaChartCard
-                  titulo="% que cumpriu a meta, por semana"
-                  descricao={`Últimas ${SEMANAS_NO_GRAFICO} semanas até ${rotuloSemana(semana)}`}
-                  dados={dados}
-                  formatar={(v) => `${Math.round(v)}%`}
-                  rotuloSerie="Período atual"
-                  rotuloComparacao={`${SEMANAS_NO_GRAFICO} semanas anteriores`}
-                  destaque={dados.length - 1}
-                  dominio={[0, 100]}
-                />
-              </Suspense>
-            )}
-          </Carregavel>
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Ranking dos setores</CardTitle>
+              <CardDescription>{rotuloMes(mesDoRanking())} · média de horas por membro, sem os dispensados</CardDescription>
+              <CardAction>
+                <Button asChild variant="outline" size="sm">
+                  <Link to="/rh/ranking">Ver ranking</Link>
+                </Button>
+              </CardAction>
+            </CardHeader>
+            <CardContent>
+              <Carregavel carga={rankingSetores} esqueleto={esqueletoGrafico}>
+                {(linhas) => <RankingSetores linhas={linhas} meuSetor={perfil === 'diretor_setor' ? eu.setor : undefined} />}
+              </Carregavel>
+            </CardContent>
+          </Card>
           <Carregavel carga={resumo} esqueleto={esqueletoGrafico}>
             {(r) => (
               <Suspense fallback={esqueletoGrafico}>
