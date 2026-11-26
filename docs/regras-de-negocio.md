@@ -85,7 +85,16 @@ Definido com a diretora de RH em 07/11/2026.
 
 - Acessam o painel do RH: `rh`, `diretor_rh`, `diretor_setor` e `presidente`. Só o `membro` não acessa.
 - O painel do membro (registrar horas) é de quem tem meta: `membro` e `rh`.
-- **Cada setor tem no máximo um diretor**: um `diretor_setor` por setor e um único `diretor_rh` (o diretor do setor RH). A EJ inteira tem **um único `presidente`**. Confirmado pelo líder do projeto em 09/11/2026.
+- **Diretorias acumuladas.** Decidido pelo líder do projeto em 26/11/2026:
+  - **Cada setor tem no máximo um diretor, mas uma pessoa pode dirigir vários setores** (por exemplo, quando uma diretoria fica vaga e outra pessoa assume até chegar o titular). Quem acumula tem, em cada setor, os mesmos poderes do titular.
+  - **Diretor do RH = quem dirige o setor RH**, inclusive o `presidente`. Os poderes de diretor do RH vêm da diretoria registrada, não do perfil `diretor_rh` sozinho.
+  - Só podem dirigir setores os perfis `diretor_setor`, `diretor_rh` e `presidente`. O `membro` e o `rh` não.
+  - **Registram e tiram diretorias** quem dirige o setor RH e o `presidente`. Se o RH estiver vago, o presidente registra (inclusive a si mesmo). Atribuir um setor que já tem diretor troca o diretor.
+  - Quem dirige vários setores vê, no painel do RH, os membros, as horas e o ranking de todos eles.
+  - Quem é desativado, ou deixa de ter perfil de diretor ou de presidente, **perde as diretorias automaticamente**.
+  - Fica guardado **quem dirigiu cada setor e quando** (histórico).
+  - O cargo aparece completo na tela, por exemplo "Diretor de Projetos e Comercial" ou "Presidente · diretor do RH".
+- A EJ inteira tem **um único `presidente`**. Confirmado pelo líder do projeto em 09/11/2026.
 - **Login apenas com Google**, com contas `@ejuvv.com` (Google Workspace). Não há senha própria nem recuperação de senha. O login **fica salvo** no aparelho, para a pessoa não precisar entrar toda vez.
 - Só entra quem está **cadastrado e ativo** na tabela `membros`. Quem não está cadastrado vê "Acesso negado, procure o RH".
 - **Só o diretor do RH altera o perfil** de alguém.
@@ -97,6 +106,7 @@ Definido com a diretora de RH em 07/11/2026.
 
 - Setores iniciais: **Projetos, Comercial, RH, Marketing, Gestão e Qualidade** (tabela editável pelo diretor do RH e pelo presidente, como no protótipo; confirmado em 09/11/2026).
 - Cada membro pertence a **um setor**. Mudanças de setor ficam em histórico.
+- Diretores e o presidente podem **dirigir vários setores** (seção 5), mas, como todo membro, **pertencem a um só**. Decidido pelo líder do projeto em 26/11/2026.
 - **Membro novo:** a meta começa a valer na **semana seguinte** ao cadastro.
 - **Membro desativado** (saiu da EJUVV):
   - não consegue mais entrar no sistema;

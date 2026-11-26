@@ -81,12 +81,14 @@ Esboço inicial, refinado pelo Bernardo na semana 1. Nomes em snake_case.
 | Tabela | Colunas principais | Membro vê | RH vê |
 | --- | --- | --- | --- |
 | `membros` | `id`, `nome`, `email` (único, @ejuvv.com), `perfil` (`membro`/`rh`/`diretor_rh`/`diretor_setor`/`presidente`), `setor_id`, `ativo`, `data_entrada` | Só a própria linha | Todas (o `diretor_setor`, só as do próprio setor) |
-| `setores` | `id`, `nome`, `ativo` | Todos | Todos (RH edita) |
+| `setores` | `id`, `nome`, `ativo`, `eh_rh` (boolean, padrão `false`, no máximo um `true`: marca o setor RH sem depender do nome) | Todos | Todos (RH edita) |
 | `registros` | `id`, `membro_id`, `inicio`, `fim` (null = cronômetro ativo), `local` (`sede`/`online`), `descricao`, `origem` (`manual`/`cronometro`), `cancelado`, `precisa_revisao`, `criado_em`, `atualizado_em` | Só os próprios | Todos (o `diretor_setor`, só os do próprio setor) |
 | `metas` | `id`, `horas_total`, `horas_sede` (pode ser 0), `vigente_desde` (segunda-feira escolhida pelo diretor, sempre futura), `alterado_por` | Todas | Todas (só `diretor_rh` cria) |
 | `requerimentos` | `id`, `membro_id`, `tipo` (`so_remoto`/`ausencia_total`), `data_inicio`, `data_fim`, `motivo`, `situacao` (`pendente`/`aprovado`/`reprovado`), `anexo_caminho`, `anexo_nome`, `motivo_resposta`, `criado_em`, `respondido_por`, `respondido_em` | Os próprios (e cria) | `rh`, `diretor_rh` e `presidente` veem todos; só `diretor_rh` responde. O `diretor_setor` não vê |
 | `presenca_sede` | `id`, `membro_id`, `entrada`, `saida` (null = está na sede agora) | Quem está na sede agora (só o nome); marca e desmarca só a própria | Todas |
 | `historico_setor` | `id`, `membro_id`, `setor_anterior_id`, `setor_novo_id`, `alterado_em`, `alterado_por` (o banco grava sozinho quando `membros.setor_id` muda; o site só lê) | O próprio | `rh`, `diretor_rh` e `presidente` |
+| `diretorias` | `setor_id` (chave primária, referência a `setores`: um diretor por setor), `membro_id`, `desde`, `registrado_por`. Uma linha = o setor tem diretor; uma pessoa pode ter várias linhas (só `diretor_setor`, `diretor_rh` e `presidente` ativos) | Não | `rh`, `diretor_rh` e `presidente` leem; o `diretor_setor` lê as diretorias atuais. Só as funções do banco gravam |
+| `historico_diretorias` | `id`, `setor_id`, `membro_id`, `inicio`, `fim` (null enquanto vale), `registrado_por`, `encerrado_por` (só as funções do banco gravam) | Não | `rh`, `diretor_rh` e `presidente` |
 | `auditoria` | `id`, `tabela`, `registro_id`, `acao`, `quem`, `quando`, `motivo`, `antes`, `depois` (só as funções do banco gravam) | Não | `rh`, `diretor_rh` e `presidente` leem. O `diretor_setor` não |
 
 **Requerimento de ausência** (seção 7 do `regras-de-negocio.md`): substitui a antiga tabela `dispensas`. Só requerimento `aprovado` muda a meta: `so_remoto` zera a exigência de sede; `ausencia_total` dispensa a semana. Vale para **todas as semanas que as datas tocam, inteiras**, da segunda de `data_inicio` à segunda de `data_fim`. O e-mail vai para todos os membros ativos com perfil `rh` ou `diretor_rh`. Só o `diretor_rh` responde. A reprovação grava `motivo_resposta` e manda e-mail ao membro. A aprovação **apaga o anexo** do Storage e limpa `anexo_caminho`. Ainda depende da diretora de RH ([`pauta-diretora-rh.md`](pauta-diretora-rh.md)): aviso ao membro na aprovação e dispensa direta pelo RH.
@@ -94,6 +96,8 @@ Esboço inicial, refinado pelo Bernardo na semana 1. Nomes em snake_case.
 **Anexo do requerimento:** arquivo em um bucket **privado** do Supabase Storage, com regras de acesso só para quem enviou, para `rh`, `diretor_rh` e `presidente`. A tela abre o arquivo por link temporário (`linkDoAnexo`). Limite técnico inicial: PDF, JPG ou PNG, até 5 MB. **O backup diário só copia o banco, não os arquivos**: é preciso incluir o bucket no backup antes de abrir o anexo em produção.
 
 **Presença na sede** (seção 13 do `regras-de-negocio.md`): não registra horas. Índice único parcial: uma única linha com `saida is null` por membro. Como o membro só vê a própria linha de `membros`, a lista de quem está na sede precisa de uma visão ou função que exponha só o nome e o setor. O sistema desmarca sozinho quem esquecer (tarefa agendada no banco); o horário ainda depende da diretora de RH.
+
+**Diretorias acumuladas** (seção 5 do `regras-de-negocio.md`; desenho em `docs/superpowers/specs/2026-11-26-diretorias-acumuladas-design.md`): a migração nova (depois da `ranking_e_podio`) cria `setores.eh_rh`, `diretorias` e `historico_diretorias`, e faz a carga inicial (cada `diretor_setor` ativo vira diretor do próprio setor; o `diretor_rh` ativo, do setor RH). Funções novas: `setores_que_dirijo()` (conjunto de `setor_id`), `minhas_diretorias()`, `situacao_dos_setores()` (todos os setores, com o diretor atual ou vago; ajuste ao desenho, que previa `diretorias_atuais()`, para a tela mostrar também os setores vagos), `atribuir_diretoria(p_setor_id, p_membro_id)` e `remover_diretoria(p_setor_id)` (só quem dirige o setor RH e o `presidente`; atribuir a um setor que já tem diretor troca o diretor). Mudam de significado: `eh_diretor_rh()` = dirige o setor RH; `eh_rh()` = perfil `rh` ou dirige o setor RH; `ve_tudo()` = perfil `rh` ou `presidente` ou dirige o setor RH. `setor_que_dirijo()` sai, trocada por `setores_que_dirijo()` (leitura de `membros` e `registros`, `resumo_da_semana` e `ranking_do_mes`). O índice de um `diretor_setor` ativo por setor sai (a chave de `diretorias` faz o papel); fica só o de um único `presidente`. Desativar alguém, ou mudar o perfil para `membro` ou `rh`, encerra as diretorias dele (gatilho). A tabela de funções auxiliares abaixo descreve `eh_rh()`, `eh_diretor_rh()`, `ve_tudo()` e `setor_que_dirijo()` como eram antes dessa migração.
 
 Funções auxiliares que já existem no `horas-dev` (conferido em 10/11/2026), todas filtrando pelo e-mail de `auth.jwt()` e `ativo = true`:
 
@@ -294,6 +298,22 @@ export interface HorasDoDia {
   horasSede: number
   horasTotal: number
 }
+
+// Setor dirigido por quem está logado. ehRH: é o setor RH (quem o dirige tem os poderes do diretor do RH).
+export interface Diretoria {
+  setor: string
+  ehRH: boolean
+  diretorId: string
+  diretorNome: string
+  desde: string         // ISO datetime
+}
+
+// Um setor com o diretor atual; diretor = null quando o setor está vago.
+export interface SituacaoSetor {
+  setor: string
+  ehRH: boolean
+  diretor: { id: string; nome: string; desde: string } | null
+}
 ```
 
 Semana com requerimento `so_remoto` aprovado: `metaSede` vem como 0 em `ProgressoSemana`. Semana com `ausencia_total` aprovado: `dispensada` vem como `true`.
@@ -350,6 +370,10 @@ Funções (todas `async`; em erro, lançam `Error` com mensagem em português pr
 | `requerimentos.ts` | `linkDoAnexo(id: string)` | `string` | Guilherme, Johannes | Semana 4 |
 | `rh.ts` | `listarRequerimentos(situacao?: SituacaoRequerimento)` | `Requerimento[]` | Johannes | Semana 3 |
 | `rh.ts` | `responderRequerimento(id: string, aprovar: boolean, motivo?: string)` | `void` | Johannes | Semana 3 |
+| `diretorias.ts` | `minhasDiretorias()` | `Diretoria[]` (setores que o logado dirige; vazio para quem não dirige) | Todos (sessão) | Diretorias acumuladas |
+| `diretorias.ts` | `situacaoDosSetores()` | `SituacaoSetor[]` (todos os setores, com diretor ou vago; lida por quem tem painel do RH) | Johannes | Diretorias acumuladas |
+| `diretorias.ts` | `atribuirDiretoria(setor: string, membroId: string)` | `void` (só quem dirige o RH e o `presidente`; troca o diretor se o setor já tem um) | Johannes | Diretorias acumuladas |
+| `diretorias.ts` | `removerDiretoria(setor: string)` | `void` (só quem dirige o RH e o `presidente`) | Johannes | Diretorias acumuladas |
 | `presenca.ts` | `quemEstaNaSede()` | `PresencaSede[]` | Guilherme, Johannes | Semana 4 |
 | `presenca.ts` | `estouNaSede()` | `boolean` | Guilherme | Semana 4 |
 | `presenca.ts` | `marcarNaSede()` | `void` | Guilherme | Semana 4 |
