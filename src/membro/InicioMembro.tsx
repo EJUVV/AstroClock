@@ -9,7 +9,6 @@ import {
   MapPinOffIcon,
   SigmaIcon,
   TrophyIcon,
-  UsersIcon,
 } from 'lucide-react'
 import { horasPorDia, minhaPosicaoNoRanking, progressoDaSemana, progressoDoMes } from '@/compartilhado/api/progresso'
 import { quemEstaNaSede } from '@/compartilhado/api/presenca'
@@ -357,26 +356,9 @@ function InicioMembro() {
               />
             )}
           </Carregavel>
+          {/* Ranking no topo (pedido do Victor em 25/11): o mini pódio já traz a posição de quem está logado. */}
           <div className="lg:col-span-2 xl:col-span-1">
-          <Carregavel carga={posicao} esqueleto={kpiEsqueleto}>
-            {(p) => !p ? (
-              <KpiCard titulo="Posição no ranking" valor="—" comparacao="Você ainda não entra no ranking deste mês" linhas={[]} />
-            ) : (
-              <KpiCard
-                titulo="Posição no ranking"
-                valor={
-                  <>
-                    {p.posicaoEJ}º<span className="text-lg font-semibold text-muted-foreground"> de {p.totalEJ}</span>
-                  </>
-                }
-                comparacao={`Na EJ, em ${rotuloMes(mesDoRanking()).toLowerCase()}`}
-                linhas={[
-                  { icone: UsersIcon, texto: `${p.posicaoSetor}º de ${p.totalSetor} no setor` },
-                  { icone: TrophyIcon, texto: 'Por horas totais' },
-                ]}
-              />
-            )}
-          </Carregavel>
+            <CartaoRanking posicao={posicao} podio={podio} euId={eu.id} />
           </div>
         </div>
 
@@ -396,9 +378,10 @@ function InicioMembro() {
     )
   }
 
-  // Celular: cartões empilhados. No tablet, em duas colunas.
+  // Celular: cartões empilhados, com o ranking no topo (pedido do Victor em 25/11). No tablet, em duas colunas.
   return (
     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+      <CartaoRanking posicao={posicao} podio={podio} euId={eu.id} />
       <Carregavel carga={progresso} esqueleto={<Skeleton className="h-64 rounded-[24px]" />}>
         {(p) => (
           <div className="flex flex-col gap-2">
@@ -414,7 +397,6 @@ function InicioMembro() {
       {cronometro}
       <CartaoHorasPorDia semana={semana} progresso={progresso} porDia={porDia} />
       <GradeDoMes selecionada={semana} onSelecionar={setSemana} dica="Toque numa semana para ver o detalhe dela no cartão acima." />
-      <CartaoRanking posicao={posicao} podio={podio} euId={eu.id} />
       {tempo}
       <div className="md:col-span-2">
         <CartaoSede />
