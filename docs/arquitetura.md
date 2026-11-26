@@ -307,6 +307,7 @@ Funções (todas `async`; em erro, lançam `Error` com mensagem em português pr
 | `auth.ts` | `meuPerfil()` | `Perfil \| null` | Guilherme, Johannes | Semana 1 |
 | `auth.ts` | `meuNome()` | `string` | Guilherme, Johannes | Semana 1 |
 | `auth.ts` | `meusDados()` | `Membro` | Guilherme, Johannes | Semana 1 |
+| `auth.ts` | `minhaFotoDoGoogle()` | `string \| null` (foto da conta Google, lida da sessão; a foto escolhida nas Configurações fica só no aparelho) | Guilherme | Semana 4 (G12) |
 | `registros.ts` | `buscarMeusRegistros(semana: string)` | `Registro[]` | Guilherme | Meio da semana 2 |
 | `registros.ts` | `criarRegistro(dados: NovoRegistro)` | `Registro` | Guilherme | Meio da semana 2 |
 | `registros.ts` | `editarRegistro(id: string, dados: NovoRegistro)` | `Registro` | Guilherme | Semana 2 |
