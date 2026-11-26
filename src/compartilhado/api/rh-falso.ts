@@ -27,7 +27,7 @@ import {
   membrosElegiveis,
   metaDaSemana,
   metas,
-  perfilFalso,
+  perfilEfetivoFalso,
   progressoDoMembro,
   registros,
   requerimentos,
@@ -41,19 +41,19 @@ import {
 
 // Painel do RH: rh, diretor_rh, presidente e diretor de setor (este só vê o próprio setor).
 function exigirRH(acao: string): void {
-  const perfil = perfilFalso()
+  const perfil = perfilEfetivoFalso()
   if (!perfil || !temPainelRH(perfil)) throw new Error(`Só o RH pode ${acao}`)
 }
 
 // O presidente e o diretor de setor não alteram registros.
 function exigirCorrecao(): void {
-  const perfil = perfilFalso()
+  const perfil = perfilEfetivoFalso()
   if (!perfil || !corrigeRegistros(perfil)) throw new Error('Só o RH pode alterar registros de outros membros')
 }
 
 // Diretor de setor: só os membros dos setores que dirige. Os outros perfis do painel veem todos.
 function noMeuAlcance(membroId: string): boolean {
-  if (perfilFalso() !== 'diretor_setor') return true
+  if (perfilEfetivoFalso() !== 'diretor_setor') return true
   const setor = membros.find((m) => m.id === membroId)?.setor
   return setor !== undefined && setoresDirigidosFalso().includes(setor)
 }
@@ -64,7 +64,7 @@ function exigirAlcance(membroId: string): void {
 
 // Sem setor, a EJ toda. O diretor de setor sempre fica nos setores que dirige.
 function elegiveisNoAlcance(semana: string, setor?: string): Membro[] {
-  const dirigidos = perfilFalso() === 'diretor_setor' ? setoresDirigidosFalso() : null
+  const dirigidos = perfilEfetivoFalso() === 'diretor_setor' ? setoresDirigidosFalso() : null
   return membrosElegiveis(semana).filter((m) => (!dirigidos || dirigidos.includes(m.setor)) && (!setor || m.setor === setor))
 }
 
@@ -190,7 +190,7 @@ export async function rankingDoMes(mes: string): Promise<LinhaRanking[]> {
 // Veem: rh, diretor_rh e presidente. O diretor de setor não vê.
 export async function listarRequerimentos(situacao?: SituacaoRequerimento): Promise<Requerimento[]> {
   await atraso()
-  const perfil = perfilFalso()
+  const perfil = perfilEfetivoFalso()
   if (!perfil || !veRequerimentos(perfil)) throw new Error('Você não pode ver os requerimentos')
   apagarAnexosVencidos()
   return copia(
@@ -204,7 +204,7 @@ export async function listarRequerimentos(situacao?: SituacaoRequerimento): Prom
 // Na aprovação, o anexo é apagado (pode ter dado de saúde); na reprovação, fica guardado por um mês.
 export async function responderRequerimento(id: string, aprovar: boolean, motivo = ''): Promise<void> {
   await atraso()
-  if (perfilFalso() !== 'diretor_rh') throw new Error('Só o diretor do RH aprova ou reprova requerimentos')
+  if (perfilEfetivoFalso() !== 'diretor_rh') throw new Error('Só o diretor do RH aprova ou reprova requerimentos')
   if (!aprovar) exigirMotivo(motivo)
   const requerimento = requerimentos.find((q) => q.id === id)
   if (!requerimento) throw new Error('Requerimento não encontrado')
@@ -234,7 +234,7 @@ export async function listarMetas(): Promise<Metas[]> {
 // A meta de sede pode ser 0 (férias durante o piloto).
 export async function alterarMetas(horasTotal: number, horasSede: number, vigenteDesde: string): Promise<void> {
   await atraso()
-  if (perfilFalso() !== 'diretor_rh') throw new Error('Só o diretor do RH pode alterar as metas')
+  if (perfilEfetivoFalso() !== 'diretor_rh') throw new Error('Só o diretor do RH pode alterar as metas')
   if (!(horasTotal > 0)) throw new Error('A meta total precisa ser maior que zero')
   if (!(horasSede >= 0)) throw new Error('A meta de sede não pode ser negativa')
   if (segundaDaSemana(vigenteDesde) !== vigenteDesde) throw new Error('Escolha a segunda-feira da semana')

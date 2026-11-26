@@ -29,9 +29,11 @@ export function corrigeRegistros(perfil: Perfil): boolean {
   return perfil === 'rh' || perfil === 'diretor_rh'
 }
 
-// Quem dirige o setor RH age como diretor do RH, qualquer que seja o perfil do cadastro.
+// Quem dirige o setor RH age como diretor do RH, qualquer que seja o perfil do cadastro. Um diretor_rh
+// sem a diretoria do RH não tem os poderes dele: age como diretor dos setores que dirige (se dirigir).
 export function perfilEfetivo(perfil: Perfil, diretorias: Diretoria[]): Perfil {
-  return diretorias.some((d) => d.ehRH) ? 'diretor_rh' : perfil
+  if (diretorias.some((d) => d.ehRH)) return 'diretor_rh'
+  return perfil === 'diretor_rh' ? 'diretor_setor' : perfil
 }
 
 // "A", "A e B", "A, B e C".

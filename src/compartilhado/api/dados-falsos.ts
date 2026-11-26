@@ -122,6 +122,16 @@ export const diretoriasFalsas: { setor: string; membroId: string; desde: string 
   { setor: setorRH, membroId: 'm4', desde: '2026-02-02T09:00:00-03:00' },
 ]
 
+// Perfil que vale para as permissões do membro logado: quem dirige o RH age como diretor_rh e um
+// diretor_rh sem o RH age como diretor de setor (mesma regra de perfilEfetivo, no site).
+export function perfilEfetivoFalso(): Perfil | null {
+  const perfil = perfilFalso()
+  if (!perfil) return null
+  const id = membroLogado().id
+  const dirigeRH = diretoriasFalsas.some((d) => d.membroId === id && d.setor === setorRH)
+  return dirigeRH ? 'diretor_rh' : perfil === 'diretor_rh' ? 'diretor_setor' : perfil
+}
+
 // Setores que o membro logado dirige na demonstração.
 export function setoresDirigidosFalso(): string[] {
   const id = membroLogado().id
