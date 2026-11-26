@@ -5,6 +5,7 @@ import { atribuirDiretoria, removerDiretoria, situacaoDosSetores } from '@/compa
 import type { Membro, SituacaoSetor } from '@/compartilhado/tipos'
 import { ConfirmDialog } from '@/compartilhado/ui/ConfirmDialog'
 import { Carregavel, useCarregar } from '@/compartilhado/ui/demo'
+import { useSessao } from '@/compartilhado/ui/RotaProtegida'
 import { Button } from '@/compartilhado/ui/shadcn/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/compartilhado/ui/shadcn/card'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/compartilhado/ui/shadcn/select'
@@ -18,6 +19,7 @@ function mensagemDeErro(e: unknown): string {
 // Setores que um diretor ou o presidente dirige. Só aparece para quem dirige o RH e para o presidente
 // (quem decide as diretorias); a proteção real é a regra do banco.
 export function SecaoDiretorias({ membro }: { membro: Membro }) {
+  const { eu, recarregarSessao } = useSessao()
   const [versao, setVersao] = useState(0)
   const situacao = useCarregar(() => situacaoDosSetores(), [versao])
   const [escolhido, setEscolhido] = useState('')
@@ -31,6 +33,8 @@ export function SecaoDiretorias({ membro }: { membro: Membro }) {
       toast.success(`${membro.nome} agora dirige ${setor}`)
       setEscolhido('')
       setVersao((v) => v + 1)
+      // Mudou as próprias diretorias: o cargo e os poderes da tela mudam junto.
+      if (membro.id === eu.id) await recarregarSessao()
     } catch (e) {
       toast.error(mensagemDeErro(e))
     } finally {
@@ -109,6 +113,8 @@ export function SecaoDiretorias({ membro }: { membro: Membro }) {
                       await removerDiretoria(removendo.setor)
                       toast.success(`${removendo.setor} ficou sem diretor`)
                       setVersao((v) => v + 1)
+                      // Mudou as próprias diretorias: o cargo e os poderes da tela mudam junto.
+                      if (membro.id === eu.id) await recarregarSessao()
                     } catch (e) {
                       toast.error(mensagemDeErro(e))
                     }

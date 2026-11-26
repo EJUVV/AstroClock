@@ -5,7 +5,7 @@ import { toast } from 'sonner'
 import { alterarPerfil, cadastrarMembro, desativarMembro, listarMembros, listarSetores } from '@/compartilhado/api/membros'
 import { situacaoDosSetores } from '@/compartilhado/api/diretorias'
 import { hoje } from '@/compartilhado/datas'
-import { corrigeRegistros, ehDiretor, juntarSetores, NOME_PERFIL } from '@/compartilhado/perfis'
+import { corrigeRegistros, juntarSetores, NOME_PERFIL } from '@/compartilhado/perfis'
 import type { Membro, Perfil, SituacaoSetor } from '@/compartilhado/tipos'
 import { AvatarMembro } from '@/compartilhado/ui/AvatarMembro'
 import { ConfirmDialog } from '@/compartilhado/ui/ConfirmDialog'
@@ -157,7 +157,7 @@ function CadastroMembro({
 function AvisosDiretorias({ membros, situacao }: { membros: Membro[]; situacao: SituacaoSetor[] }) {
   const vagos = situacao.filter((s) => !s.diretor).map((s) => s.setor)
   const comSetor = new Set(situacao.flatMap((s) => (s.diretor ? [s.diretor.id] : [])))
-  const semSetor = membros.filter((m) => m.ativo && ehDiretor(m.perfil) && !comSetor.has(m.id)).map((m) => m.nome)
+  const semSetor = membros.filter((m) => m.ativo && (m.perfil === 'diretor_setor' || m.perfil === 'diretor_rh') && !comSetor.has(m.id)).map((m) => m.nome)
   if (vagos.length === 0 && semSetor.length === 0) return null
   return (
     <div className="flex flex-col gap-1 rounded-2xl border border-alerta/40 bg-alerta-fundo px-4 py-3 text-sm">
