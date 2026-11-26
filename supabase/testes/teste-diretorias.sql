@@ -2,7 +2,8 @@
 -- AstroClock · teste das diretorias acumuladas (vacância)
 -- (seção 5 do regras-de-negocio.md; migração diretorias_acumuladas)
 -- =============================================================================
--- Rode DEPOIS da migração diretorias_acumuladas, no SQL Editor. Cria dados de
+-- Rode DEPOIS das migrações diretorias_acumuladas e
+-- encerrar_diretoria_setor_inativo, no SQL Editor. Cria dados de
 -- teste (prefixo zz), confere pelos dois lados (quem deve poder, pode; quem não
 -- deve, não pode) e desfaz tudo no final: não suja o banco.
 -- Terminou com "OK: diretorias passaram" = passou. Se falhar, a mensagem diz o
@@ -298,7 +299,42 @@ begin
   assert public.eh_diretor_rh(), 'presidente: deveria conseguir assumir o RH vago de novo';
 
   ---------------------------------------------------------------------------
-  -- 8. Como dono do banco: um diretor por setor; desativar ou rebaixar encerra
+  -- 8. Desativar um setor dirigido encerra a diretoria; reativar deixa vago
+  --    (migração encerrar_diretoria_setor_inativo)
+  ---------------------------------------------------------------------------
+  perform public.atribuir_diretoria('zz C', c_dira);   -- DirA passa a dirigir B e C
+
+  update public.setores set ativo = false where id = c_c;
+  get diagnostics n = row_count;
+  assert n = 1, 'presidente: não conseguiu desativar o setor C';
+
+  select count(*) into n from public.diretorias where setor_id = c_c;
+  assert n = 0, 'setor desativado: a diretoria do setor C deveria sumir';
+  select count(*) into n from public.historico_diretorias where setor_id = c_c and fim is null;
+  assert n = 0, 'setor desativado: o histórico do setor C deveria estar fechado';
+  select count(*) into n from public.historico_diretorias
+   where setor_id = c_c and membro_id = c_dira and fim is not null and encerrado_por = c_pres;
+  assert n = 1, 'setor desativado: a diretoria do DirA no setor C deveria estar fechada pelo presidente';
+
+  perform set_config('request.jwt.claims', '{"role":"authenticated","email":"zz.dir.dira@ejuvv.com"}', true);
+  select count(*) into n from public.setores_que_dirijo() t(setor_id) where t.setor_id = c_c;
+  assert n = 0, 'setor desativado: setores_que_dirijo() do DirA ainda traz o setor C';
+  select string_agg(d.setor, ',' order by d.setor) into v_lista from public.minhas_diretorias() d;
+  assert v_lista = 'zz B', format('setor desativado: o DirA deveria ficar só com o B (ficou com %s)', v_lista);
+  select count(*) into n from public.membros where id = c_memc;
+  assert n = 0, 'setor desativado: o DirA continuou vendo o zz MemC (setor C)';
+
+  perform set_config('request.jwt.claims', '{"role":"authenticated","email":"zz.dir.pres@ejuvv.com"}', true);
+  update public.setores set ativo = true where id = c_c;
+  get diagnostics n = row_count;
+  assert n = 1, 'presidente: não conseguiu reativar o setor C';
+  select count(*) into n from public.situacao_dos_setores() s where s.setor = 'zz C' and s.diretor_id is null;
+  assert n = 1, 'setor reativado: o setor C deveria voltar vago';
+  select count(*) into n from public.diretorias where setor_id = c_c;
+  assert n = 0, 'setor reativado: o setor C não deveria ganhar diretor sozinho';
+
+  ---------------------------------------------------------------------------
+  -- 9. Como dono do banco: um diretor por setor; desativar ou rebaixar encerra
   ---------------------------------------------------------------------------
   perform set_config('role', 'none', true);
   perform set_config('request.jwt.claims', '', true);

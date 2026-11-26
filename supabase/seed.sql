@@ -23,8 +23,9 @@
 --   Bruno e Carla  rh fictícios, batem a meta
 --   Diretores  Rafael presidente (Gestão e Qualidade) · Marcos (Comercial),
 --              Paula (Projetos) e Renata (Marketing) diretores de setor ·
---              Antônio, ex-diretor do Comercial, desativado · RH e Gestão e
---              Qualidade sem diretor de setor, de propósito
+--              Antônio, ex-diretor do Comercial, desativado · o RH é
+--              dirigido pelo Victor (diretoria registrada na 3.3.1) e Gestão
+--              e Qualidade fica vago, de propósito
 --   Metas      8h/4h até 2 semanas atrás, depois 10h/5h (testa o histórico)
 --
 -- As datas são relativas à semana atual: tem dados da semana corrente (só o
@@ -89,6 +90,38 @@ select 'Lucas Prado', 'teste.lucas@ejuvv.com', 'membro', s.id,
 from public.setores s
 where s.nome = 'Marketing'
 on conflict do nothing;
+
+
+-- 3.3.1 Setor RH e diretorias (diretorias acumuladas) ---------------------------
+-- Os setores nascem aqui, depois das migrações: a carga inicial da migração
+-- diretorias_acumuladas não acha nada num banco vazio. Então o seed faz o
+-- mesmo que ela: marca o setor RH e registra as diretorias (o diretor_rh
+-- ativo dirige o RH; cada diretor_setor ativo, o próprio setor), com a linha
+-- aberta no histórico. Sem isso ninguém tem os poderes do RH. Gestão e
+-- Qualidade fica vago, de propósito.
+
+update public.setores set eh_rh = true where lower(nome) = 'rh' and not eh_rh;
+
+insert into public.diretorias (setor_id, membro_id, desde)
+select s.id, m.id, now()
+from public.membros m
+cross join public.setores s
+where m.ativo and m.perfil = 'diretor_rh' and s.eh_rh
+on conflict (setor_id) do nothing;
+
+insert into public.diretorias (setor_id, membro_id, desde)
+select m.setor_id, m.id, now()
+from public.membros m
+where m.ativo and m.perfil = 'diretor_setor'
+on conflict (setor_id) do nothing;
+
+insert into public.historico_diretorias (setor_id, membro_id, inicio)
+select d.setor_id, d.membro_id, d.desde
+from public.diretorias d
+where not exists (
+  select 1 from public.historico_diretorias h
+  where h.setor_id = d.setor_id and h.fim is null
+);
 
 
 -- 3.4 Troca de setor: Diego veio do Marketing há 4 semanas (feita pela Carla) --
