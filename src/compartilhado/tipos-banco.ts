@@ -85,6 +85,108 @@ export type Database = {
           },
         ]
       }
+      diretorias: {
+        Row: {
+          desde: string
+          membro_id: string
+          registrado_por: string | null
+          setor_id: string
+        }
+        Insert: {
+          desde?: string
+          membro_id: string
+          registrado_por?: string | null
+          setor_id: string
+        }
+        Update: {
+          desde?: string
+          membro_id?: string
+          registrado_por?: string | null
+          setor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "diretorias_membro_id_fkey"
+            columns: ["membro_id"]
+            isOneToOne: false
+            referencedRelation: "membros"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "diretorias_registrado_por_fkey"
+            columns: ["registrado_por"]
+            isOneToOne: false
+            referencedRelation: "membros"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "diretorias_setor_id_fkey"
+            columns: ["setor_id"]
+            isOneToOne: true
+            referencedRelation: "setores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      historico_diretorias: {
+        Row: {
+          encerrado_por: string | null
+          fim: string | null
+          id: string
+          inicio: string
+          membro_id: string
+          registrado_por: string | null
+          setor_id: string
+        }
+        Insert: {
+          encerrado_por?: string | null
+          fim?: string | null
+          id?: string
+          inicio?: string
+          membro_id: string
+          registrado_por?: string | null
+          setor_id: string
+        }
+        Update: {
+          encerrado_por?: string | null
+          fim?: string | null
+          id?: string
+          inicio?: string
+          membro_id?: string
+          registrado_por?: string | null
+          setor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "historico_diretorias_encerrado_por_fkey"
+            columns: ["encerrado_por"]
+            isOneToOne: false
+            referencedRelation: "membros"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "historico_diretorias_membro_id_fkey"
+            columns: ["membro_id"]
+            isOneToOne: false
+            referencedRelation: "membros"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "historico_diretorias_registrado_por_fkey"
+            columns: ["registrado_por"]
+            isOneToOne: false
+            referencedRelation: "membros"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "historico_diretorias_setor_id_fkey"
+            columns: ["setor_id"]
+            isOneToOne: false
+            referencedRelation: "setores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       historico_setor: {
         Row: {
           alterado_em: string
@@ -271,18 +373,21 @@ export type Database = {
         Row: {
           ativo: boolean
           criado_em: string
+          eh_rh: boolean
           id: string
           nome: string
         }
         Insert: {
           ativo?: boolean
           criado_em?: string
+          eh_rh?: boolean
           id?: string
           nome: string
         }
         Update: {
           ativo?: boolean
           criado_em?: string
+          eh_rh?: boolean
           id?: string
           nome?: string
         }
@@ -311,13 +416,6 @@ export type Database = {
       }
     }
     Functions: {
-      // As 4 funções de diretorias (atribuir_diretoria, minhas_diretorias, remover_diretoria,
-      // situacao_dos_setores) foram escritas à mão, a partir da migração diretorias_acumuladas,
-      // ainda não aplicada ao banco. Gere os tipos de novo depois de aplicá-la.
-      atribuir_diretoria: {
-        Args: { p_membro_id: string; p_setor: string }
-        Returns: undefined
-      }
       abaixo_da_meta: {
         Args: { p_semana: string; p_setor?: string }
         Returns: {
@@ -335,6 +433,10 @@ export type Database = {
           perfil: Database["public"]["Enums"]["perfil"]
           setor: string
         }[]
+      }
+      atribuir_diretoria: {
+        Args: { p_membro_id: string; p_setor: string }
+        Returns: undefined
       }
       cancelar_registro_de_membro: {
         Args: { p_id: string; p_motivo: string }
@@ -387,6 +489,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      dirige_rh: { Args: { p_membro_id: string }; Returns: boolean }
       editar_registro_de_membro: {
         Args: {
           p_descricao?: string
@@ -601,6 +704,7 @@ export type Database = {
           setor_id: string
         }[]
       }
+      remover_diretoria: { Args: { p_setor: string }; Returns: undefined }
       resumo_da_semana: {
         Args: { p_semana: string; p_setor?: string }
         Returns: {
@@ -641,7 +745,6 @@ export type Database = {
           isSetofReturn: false
         }
       }
-      remover_diretoria: { Args: { p_setor: string }; Returns: undefined }
       segunda_da_semana: { Args: { p_dia: string }; Returns: string }
       semanas_seguidas_abaixo: {
         Args: { p_semana: string }
@@ -656,17 +759,17 @@ export type Database = {
           setor: string
         }[]
       }
+      setores_que_dirijo: { Args: never; Returns: string[] }
       situacao_dos_setores: {
         Args: never
         Returns: {
-          desde: string | null
-          diretor_id: string | null
-          diretor_nome: string | null
+          desde: string
+          diretor_id: string
+          diretor_nome: string
           eh_rh: boolean
           setor: string
         }[]
       }
-      setor_que_dirijo: { Args: never; Returns: string }
       ve_tudo: { Args: never; Returns: boolean }
     }
     Enums: {
