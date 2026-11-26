@@ -80,15 +80,15 @@ Esboço inicial, refinado pelo Bernardo na semana 1. Nomes em snake_case.
 
 | Tabela | Colunas principais | Membro vê | RH vê |
 | --- | --- | --- | --- |
-| `membros` | `id`, `nome`, `email` (único, @ejuvv.com), `perfil` (`membro`/`rh`/`diretor_rh`/`diretor_setor`/`presidente`), `setor_id`, `ativo`, `data_entrada` | Só a própria linha | Todas (o `diretor_setor`, só as do próprio setor) |
+| `membros` | `id`, `nome`, `email` (único, @ejuvv.com), `perfil` (`membro`/`rh`/`diretor_rh`/`diretor_setor`/`presidente`), `setor_id`, `ativo`, `data_entrada` | Só a própria linha | Todas (quem dirige setores sem ver tudo, só as dos setores que dirige) |
 | `setores` | `id`, `nome`, `ativo`, `eh_rh` (boolean, padrão `false`, no máximo um `true`: marca o setor RH sem depender do nome) | Todos | Todos (RH edita) |
-| `registros` | `id`, `membro_id`, `inicio`, `fim` (null = cronômetro ativo), `local` (`sede`/`online`), `descricao`, `origem` (`manual`/`cronometro`), `cancelado`, `precisa_revisao`, `criado_em`, `atualizado_em` | Só os próprios | Todos (o `diretor_setor`, só os do próprio setor) |
+| `registros` | `id`, `membro_id`, `inicio`, `fim` (null = cronômetro ativo), `local` (`sede`/`online`), `descricao`, `origem` (`manual`/`cronometro`), `cancelado`, `precisa_revisao`, `criado_em`, `atualizado_em` | Só os próprios | Todos (quem dirige setores sem ver tudo, só os dos setores que dirige) |
 | `metas` | `id`, `horas_total`, `horas_sede` (pode ser 0), `vigente_desde` (segunda-feira escolhida pelo diretor, sempre futura), `alterado_por` | Todas | Todas (só `diretor_rh` cria) |
 | `requerimentos` | `id`, `membro_id`, `tipo` (`so_remoto`/`ausencia_total`), `data_inicio`, `data_fim`, `motivo`, `situacao` (`pendente`/`aprovado`/`reprovado`), `anexo_caminho`, `anexo_nome`, `motivo_resposta`, `criado_em`, `respondido_por`, `respondido_em` | Os próprios (e cria) | `rh`, `diretor_rh` e `presidente` veem todos; só `diretor_rh` responde. O `diretor_setor` não vê |
 | `presenca_sede` | `id`, `membro_id`, `entrada`, `saida` (null = está na sede agora) | Quem está na sede agora (só o nome); marca e desmarca só a própria | Todas |
 | `historico_setor` | `id`, `membro_id`, `setor_anterior_id`, `setor_novo_id`, `alterado_em`, `alterado_por` (o banco grava sozinho quando `membros.setor_id` muda; o site só lê) | O próprio | `rh`, `diretor_rh` e `presidente` |
-| `diretorias` | `setor_id` (chave primária, referência a `setores`: um diretor por setor), `membro_id`, `desde`, `registrado_por`. Uma linha = o setor tem diretor; uma pessoa pode ter várias linhas (só `diretor_setor`, `diretor_rh` e `presidente` ativos) | Não | `rh`, `diretor_rh` e `presidente` leem; o `diretor_setor` lê as diretorias atuais. Só as funções do banco gravam |
-| `historico_diretorias` | `id`, `setor_id`, `membro_id`, `inicio`, `fim` (null enquanto vale), `registrado_por`, `encerrado_por` (só as funções do banco gravam) | Não | `rh`, `diretor_rh` e `presidente` |
+| `diretorias` | `setor_id` (chave primária, referência a `setores`: um diretor por setor), `membro_id`, `desde`, `registrado_por`. Uma linha = o setor tem diretor; uma pessoa pode ter várias linhas (só `diretor_setor`, `diretor_rh` e `presidente` ativos) | Não | Quem tem o painel do RH lê: quem vê tudo (`rh`, `presidente`, quem dirige o setor RH) e quem dirige algum setor (inclusive o `diretor_setor`). Só as funções do banco gravam |
+| `historico_diretorias` | `id`, `setor_id`, `membro_id`, `inicio`, `fim` (null enquanto vale), `registrado_por`, `encerrado_por` (null = direto no banco; só as funções do banco gravam) | Não | Quem tem o painel do RH lê, como em `diretorias` (inclusive o `diretor_setor`) |
 | `auditoria` | `id`, `tabela`, `registro_id`, `acao`, `quem`, `quando`, `motivo`, `antes`, `depois` (só as funções do banco gravam) | Não | `rh`, `diretor_rh` e `presidente` leem. O `diretor_setor` não |
 
 **Requerimento de ausência** (seção 7 do `regras-de-negocio.md`): substitui a antiga tabela `dispensas`. Só requerimento `aprovado` muda a meta: `so_remoto` zera a exigência de sede; `ausencia_total` dispensa a semana. Vale para **todas as semanas que as datas tocam, inteiras**, da segunda de `data_inicio` à segunda de `data_fim`. O e-mail vai para todos os membros ativos com perfil `rh` ou `diretor_rh`. Só o `diretor_rh` responde. A reprovação grava `motivo_resposta` e manda e-mail ao membro. A aprovação **apaga o anexo** do Storage e limpa `anexo_caminho`. Ainda depende da diretora de RH ([`pauta-diretora-rh.md`](pauta-diretora-rh.md)): aviso ao membro na aprovação e dispensa direta pelo RH.
@@ -97,19 +97,21 @@ Esboço inicial, refinado pelo Bernardo na semana 1. Nomes em snake_case.
 
 **Presença na sede** (seção 13 do `regras-de-negocio.md`): não registra horas. Índice único parcial: uma única linha com `saida is null` por membro. Como o membro só vê a própria linha de `membros`, a lista de quem está na sede precisa de uma visão ou função que exponha só o nome e o setor. O sistema desmarca sozinho quem esquecer (tarefa agendada no banco); o horário ainda depende da diretora de RH.
 
-**Diretorias acumuladas** (seção 5 do `regras-de-negocio.md`; desenho em `docs/superpowers/specs/2026-11-26-diretorias-acumuladas-design.md`): a migração nova (depois da `ranking_e_podio`) cria `setores.eh_rh`, `diretorias` e `historico_diretorias`, e faz a carga inicial (cada `diretor_setor` ativo vira diretor do próprio setor; o `diretor_rh` ativo, do setor RH). Funções novas: `setores_que_dirijo()` (conjunto de `setor_id`), `minhas_diretorias()`, `situacao_dos_setores()` (todos os setores, com o diretor atual ou vago; ajuste ao desenho, que previa `diretorias_atuais()`, para a tela mostrar também os setores vagos), `atribuir_diretoria(p_setor_id, p_membro_id)` e `remover_diretoria(p_setor_id)` (só quem dirige o setor RH e o `presidente`; atribuir a um setor que já tem diretor troca o diretor). Mudam de significado: `eh_diretor_rh()` = dirige o setor RH; `eh_rh()` = perfil `rh` ou dirige o setor RH; `ve_tudo()` = perfil `rh` ou `presidente` ou dirige o setor RH. `setor_que_dirijo()` sai, trocada por `setores_que_dirijo()` (leitura de `membros` e `registros`, `resumo_da_semana` e `ranking_do_mes`). O índice de um `diretor_setor` ativo por setor sai (a chave de `diretorias` faz o papel); fica só o de um único `presidente`. Desativar alguém, ou mudar o perfil para `membro` ou `rh`, encerra as diretorias dele (gatilho). A tabela de funções auxiliares abaixo descreve `eh_rh()`, `eh_diretor_rh()`, `ve_tudo()` e `setor_que_dirijo()` como eram antes dessa migração.
+**Diretorias acumuladas** (seção 5 do `regras-de-negocio.md`; desenho em `docs/superpowers/specs/2026-11-26-diretorias-acumuladas-design.md`): a migração nova (depois da `ranking_e_podio`) cria `setores.eh_rh`, `diretorias` e `historico_diretorias`, e faz a carga inicial (cada `diretor_setor` ativo vira diretor do próprio setor; o `diretor_rh` ativo, do setor RH). Funções novas: `setores_que_dirijo()` (conjunto de `setor_id`), `minhas_diretorias()`, `situacao_dos_setores()` (os setores ativos, com o diretor atual ou vago; ajuste ao desenho, que previa `diretorias_atuais()`, para a tela mostrar também os setores vagos), `atribuir_diretoria(p_setor, p_membro_id)` e `remover_diretoria(p_setor)` (`p_setor` é o **nome** do setor, texto, sem diferenciar maiúsculas; só quem dirige o setor RH e o `presidente`; atribuir a um setor que já tem diretor troca o diretor). Mudam de significado: `eh_diretor_rh()` = dirige o setor RH; `eh_rh()` = perfil `rh` ou dirige o setor RH; `ve_tudo()` = perfil `rh` ou `presidente` ou dirige o setor RH. `setor_que_dirijo()` sai, trocada por `setores_que_dirijo()` (leitura de `membros` e `registros`, `resumo_da_semana` e `ranking_do_mes`). O índice de um `diretor_setor` ativo por setor sai (a chave de `diretorias` faz o papel); fica só o de um único `presidente`. Desativar alguém, ou mudar o perfil para `membro` ou `rh`, encerra as diretorias dele (gatilho). A migração seguinte, `encerrar_diretoria_setor_inativo` (decidido pelo líder do projeto em 26/11/2026), faz o mesmo com o setor: desativar um setor encerra a diretoria dele (sai de `diretorias`, o histórico fecha com `encerrado_por` = quem desativou, ou null direto no banco), e reativar deixa o setor vago; `setores_que_dirijo()` e `minhas_diretorias()` ignoram setor inativo.
 
-Funções auxiliares que já existem no `horas-dev` (conferido em 10/11/2026), todas filtrando pelo e-mail de `auth.jwt()` e `ativo = true`:
+**Banco novo (`horas-prod` e `db reset`):** os setores não nascem nas migrações, então a migração não marca o setor RH nem cria diretorias num banco vazio. Depois de criar os setores, é preciso marcar o setor RH (`eh_rh = true`, só direto no banco) e registrar a diretoria do primeiro diretor do RH (linha em `diretorias` e linha aberta em `historico_diretorias`); sem isso ninguém tem os poderes do RH. O passo está na B14 (`tarefas-semanas-2-a-4.md`) e o `seed.sql` faz o mesmo para o `horas-dev`.
+
+Funções auxiliares que já existem no `horas-dev` (conferido em 10/11/2026; atualizado com as diretorias acumuladas em 26/11/2026), todas filtrando pelo e-mail de `auth.jwt()` e `ativo = true`:
 
 | Função | O que devolve |
 | --- | --- |
 | `meu_id()` | O `id` do membro logado |
 | `meu_perfil()` | O perfil do membro logado (usada pelo `auth.ts`) |
 | `meus_dados()` | Nome, e-mail, perfil, setor, ativo e data de entrada (usada pelo `auth.ts`) |
-| `eh_rh()` | Se o perfil é `rh` ou `diretor_rh` |
-| `eh_diretor_rh()` | Se o perfil é `diretor_rh` |
-| `ve_tudo()` | Se o perfil é `rh`, `diretor_rh` ou `presidente` (veem a EJ toda) |
-| `setor_que_dirijo()` | O setor do `diretor_setor` logado (null para os outros perfis) |
+| `eh_rh()` | Se o perfil é `rh` ou se a pessoa dirige o setor RH |
+| `eh_diretor_rh()` | Se a pessoa dirige o setor RH (é o diretor do RH, inclusive o `presidente`); o perfil `diretor_rh` sozinho não basta |
+| `ve_tudo()` | Se o perfil é `rh` ou `presidente`, ou se a pessoa dirige o setor RH (veem a EJ toda) |
+| `setores_que_dirijo()` | Os `setor_id` dos setores ativos que o logado dirige (vazio para quem não dirige nenhum). Trocou a `setor_que_dirijo()`, que saiu |
 | `meu_setor_id()` | O setor de quem está logado, qualquer perfil (criada na B7) |
 | `perfil_tem_meta(perfil)` | Se o perfil tem meta (`membro` e `rh`) |
 | `elegivel_na_semana(...)` | Se o membro conta na meta daquela semana |
@@ -125,12 +127,12 @@ Funções do RH criadas na B7, chamadas pelo site com `supabase.rpc(...)`. Só `
 | `membro` | Só os próprios | Os próprios registros (prazo de 7 dias) |
 | `rh` | Todos | Registros de qualquer um (com motivo), desativar membro, mudar setor |
 | `diretor_rh` | Todos | Tudo do `rh` + cadastrar membro, alterar perfil, metas, responder requerimento |
-| `diretor_setor` | Só os do próprio setor | Nada de outros membros |
+| `diretor_setor` | Só os dos setores que dirige (registrados em `diretorias`) | Nada de outros membros |
 | `presidente` | Todos, inclusive requerimentos e anexos | Nada de outros membros |
 
 Só `membro` e `rh` têm registros de horas e requerimentos: os diretores e o presidente não têm meta.
 
-Restrições previstas: exclusion constraint em `registros` contra sobreposição por `membro_id` (ignorando cancelados); índice único parcial garantindo um único registro com `fim is null` por membro; índice único parcial garantindo no máximo um `diretor_setor` ativo por `setor_id`.
+Restrições previstas: exclusion constraint em `registros` contra sobreposição por `membro_id` (ignorando cancelados); índice único parcial garantindo um único registro com `fim is null` por membro; um diretor por setor garantido pela chave primária de `diretorias` (`setor_id`; desde as diretorias acumuladas, o antigo índice de um `diretor_setor` ativo por setor saiu); índice único parcial garantindo um único `presidente` ativo.
 
 **Registro que passa da meia-noite:** vira duas linhas em `registros`, uma para cada dia. `criarRegistro()`, `editarRegistro()` e `pararCronometro()` devolvem a **primeira parte**, e a tela recarrega a lista depois de salvar. As funções falsas fazem a divisão pelo horário de Brasília (`dividirNaMeiaNoite`); cada parte vira um registro independente, editado ou cancelado sozinho.
 

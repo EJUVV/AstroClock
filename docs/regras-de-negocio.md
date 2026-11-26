@@ -80,7 +80,7 @@ Definido com a diretora de RH em 07/11/2026.
 | `membro` | Sim | Registrar e ver as próprias horas e o próprio progresso |
 | `rh` | Sim | Tudo do membro + painel do RH: ver todos os membros, desativar membros e mudar de setor, ver requerimentos e anexos, revisar cronômetros, lançar, alterar e cancelar registros de outros membros (com motivo) |
 | `diretor_rh` | Não | Painel do RH com tudo do `rh` + **cadastrar membros**, **alterar perfis**, **alterar as metas**, **cadastrar as férias** e **responder requerimentos** |
-| `diretor_setor` | Não | Painel do RH **só com os membros do próprio setor**: acompanhar horas, metas e quem ficou abaixo. Não vê requerimentos nem anexos, não corrige registros e não revisa cronômetros |
+| `diretor_setor` | Não | Painel do RH **só com os membros dos setores que dirige** (um ou vários; ver "Diretorias acumuladas" abaixo): acompanhar horas, metas e quem ficou abaixo. Não vê requerimentos nem anexos, não corrige registros e não revisa cronômetros |
 | `presidente` | Não | Painel do RH com **todos os membros**, inclusive requerimentos e anexos. Revisa cronômetros e lê a auditoria. Não corrige registros |
 
 - Acessam o painel do RH: `rh`, `diretor_rh`, `diretor_setor` e `presidente`. Só o `membro` não acessa.
@@ -92,6 +92,7 @@ Definido com a diretora de RH em 07/11/2026.
   - **Registram e tiram diretorias** quem dirige o setor RH e o `presidente`. Se o RH estiver vago, o presidente registra (inclusive a si mesmo). Atribuir um setor que já tem diretor troca o diretor.
   - Quem dirige vários setores vê, no painel do RH, os membros, as horas e o ranking de todos eles.
   - Quem é desativado, ou deixa de ter perfil de diretor ou de presidente, **perde as diretorias automaticamente**.
+  - **Desativar um setor encerra a diretoria dele** automaticamente (o histórico fica). Reativar o setor não devolve o diretor: o setor volta vago, até alguém ser atribuído. Decidido pelo líder do projeto em 26/11/2026.
   - Fica guardado **quem dirigiu cada setor e quando** (histórico).
   - O cargo aparece completo na tela, por exemplo "Diretor de Projetos e Comercial" ou "Presidente · diretor do RH".
 - A EJ inteira tem **um único `presidente`**. Confirmado pelo líder do projeto em 09/11/2026.
@@ -99,7 +100,7 @@ Definido com a diretora de RH em 07/11/2026.
 - Só entra quem está **cadastrado e ativo** na tabela `membros`. Quem não está cadastrado vê "Acesso negado, procure o RH".
 - **Só o diretor do RH altera o perfil** de alguém.
 - **Só o diretor do RH** cadastra membros. Desativar e mudar de setor: `rh` e `diretor_rh`.
-- O primeiro diretor do RH é cadastrado diretamente no banco pelo líder do projeto.
+- O primeiro diretor do RH é cadastrado diretamente no banco pelo líder do projeto: além do cadastro, ele marca o setor RH e registra a diretoria do RH dessa pessoa (sem a diretoria, o perfil `diretor_rh` sozinho não dá os poderes do RH). Passo a passo na B14 (`tarefas-semanas-2-a-4.md`).
 - Quem tem perfil `rh` também registra horas e **está sujeito à meta**. O `diretor_rh` não.
 
 ## 6. Membros e setores
@@ -145,7 +146,7 @@ Substitui a antiga "dispensa de semana inteira registrada pelo RH".
 - **Percentual de presença** = membros que cumpriram ÷ (membros elegíveis − dispensados). É **por membros, não por horas**.
 - Membros elegíveis em uma semana: ativos, com perfil `membro` ou `rh`, e cuja meta já começou a valer (cadastrados antes daquela semana).
 - **Médias por membro na semana** (painel do RH): média de horas totais, média de horas na sede e média diária (horas totais ÷ 5 dias úteis). Não contam quem teve a semana dispensada.
-- O painel do RH pode **filtrar por setor**. O `diretor_setor` vê sempre só o próprio setor.
+- O painel do RH pode **filtrar por setor**. O `diretor_setor` vê sempre só os setores que dirige.
 - Horas acima de 10 valem só para a própria semana (não acumulam para a seguinte), mas **entram nos totais** de mês, trimestre e ano.
 - **Semana entre dois meses** conta para o mês da **segunda-feira**. Trimestre e ano seguem o calendário normal.
 - Os totais **nunca são armazenados**: sempre calculados a partir dos registros.
@@ -182,7 +183,7 @@ Substitui a antiga "dispensa de semana inteira registrada pelo RH".
 - Ordem: **horas totais**; desempate por **horas na sede**; dispensados no fim. Empate nas duas divide a posição.
 - No ranking do mês, "dispensado" é quem teve **todas as semanas do mês** dispensadas.
 - **O RH** (`rh`, `diretor_rh`) e o `presidente` veem o ranking completo.
-- O `diretor_setor` vê o ranking do **próprio setor**. Respondido pelo líder do projeto em 09/11/2026.
+- O `diretor_setor` vê o ranking dos **setores que dirige** (a posição dentro de cada setor). Respondido pelo líder do projeto em 09/11/2026 (era o próprio setor; com as diretorias acumuladas, de 26/11/2026, vale para cada setor que dirige).
 - **O membro** (e o `rh`, no próprio painel de membro) vê o **pódio da EJ (5 primeiros)** e o **pódio do setor (3 primeiros)**, com **nome, setor e horas**, e a própria posição na EJ e no setor, com quantas horas faltam para entrar no pódio. O pódio mostra só quem tem horas no mês; com empate na última vaga, todos os empatados aparecem. Decidido pelo líder do projeto em 24/11/2026.
 
 ### Ranking dos setores

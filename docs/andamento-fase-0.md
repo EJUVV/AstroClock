@@ -6,6 +6,14 @@ Retrato de onde a Fase 0 parou (atualizado em 26/11/2026). Ao retomar com uma IA
 
 Onde paramos (25/11/2026, semana 4): **o cálculo semanal (B9), o cronômetro que para sozinho (B10), as correções da B7 (B7.1), a G10, a J5, a G13 e o ranking com pódio estão na `main` e no `horas-dev`.** A G12 (Configurações) também entrou (PR #12), e o login com Google já passa na produção (Google Cloud acertado em 25/11 à noite). Falta trocar os painéis pelo cálculo real (G11 do membro e J10 do RH), a tela de mudar setor (J4) e levar tudo para o `horas-prod` (B14). O acompanhamento das tarefas está no Notion (Quadro de Sprints, projeto AstroClock). As regras estão fechadas no [`regras-de-negocio.md`](regras-de-negocio.md).
 
+### Feito em 26/11/2026
+
+- **Diretorias acumuladas** (regra decidida pelo líder do projeto em 26/11; seção 5 do [`regras-de-negocio.md`](regras-de-negocio.md); desenho em `docs/superpowers/specs/2026-11-26-diretorias-acumuladas-design.md`): feitas na branch `feat/diretorias-acumuladas` (banco, site e documentação). A migração `20261126182603_diretorias_acumuladas` foi **aplicada no `horas-dev`** e as 3 suítes passaram no SQL Editor (`teste.sql`, `teste-ranking.sql` e `teste-diretorias.sql`); tipos do banco gerados de novo.
+- **Setor desativado encerra a diretoria** (decidido pelo líder do projeto em 26/11, na revisão final): migração nova `20261126210425_encerrar_diretoria_setor_inativo` e caso novo na `teste-diretorias.sql`. **Ainda não aplicada no `horas-dev`**: aplicar e rodar a `teste-diretorias.sql` de novo antes do merge.
+- **Como ficou o `horas-dev`:** os setores **RH e Gestão e Qualidade estão vagos** (sem diretor). Para testar, o **perfil do Victor virou `presidente`** no `horas-dev`, e o presidente do seed (Rafael Souza) foi desativado (só pode haver um presidente ativo).
+- **B14 (atenção):** tem que levar **as duas migrações** (`diretorias_acumuladas` e `encerrar_diretoria_setor_inativo`) **antes** de publicar o site de produção (sem elas o login novo falha), e depois os **passos manuais do RH** no SQL Editor: marcar o setor RH (`eh_rh = true`) e registrar a diretoria do primeiro diretor do RH (linha em `diretorias` e linha aberta em `historico_diretorias`). Sem isso ninguém tem os poderes do RH. Passo a passo na B14 ([`tarefas-semanas-2-a-4.md`](tarefas-semanas-2-a-4.md)); o `seed.sql` faz o mesmo para um banco novo.
+- **Falta:** abrir o PR da `feat/diretorias-acumuladas` para a `main` (revisão pelo Victor).
+
 ### Revisão de 23/11 e conferência de 24/11/2026 (início da semana 4)
 
 As revisões de 23/11 foram feitas pelo Victor e registradas no Notion; em 24/11 a IA passou o resumo para cá e conferiu o GitHub, o `horas-dev` (só leitura) e o DNS.
