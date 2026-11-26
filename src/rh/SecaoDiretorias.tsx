@@ -19,7 +19,7 @@ function mensagemDeErro(e: unknown): string {
 // Setores que um diretor ou o presidente dirige. Só aparece para quem dirige o RH e para o presidente
 // (quem decide as diretorias); a proteção real é a regra do banco.
 export function SecaoDiretorias({ membro }: { membro: Membro }) {
-  const { eu, recarregarSessao } = useSessao()
+  const { recarregarSessao } = useSessao()
   const [versao, setVersao] = useState(0)
   const situacao = useCarregar(() => situacaoDosSetores(), [versao])
   const [escolhido, setEscolhido] = useState('')
@@ -33,8 +33,9 @@ export function SecaoDiretorias({ membro }: { membro: Membro }) {
       toast.success(`${membro.nome} agora dirige ${setor}`)
       setEscolhido('')
       setVersao((v) => v + 1)
-      // Mudou as próprias diretorias: o cargo e os poderes da tela mudam junto.
-      if (membro.id === eu.id) await recarregarSessao()
+      // Pode mudar as diretorias de quem está logado (o novo diretor, ou quem dirigia o setor, como o
+      // presidente que passa o RH): recarrega sempre, para o cargo e os poderes da tela mudarem junto.
+      await recarregarSessao()
     } catch (e) {
       toast.error(mensagemDeErro(e))
     } finally {
@@ -113,8 +114,8 @@ export function SecaoDiretorias({ membro }: { membro: Membro }) {
                       await removerDiretoria(removendo.setor)
                       toast.success(`${removendo.setor} ficou sem diretor`)
                       setVersao((v) => v + 1)
-                      // Mudou as próprias diretorias: o cargo e os poderes da tela mudam junto.
-                      if (membro.id === eu.id) await recarregarSessao()
+                      // Pode ser a diretoria de quem está logado: recarrega sempre (cargo e poderes da tela).
+                      await recarregarSessao()
                     } catch (e) {
                       toast.error(mensagemDeErro(e))
                     }

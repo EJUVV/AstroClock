@@ -12,7 +12,7 @@ interface Sessao {
   diretorias: Diretoria[]
   setoresQueDirijo: string[]
   eu: Membro
-  recarregarSessao: () => Promise<void> // depois de mudar as próprias diretorias
+  recarregarSessao: () => Promise<void> // depois de mudar diretorias (as próprias ou as de outro)
 }
 
 const ContextoSessao = createContext<Sessao | null>(null)
