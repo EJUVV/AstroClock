@@ -408,7 +408,7 @@ begin
 
   assert public.meu_id() = c_dsetor,               'diretor_setor: meu_id() errado';
   assert public.meu_perfil() = 'diretor_setor',    'diretor_setor: meu_perfil() errado';
-  assert (select array_agg(x) from public.setores_que_dirijo() x) = array[c_setor_a],
+  assert (select array_agg(q.setor_id) from public.setores_que_dirijo() q(setor_id)) = array[c_setor_a],
                                                    'diretor_setor: setores_que_dirijo() errado';
   assert not public.eh_rh(),                       'diretor_setor: eh_rh() deveria ser false';
   assert not public.ve_tudo(),                     'diretor_setor: ve_tudo() deveria ser false';
