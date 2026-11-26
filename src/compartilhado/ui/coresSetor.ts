@@ -4,8 +4,8 @@
 // Setor que não está aqui (criado depois pelo diretor do RH) fica cinza: nunca gerar uma cor nova automaticamente.
 const CORES: Record<string, string> = {
   projetos: '#2563eb', // azul
-  comercial: '#e8572f', // vermelho coral (diferente do vermelho de "abaixo da meta")
-  rh: '#db5aa6', // rosa
+  comercial: '#e03131', // vermelho (pedido do Victor; perto do vermelho de "abaixo da meta", por isso só na bolinha ao lado do nome)
+  rh: '#e05ab4', // rosa (um pouco mais quente, para não se confundir com o vermelho do Comercial)
   'gestao e qualidade': '#16a888', // verde-água (diferente do verde de "cumpriu")
   marketing: '#a855f7', // roxo
 }
