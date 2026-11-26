@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react'
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { BellIcon, ClockIcon, FileTextIcon, LayoutDashboardIcon, MapPinIcon, SearchIcon, TargetIcon, TimerIcon, TrophyIcon, UsersIcon } from 'lucide-react'
 import { cronometrosEmRevisao, listarRequerimentos } from '@/compartilhado/api/rh'
-import { veRequerimentos } from '@/compartilhado/perfis'
-import type { Membro, Perfil } from '@/compartilhado/tipos'
+import { juntarSetores, veRequerimentos } from '@/compartilhado/perfis'
+import type { Perfil } from '@/compartilhado/tipos'
 import { BotaoSedeTopo, ProvedorPresenca } from '@/membro/usePresenca'
 import { LayoutPainel, type ItemMenu, type TituloPagina } from '@/compartilhado/ui/LayoutPainel'
 import { useSessao } from '@/compartilhado/ui/RotaProtegida'
@@ -11,12 +11,13 @@ import { Button } from '@/compartilhado/ui/shadcn/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/compartilhado/ui/shadcn/popover'
 
 // O diretor de setor vê só o próprio setor; o presidente e o RH veem a EJ toda.
-function titulos(perfil: Perfil, eu: Membro): TituloPagina[] {
-  const alvo = perfil === 'diretor_setor' ? `o setor ${eu.setor}` : 'a EJ'
+function titulos(perfil: Perfil, setoresQueDirijo: string[]): TituloPagina[] {
+  const meus = juntarSetores(setoresQueDirijo) || 'seu setor'
+  const alvo = perfil === 'diretor_setor' ? (setoresQueDirijo.length > 1 ? `os setores ${meus}` : setoresQueDirijo.length === 1 ? `o setor ${meus}` : meus) : 'a EJ'
   const membros =
     perfil === 'diretor_rh' ? 'Cadastre, encontre e desative membros.'
     : perfil === 'rh' ? 'Encontre e desative membros.'
-    : perfil === 'diretor_setor' ? `Os membros de ${eu.setor}.`
+    : perfil === 'diretor_setor' ? `Os membros de ${meus}.`
     : 'Encontre os membros da EJ.'
   return [
     { prefixo: '/rh/membros/', titulo: 'Detalhe do membro', subtitulo: 'Semanas, registros e requerimentos de uma pessoa.' },
@@ -40,7 +41,7 @@ const SECAO: Record<Perfil, string> = {
 }
 
 function PainelRH() {
-  const { perfil, eu } = useSessao()
+  const { perfil, setoresQueDirijo } = useSessao()
   const location = useLocation()
   const navigate = useNavigate()
   const [pendentes, setPendentes] = useState(0)
@@ -73,7 +74,7 @@ function PainelRH() {
       itens={itens}
       itensBarra={itensBarra}
       itensRodape={perfil === 'rh' ? [{ para: '/membro', rotulo: 'Minhas horas', icone: ClockIcon }] : []}
-      titulos={titulos(perfil, eu)}
+      titulos={titulos(perfil, setoresQueDirijo)}
       acoesTopo={
         <>
           <BotaoSedeTopo />

@@ -23,7 +23,7 @@ import {
   dataEmBrasilia,
   dividirNaMeiaNoite,
   membros,
-  membroLogado,
+  setoresDirigidosFalso,
   membrosElegiveis,
   metaDaSemana,
   metas,
@@ -51,20 +51,21 @@ function exigirCorrecao(): void {
   if (!perfil || !corrigeRegistros(perfil)) throw new Error('Só o RH pode alterar registros de outros membros')
 }
 
-// Diretor de setor: só os membros do próprio setor. Os outros perfis do painel veem todos.
+// Diretor de setor: só os membros dos setores que dirige. Os outros perfis do painel veem todos.
 function noMeuAlcance(membroId: string): boolean {
   if (perfilFalso() !== 'diretor_setor') return true
-  return membros.find((m) => m.id === membroId)?.setor === membroLogado().setor
+  const setor = membros.find((m) => m.id === membroId)?.setor
+  return setor !== undefined && setoresDirigidosFalso().includes(setor)
 }
 
 function exigirAlcance(membroId: string): void {
-  if (!noMeuAlcance(membroId)) throw new Error('Este membro não é do seu setor')
+  if (!noMeuAlcance(membroId)) throw new Error('Este membro não é de um setor que você dirige')
 }
 
-// Sem setor, a EJ toda. O diretor de setor sempre fica no próprio setor.
+// Sem setor, a EJ toda. O diretor de setor sempre fica nos setores que dirige.
 function elegiveisNoAlcance(semana: string, setor?: string): Membro[] {
-  const filtro = perfilFalso() === 'diretor_setor' ? membroLogado().setor : setor
-  return membrosElegiveis(semana).filter((m) => !filtro || m.setor === filtro)
+  const dirigidos = perfilFalso() === 'diretor_setor' ? setoresDirigidosFalso() : null
+  return membrosElegiveis(semana).filter((m) => (!dirigidos || dirigidos.includes(m.setor)) && (!setor || m.setor === setor))
 }
 
 function exigirMotivo(motivo: string): void {

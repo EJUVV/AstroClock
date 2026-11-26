@@ -34,6 +34,11 @@ export function perfilEfetivo(perfil: Perfil, diretorias: Diretoria[]): Perfil {
   return diretorias.some((d) => d.ehRH) ? 'diretor_rh' : perfil
 }
 
+// "A", "A e B", "A, B e C".
+export function juntarSetores(setores: string[]): string {
+  return setores.length > 1 ? `${setores.slice(0, -1).join(', ')} e ${setores[setores.length - 1]}` : (setores[0] ?? '')
+}
+
 // Cargo para mostrar na tela, a partir do perfil do cadastro e das diretorias.
 export function nomeDoCargo(perfil: Perfil, diretorias: Diretoria[]): string {
   const dirigeRH = diretorias.some((d) => d.ehRH)
@@ -42,7 +47,7 @@ export function nomeDoCargo(perfil: Perfil, diretorias: Diretoria[]): string {
   if (perfil === 'diretor_rh' || perfil === 'diretor_setor') {
     if (diretorias.length === 0) return 'Diretor de setor (sem setor)'
     if (outros.length === 0) return 'Diretor do RH'
-    const lista = outros.length > 1 ? `${outros.slice(0, -1).join(', ')} e ${outros[outros.length - 1]}` : outros[0]
+    const lista = juntarSetores(outros)
     return `Diretor de ${lista}${dirigeRH ? ' · diretor do RH' : ''}`
   }
   return NOME_PERFIL[perfil]

@@ -27,6 +27,7 @@ import { FormRegistro } from '@/compartilhado/ui/FormRegistro'
 import { ItemRegistro } from '@/compartilhado/ui/ItemRegistro'
 import { ItemRequerimento } from '@/compartilhado/ui/ItemRequerimento'
 import { corrigeRegistros, ehDiretor, NOME_PERFIL } from '@/compartilhado/perfis'
+import { SecaoDiretorias } from './SecaoDiretorias'
 import { useSessao } from '@/compartilhado/ui/RotaProtegida'
 import { EtiquetaSetor } from '@/compartilhado/ui/EtiquetaSetor'
 
@@ -38,7 +39,7 @@ type Acao =
   | { tipo: 'cancelar'; registro: Registro }
 
 function DetalheMembro() {
-  const { perfil } = useSessao()
+  const { perfil, cargo } = useSessao()
   const podeCorrigir = corrigeRegistros(perfil)
   const veRequerimentosDoMembro = perfil !== 'diretor_setor'
   const { id = '' } = useParams()
@@ -102,6 +103,8 @@ function DetalheMembro() {
           )
         }
       </Carregavel>
+
+      {membro.status === 'conteudo' && membro.dados && ehDiretor(membro.dados.perfil) && (perfil === 'diretor_rh' || cargo === 'presidente') && <SecaoDiretorias membro={membro.dados} />}
 
       {membro.status === 'conteudo' && membro.dados && ehDiretor(membro.dados.perfil) ? (
         <EstadoVazio titulo="Diretores não contabilizam horas" descricao="Esta pessoa não tem meta e fica fora do ranking e das métricas." />

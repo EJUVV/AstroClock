@@ -122,6 +122,12 @@ export const diretoriasFalsas: { setor: string; membroId: string; desde: string 
   { setor: setorRH, membroId: 'm4', desde: '2026-02-02T09:00:00-03:00' },
 ]
 
+// Setores que o membro logado dirige na demonstração.
+export function setoresDirigidosFalso(): string[] {
+  const id = membroLogado().id
+  return diretoriasFalsas.filter((d) => d.membroId === id).map((d) => d.setor)
+}
+
 // semanasAtras: 0 = semana atual. dia: 0 = segunda ... 6 = domingo. ate '24:00' = meia-noite do dia seguinte.
 function reg(
   id: string,

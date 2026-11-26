@@ -1,6 +1,6 @@
 // FALSO: versão de demonstração, usada só com VITE_LOGIN_FALSO=true (ver membros.ts)
 import type { Membro, NovoMembro, Perfil } from '../tipos.ts'
-import { atraso, copia, membroLogado, membros, perfilFalso, setores } from './dados-falsos.ts'
+import { atraso, copia, membros, perfilFalso, setoresDirigidosFalso, setores } from './dados-falsos.ts'
 
 function buscarMembro(id: string): Membro {
   const membro = membros.find((m) => m.id === id)
@@ -11,8 +11,8 @@ function buscarMembro(id: string): Membro {
 // O diretor de setor só vê os membros do próprio setor.
 export async function listarMembros(): Promise<Membro[]> {
   await atraso()
-  const setor = perfilFalso() === 'diretor_setor' ? membroLogado().setor : null
-  return copia(membros.filter((m) => !setor || m.setor === setor).sort((a, b) => a.nome.localeCompare(b.nome)))
+  const dirigidos = perfilFalso() === 'diretor_setor' ? setoresDirigidosFalso() : null
+  return copia(membros.filter((m) => !dirigidos || dirigidos.includes(m.setor)).sort((a, b) => a.nome.localeCompare(b.nome)))
 }
 
 // Só o diretor do RH cadastra membros.
