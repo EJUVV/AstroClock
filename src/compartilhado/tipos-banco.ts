@@ -526,7 +526,29 @@ export type Database = {
           setor: string
         }[]
       }
+      ajuste_da_semana: {
+        Args: { p_membro_id: string; p_semana: string }
+        Returns: {
+          dispensada: boolean
+          so_remoto: boolean
+        }[]
+      }
+      ajuste_da_semana_interno: {
+        Args: { p_membro_id: string; p_semana: string }
+        Returns: {
+          dispensada: boolean
+          so_remoto: boolean
+        }[]
+      }
       anexo_apagado: { Args: { p_id: string }; Returns: undefined }
+      anexo_deve_sumir: {
+        Args: {
+          p_respondido_em: string
+          p_situacao: Database["public"]["Enums"]["situacao_requerimento"]
+        }
+        Returns: boolean
+      }
+      anexo_pode_ser_apagado: { Args: { p_caminho: string }; Returns: boolean }
       anexos_para_apagar: {
         Args: never
         Returns: {
@@ -827,6 +849,10 @@ export type Database = {
         }[]
       }
       remover_diretoria: { Args: { p_setor: string }; Returns: undefined }
+      responder_requerimento: {
+        Args: { p_aprovar: boolean; p_id: string; p_motivo?: string }
+        Returns: undefined
+      }
       resumo_da_semana: {
         Args: { p_semana: string; p_setor?: string }
         Returns: {
@@ -844,10 +870,6 @@ export type Database = {
           perfil: Database["public"]["Enums"]["perfil"]
           setor: string
         }[]
-      }
-      responder_requerimento: {
-        Args: { p_aprovar: boolean; p_id: string; p_motivo?: string }
-        Returns: undefined
       }
       revisar_cronometro: {
         Args: { p_aprovar: boolean; p_id: string; p_motivo?: string }
