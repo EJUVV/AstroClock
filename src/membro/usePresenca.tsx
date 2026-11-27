@@ -9,6 +9,8 @@ interface Presenca {
   naSede: boolean | null
   enviando: boolean
   alternar: () => Promise<void>
+  // Lê de novo no banco (outra aba, virada do dia ou o lembrete de "Saí da sede" mudaram o estado).
+  atualizar: () => void
 }
 
 const ContextoPresenca = createContext<Presenca | null>(null)
@@ -19,12 +21,14 @@ export function ProvedorPresenca({ children }: { children: ReactNode }) {
   const [naSede, setNaSede] = useState<boolean | null>(null)
   const [enviando, setEnviando] = useState(false)
 
-  useEffect(() => {
+  const atualizar = useCallback(() => {
     if (!temSede) return
     estouNaSede()
       .then(setNaSede)
       .catch(() => setNaSede(false))
   }, [])
+
+  useEffect(atualizar, [atualizar])
 
   const alternar = useCallback(async () => {
     setEnviando(true)
@@ -40,12 +44,13 @@ export function ProvedorPresenca({ children }: { children: ReactNode }) {
       }
     } catch (e) {
       toast.error((e as Error).message)
+      atualizar() // o botão volta a mostrar o que está no banco
     } finally {
       setEnviando(false)
     }
-  }, [naSede])
+  }, [naSede, atualizar])
 
-  return <ContextoPresenca.Provider value={{ naSede, enviando, alternar }}>{children}</ContextoPresenca.Provider>
+  return <ContextoPresenca.Provider value={{ naSede, enviando, alternar, atualizar }}>{children}</ContextoPresenca.Provider>
 }
 
 export function usePresenca(): Presenca {

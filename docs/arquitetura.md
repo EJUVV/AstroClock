@@ -377,10 +377,10 @@ Funções (todas `async`; em erro, lançam `Error` com mensagem em português pr
 | `diretorias.ts` | `situacaoDosSetores()` | `SituacaoSetor[]` (todos os setores, com diretor ou vago; lida por quem tem painel do RH) | Johannes | Diretorias acumuladas |
 | `diretorias.ts` | `atribuirDiretoria(setor: string, membroId: string)` | `void` (só quem dirige o RH e o `presidente`; troca o diretor se o setor já tem um) | Johannes | Diretorias acumuladas |
 | `diretorias.ts` | `removerDiretoria(setor: string)` | `void` (só quem dirige o RH e o `presidente`) | Johannes | Diretorias acumuladas |
-| `presenca.ts` | `quemEstaNaSede()` | `PresencaSede[]` | Guilherme, Johannes | Semana 4 |
-| `presenca.ts` | `estouNaSede()` | `boolean` | Guilherme | Semana 4 |
-| `presenca.ts` | `marcarNaSede()` | `void` | Guilherme | Semana 4 |
-| `presenca.ts` | `desmarcarNaSede()` | `void` | Guilherme | Semana 4 |
+| `presenca.ts` | `quemEstaNaSede()` | `PresencaSede[]` | Guilherme, Johannes | Real desde 27/11 (B13 e G9) |
+| `presenca.ts` | `estouNaSede()` | `boolean` | Guilherme | Real desde 27/11 (B13 e G9) |
+| `presenca.ts` | `marcarNaSede()` | `void` | Guilherme | Real desde 27/11 (B13 e G9) |
+| `presenca.ts` | `desmarcarNaSede()` | `void` | Guilherme | Real desde 27/11 (B13 e G9) |
 
 Sem `setor`, as funções do painel do RH consideram a EJ toda. Para o `diretor_setor`, elas sempre ficam no setor dele, mesmo que a tela peça outro. `motivo` em `responderRequerimento` é obrigatório na reprovação.
 

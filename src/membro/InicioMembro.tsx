@@ -150,7 +150,7 @@ function GradeDoMes({ selecionada, onSelecionar, dica }: { selecionada: string; 
 
 function CartaoSede({ comBotao = true }: { comBotao?: boolean }) {
   const { naSede, enviando, alternar } = usePresenca()
-  const carga = useCarregar(() => quemEstaNaSede(), [naSede])
+  const carga = useCarregar(() => quemEstaNaSede(), [naSede], 60_000)
   return (
     <Card>
       <CardHeader>

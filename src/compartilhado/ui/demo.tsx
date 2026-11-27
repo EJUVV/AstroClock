@@ -1,5 +1,5 @@
 // Só do protótipo: força o estado das telas (carregando, erro, vazio) e troca o perfil falso.
-import { createContext, useCallback, useContext, useEffect, useState, type DependencyList, type ReactNode } from 'react'
+import { createContext, useCallback, useContext, useEffect, useRef, useState, type DependencyList, type ReactNode } from 'react'
 import { FlaskConicalIcon } from 'lucide-react'
 import { loginFalso } from '@/compartilhado/api/auth'
 import { Button } from '@/compartilhado/ui/shadcn/button'
@@ -54,14 +54,17 @@ export type Carregamento<T> =
   | { status: 'conteudo'; dados: T }
 
 // Chama uma função de api/ e devolve o estado da tela. O seletor de demonstração pode forçar outro estado.
-export function useCarregar<T>(buscar: () => Promise<T>, deps: DependencyList) {
+// atualizarACada (ms): busca de novo sozinho, sem voltar ao esqueleto (ex.: quem está na sede).
+export function useCarregar<T>(buscar: () => Promise<T>, deps: DependencyList, atualizarACada?: number) {
   const { estado: forcado } = useDemo()
   const [resultado, setResultado] = useState<Carregamento<T>>({ status: 'carregando' })
   const [versao, setVersao] = useState(0)
+  const emSilencio = useRef(false)
 
   useEffect(() => {
     let ativo = true
-    setResultado({ status: 'carregando' })
+    if (!emSilencio.current) setResultado({ status: 'carregando' })
+    emSilencio.current = false
     buscar()
       .then((dados) => ativo && setResultado({ status: 'conteudo', dados }))
       .catch((e: Error) => ativo && setResultado({ status: 'erro', erro: e.message }))
@@ -72,6 +75,15 @@ export function useCarregar<T>(buscar: () => Promise<T>, deps: DependencyList) {
   }, [...deps, versao])
 
   const recarregar = useCallback(() => setVersao((v) => v + 1), [])
+
+  useEffect(() => {
+    if (!atualizarACada) return
+    const t = setInterval(() => {
+      emSilencio.current = true
+      setVersao((v) => v + 1)
+    }, atualizarACada)
+    return () => clearInterval(t)
+  }, [atualizarACada])
 
   let final: Carregamento<T> = resultado
   if (forcado === 'carregando') final = { status: 'carregando' }
