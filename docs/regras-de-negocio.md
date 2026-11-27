@@ -168,7 +168,8 @@ Substitui a antiga "dispensa de semana inteira registrada pelo RH".
 
 - A situação da semana fica explícita:
   - semana encerrada **sem a meta**: **vermelho**;
-  - semana em andamento ainda sem a meta: um indicador de que **ainda não cumpriu**.
+  - semana em andamento ainda sem a meta: um indicador de que **ainda não cumpriu**;
+  - semana em que a pessoa ainda não tinha meta (a meta começa na semana seguinte à entrada, seção 8): **"Sem meta"**, neutro, nunca vermelho (27/11/2026, na revisão da G11).
 - Barras de **quanto do tempo já passou**: do dia, da semana, do mês e do ano (em %), para o membro comparar com as próprias horas.
 - **Gráfico de barras** com as horas feitas por dia. [PENDENTE] Outros gráficos e o conteúdo dos relatórios: há proposta em [`pauta-diretora-rh.md`](pauta-diretora-rh.md), a definir depois.
 - No "% que bateu a meta de sede", quem está com requerimento "só remoto" aprovado **fica fora da conta**.

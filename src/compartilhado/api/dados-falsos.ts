@@ -528,14 +528,18 @@ export function progressoDoMembro(membroId: string, semana: string): ProgressoSe
   const meta = metaDaSemana(semana)
   const dispensada = estaDispensada(membroId, semana)
   const metaSede = temRequerimentoAprovado(membroId, semana, 'so_remoto') ? 0 : meta.horasSede
+  // A meta começa na semana seguinte à entrada (igual ao membrosElegiveis e ao elegivel do banco).
+  const membro = membros.find((m) => m.id === membroId)
+  const semMeta = !membro || membro.dataEntrada >= semana
   return {
     semana,
     horasSede,
     horasTotal,
     metaSede,
     metaTotal: meta.horasTotal,
-    cumpriu: !dispensada && horasTotal >= meta.horasTotal && horasSede >= metaSede,
+    cumpriu: !semMeta && !dispensada && horasTotal >= meta.horasTotal && horasSede >= metaSede,
     dispensada,
+    semMeta,
   }
 }
 

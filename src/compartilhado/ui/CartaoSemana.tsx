@@ -1,4 +1,4 @@
-import { CircleCheckIcon, CircleDashedIcon, CircleXIcon, ShieldCheckIcon, CalendarClockIcon } from 'lucide-react'
+import { CircleCheckIcon, CircleDashedIcon, CircleMinusIcon, CircleXIcon, ShieldCheckIcon, CalendarClockIcon } from 'lucide-react'
 import { formatarHoras, rotuloSemana, semanaAtual } from '@/compartilhado/datas'
 import type { ProgressoSemana } from '@/compartilhado/tipos'
 import { MetaBar } from '@/compartilhado/ui/MetaBar'
@@ -6,11 +6,13 @@ import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle }
 import { StatusPill } from '@/compartilhado/ui/StatusPill'
 import { cn } from '@/compartilhado/ui/utils'
 
-export type SituacaoSemana = 'cumpriu' | 'andamento' | 'naoCumpriu' | 'dispensada' | 'futura'
+export type SituacaoSemana = 'cumpriu' | 'andamento' | 'naoCumpriu' | 'dispensada' | 'futura' | 'semMeta'
 
 // docs/regras-de-negocio.md, seção 11: encerrada sem a meta = vermelho; em andamento = "ainda não cumpriu".
+// Semana em que a pessoa ainda não tinha meta (seção 8: começa na semana seguinte à entrada) = "Sem meta".
 export function situacaoDaSemana(p: ProgressoSemana): SituacaoSemana {
   const atual = semanaAtual()
+  if (p.semMeta) return 'semMeta'
   if (p.semana > atual) return 'futura'
   if (p.dispensada) return 'dispensada'
   if (p.cumpriu) return 'cumpriu'
@@ -29,12 +31,15 @@ export function PilulaSituacao({ situacao }: { situacao: SituacaoSemana }) {
       return <StatusPill tom="roxo"><ShieldCheckIcon />Dispensada</StatusPill>
     case 'futura':
       return <StatusPill tom="neutro"><CalendarClockIcon />Ainda não começou</StatusPill>
+    case 'semMeta':
+      return <StatusPill tom="neutro"><CircleMinusIcon />Sem meta</StatusPill>
   }
 }
 
 function frase(p: ProgressoSemana, s: SituacaoSemana): string {
   const faltaTotal = Math.max(0, p.metaTotal - p.horasTotal)
   const faltaSede = Math.max(0, p.metaSede - p.horasSede)
+  if (s === 'semMeta') return 'Esta semana não conta na meta: ela começa na semana seguinte à entrada na EJ. As horas registradas aparecem normalmente.'
   if (s === 'dispensada') return 'Ausência total aprovada: esta semana não conta na meta. Você pode continuar registrando.'
   if (s === 'cumpriu') return 'Meta da semana batida. As horas extras entram no total do mês.'
   if (s === 'futura') return `Meta desta semana: ${formatarHoras(p.metaTotal)} no total${p.metaSede > 0 ? ` e ${formatarHoras(p.metaSede)} na sede` : ', sem exigência de sede'}.`
@@ -56,7 +61,7 @@ export function CartaoSemana({ progresso, titulo }: { progresso: ProgressoSemana
           <PilulaSituacao situacao={situacao} />
         </CardAction>
       </CardHeader>
-      <CardContent className={cn('flex flex-col gap-4', situacao === 'dispensada' && 'opacity-70')}>
+      <CardContent className={cn('flex flex-col gap-4', (situacao === 'dispensada' || situacao === 'semMeta') && 'opacity-70')}>
         <MetaBar
           rotulo="Sede"
           cor="sede"

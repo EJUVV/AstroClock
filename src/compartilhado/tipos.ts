@@ -39,6 +39,7 @@ export interface ProgressoSemana {
   metaTotal: number
   cumpriu: boolean
   dispensada: boolean
+  semMeta: boolean      // a semana não conta para a pessoa: a meta começa na semana seguinte à entrada (ou ainda não há meta)
 }
 
 export interface Metas {

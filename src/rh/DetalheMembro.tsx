@@ -129,7 +129,7 @@ function DetalheMembro() {
                       sede: p.horasSede,
                       online: Math.max(0, p.horasTotal - p.horasSede),
                       ativo: p.semana === semana,
-                      balao: s === 'naoCumpriu' ? falta : s === 'dispensada' ? 'Dispensada' : undefined,
+                      balao: s === 'naoCumpriu' ? falta : s === 'dispensada' ? 'Dispensada' : s === 'semMeta' ? 'Sem meta' : undefined,
                       hachura: s === 'naoCumpriu',
                     }
                   })}

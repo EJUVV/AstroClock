@@ -550,6 +550,14 @@ export type Database = {
           setor_id: string
         }[]
       }
+      horas_por_dia: {
+        Args: { p_semana: string }
+        Returns: {
+          dia: string
+          horas_sede: number
+          horas_total: number
+        }[]
+      }
       medias_da_semana: {
         Args: { p_semana: string; p_setor?: string }
         Returns: {
