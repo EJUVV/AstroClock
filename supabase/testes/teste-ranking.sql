@@ -1,16 +1,17 @@
 -- =============================================================================
 -- AstroClock · teste do ranking com pódio e do ranking dos setores
--- (seção 12 do regras-de-negocio.md; migração ranking_e_podio)
+-- (seção 12 do regras-de-negocio.md; migrações ranking_e_podio e ranking_sem_empate)
 -- =============================================================================
 -- Rode DEPOIS das migrações do PR #9 (cálculo da semana), da ranking_e_podio e
--- da diretorias_acumuladas, no SQL Editor. Cria dados de teste (prefixo zz) num mês antigo (março de 2021,
+-- da diretorias_acumuladas e da ranking_sem_empate, no SQL Editor. Cria dados de teste (prefixo zz) num mês antigo (março de 2021,
 -- com meta própria), confere pelos dois lados (quem deve ver, vê; quem não deve,
 -- não vê) e desfaz tudo no final: não suja o banco.
 -- Terminou com "OK: ranking passou" = passou. Se falhar, a mensagem diz o que
 -- quebrou (e também não fica nada no banco).
 --
 -- Cenário (março de 2021):
---   Setor A: Ana 10h (4h na sede), Beto 8h, Caio 8h (empate com o Beto), Duda 0h
+--   Setor A: Ana 10h (4h na sede), Beto 8h, Caio 8h (empata com o Beto nas
+--            horas, mas o Beto chegou primeiro: terminou em 03/03, o Caio em 08/03), Duda 0h
 --            (um registro em revisão e um cancelado, que não contam),
 --            um membro novo (entrou em 29/03: não entra no ranking do mês) e
 --            um diretor do setor (sem meta, fora do ranking).
@@ -75,16 +76,17 @@ begin
   perform set_config('role', 'authenticated', true);
   perform set_config('request.jwt.claims', '{"role":"authenticated","email":"zz.rank.duda@ejuvv.com"}', true);
 
-  -- Pódio da EJ: Ana 1º, Beto e Caio 2º (empate), Eva 4º; a Duda (0h) não aparece.
+  -- Pódio da EJ sem posição repetida: Ana 1º, Beto 2º (chegou primeiro), Caio 3º,
+  -- Eva 4º; a Duda (0h) não aparece.
   select string_agg(p.nome || ':' || p.posicao, ',' order by p.posicao, p.nome) into v_lista
     from public.podio_do_mes(c_mes) p where p.escopo = 'ej';
-  assert v_lista = 'zz Ana:1,zz Beto:2,zz Caio:2,zz Eva:4',
+  assert v_lista = 'zz Ana:1,zz Beto:2,zz Caio:3,zz Eva:4',
     format('Duda: pódio da EJ errado (%s)', v_lista);
 
-  -- Pódio do setor A: Ana 1º, Beto e Caio 2º.
+  -- Pódio do setor A: Ana 1º, Beto 2º, Caio 3º.
   select string_agg(p.nome || ':' || p.posicao, ',' order by p.posicao, p.nome) into v_lista
     from public.podio_do_mes(c_mes) p where p.escopo = 'setor';
-  assert v_lista = 'zz Ana:1,zz Beto:2,zz Caio:2',
+  assert v_lista = 'zz Ana:1,zz Beto:2,zz Caio:3',
     format('Duda: pódio do setor errado (%s)', v_lista);
 
   -- O pódio não traz e-mail nem nada além de nome, setor e horas.
@@ -92,7 +94,7 @@ begin
   assert not coalesce(ok1, false), 'Duda: o pódio trouxe e-mail ou perfil';
 
   -- Posição: 5º de 5 na EJ, 4º de 4 no setor. O pódio da EJ tem 4 pessoas (há vaga):
-  -- faltam 0,5h. O do setor A está cheio (Ana, Beto, Caio): faltam 8h para alcançar o Beto e o Caio.
+  -- faltam 0,5h. O do setor A está cheio (Ana, Beto, Caio): faltam 8h para alcançar o Caio.
   select * into eu from public.minha_posicao_no_ranking(c_mes);
   assert found, 'Duda: deveria ter posição no ranking';
   assert eu.horas_total = 0, format('Duda: horas deveriam ser 0 (são %s)', eu.horas_total);
@@ -131,6 +133,12 @@ begin
   assert eu.posicao_setor = 2 and eu.faltam_para_podio_setor = 0 and eu.faltam_para_podio_ej = 0,
     format('Beto: está no pódio, faltam deveria ser 0 (%s)', to_jsonb(eu));
 
+  -- Caio: mesmas horas do Beto, mas chegou depois: 3º na EJ e no setor.
+  perform set_config('request.jwt.claims', '{"role":"authenticated","email":"zz.rank.caio@ejuvv.com"}', true);
+  select * into eu from public.minha_posicao_no_ranking(c_mes);
+  assert eu.posicao_ej = 3 and eu.posicao_setor = 3 and eu.faltam_para_podio_setor = 0,
+    format('Caio: deveria ser 3º na EJ e no setor, no pódio (%s)', to_jsonb(eu));
+
   -- Eva: sozinha no setor B e no pódio dele.
   perform set_config('request.jwt.claims', '{"role":"authenticated","email":"zz.rank.eva@ejuvv.com"}', true);
   select * into eu from public.minha_posicao_no_ranking(c_mes);
@@ -147,7 +155,7 @@ begin
   perform set_config('request.jwt.claims', '{"role":"authenticated","email":"zz.rank.dsetor@ejuvv.com"}', true);
   select string_agg(r.nome || ':' || r.posicao, ',' order by r.posicao, r.nome) into v_lista
     from public.ranking_do_mes(c_mes) r;
-  assert v_lista = 'zz Ana:1,zz Beto:2,zz Caio:2,zz Duda:4',
+  assert v_lista = 'zz Ana:1,zz Beto:2,zz Caio:3,zz Duda:4',
     format('diretor de setor: deveria ver só o setor A, com posições no setor (%s)', v_lista);
 
   perform set_config('request.jwt.claims', '{"role":"authenticated","email":"zz.rank.rh@ejuvv.com"}', true);

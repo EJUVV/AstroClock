@@ -770,6 +770,13 @@ export type Database = {
           setor: string
         }[]
       }
+      ultimo_registro_do_mes: {
+        Args: { p_mes: string }
+        Returns: {
+          membro_id: string
+          ultimo_fim: string
+        }[]
+      }
       ve_tudo: { Args: never; Returns: boolean }
     }
     Enums: {

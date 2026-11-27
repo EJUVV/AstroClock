@@ -241,7 +241,7 @@ function CartaoHorasPorDia({
   )
 }
 
-// Mini pódio da EJ (3 primeiras linhas, mesmo com empate: a lista inteira fica na página Ranking) e a posição de quem está logado, com o link para a página Ranking.
+// Mini pódio da EJ (3 primeiros: a lista inteira fica na página Ranking) e a posição de quem está logado, com o link para a página Ranking.
 function CartaoRanking({ posicao, podio, euId }: { posicao: Carga<PosicaoRanking | null>; podio: Carga<PodioDoMes>; euId: string }) {
   return (
     <Card>
