@@ -182,6 +182,7 @@ export interface ProgressoSemana {
   metaTotal: number
   cumpriu: boolean
   dispensada: boolean
+  semMeta: boolean      // a semana não conta para a pessoa (meta começa na semana seguinte à entrada); no banco, elegivel = false
 }
 
 export interface Metas {
@@ -339,7 +340,7 @@ Funções (todas `async`; em erro, lançam `Error` com mensagem em português pr
 | `cronometro.ts` | `pararCronometro()` | `Registro` | Guilherme | Semana 2 |
 | `progresso.ts` | `progressoDaSemana(semana: string)` | `ProgressoSemana` | Guilherme | Começo da semana 3 |
 | `progresso.ts` | `progressoDoMes(mes: string)` | `ProgressoSemana[]` | Guilherme | Semana 3 |
-| `progresso.ts` | `horasPorDia(semana: string)` | `HorasDoDia[]` | Guilherme | Semana 4 |
+| `progresso.ts` | `horasPorDia(semana: string)` | `HorasDoDia[]` | Guilherme | Real desde 27/11 (G11, com a função `horas_por_dia` da B12) |
 | `ranking.ts` | `minhaPosicaoNoRanking(mes: string)` | `PosicaoRanking` ou `null` | Guilherme | Ranking com pódio (24/11); o `progresso.ts` reexporta |
 | `ranking.ts` | `podioDoMes(mes: string)` | `PodioDoMes` | Guilherme | Ranking com pódio (24/11) |
 | `ranking.ts` | `rankingDosSetores(mes: string)` | `LinhaRankingSetor[]` | Guilherme, Johannes | Ranking com pódio (24/11) |
@@ -358,7 +359,7 @@ Funções (todas `async`; em erro, lançam `Error` com mensagem em português pr
 | `rh.ts` | `resumoDaSemana(semana: string, setor?: string)` | `ResumoMembroSemana[]` | Johannes | Semana 3 |
 | `rh.ts` | `abaixoDaMeta(semana: string, setor?: string)` | `ResumoMembroSemana[]` | Johannes | Semana 3 |
 | `rh.ts` | `mediasDaSemana(semana: string, setor?: string)` | `MediasDaSemana` | Johannes | Semana 3 |
-| `rh.ts` | `progressoDeMembro(membroId: string, semana: string)` | `ProgressoSemana` | Johannes | Semana 3 |
+| `rh.ts` | `progressoDeMembro(membroId: string, semana: string)` | `ProgressoSemana` | Johannes | J10 (`progresso_de_membro`; `semMeta` = `not elegivel`) |
 | `rh.ts` | `semanasSeguidasAbaixo(semana: string)` | `MembroAbaixoSeguido[]` | Johannes | Semana 3 |
 | `rh.ts` | `cronometrosEmRevisao()` | `Registro[]` | Johannes | Semana 3 |
 | `rh.ts` | `revisarCronometro(id: string, aprovar: boolean)` | `void` | Johannes | Semana 3 |

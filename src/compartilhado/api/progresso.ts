@@ -1,13 +1,12 @@
-// O cálculo da semana e do mês é real (funções do banco). O gráfico de horas por dia ainda é falso
-// e vem de progresso-falso.ts; a posição no ranking é real e fica em ranking.ts.
-import type { ProgressoSemana } from '../tipos.ts'
+// Progresso da semana, do mês e horas por dia: funções do banco (B9 e B12). A posição no ranking
+// fica em ranking.ts (reexportada aqui).
+import type { HorasDoDia, ProgressoSemana } from '../tipos.ts'
 import type { Database } from '../tipos-banco.ts'
 import { supabase } from '../supabase.ts'
 import { loginFalso } from './auth.ts'
 import { erroDoBanco } from './banco.ts'
 import * as falso from './progresso-falso.ts'
 
-export { horasPorDia } from './progresso-falso.ts'
 export { minhaPosicaoNoRanking } from './ranking.ts'
 
 type LinhaProgresso = Database['public']['Functions']['progresso_da_semana']['Returns'][number]
@@ -22,6 +21,7 @@ function paraProgresso(l: LinhaProgresso): ProgressoSemana {
     metaTotal: l.meta_total ?? 0,
     cumpriu: l.cumpriu,
     dispensada: l.dispensada,
+    semMeta: !l.elegivel,
   }
 }
 
@@ -40,4 +40,12 @@ export async function progressoDoMes(mes: string): Promise<ProgressoSemana[]> {
   const { data, error } = await supabase.rpc('progresso_do_mes', { p_mes: mes })
   if (error) throw erroDoBanco(error)
   return data.map(paraProgresso)
+}
+
+// Os 7 dias da semana, de segunda a domingo, para o gráfico de barras. semana: qualquer dia dela.
+export async function horasPorDia(semana: string): Promise<HorasDoDia[]> {
+  if (loginFalso) return falso.horasPorDia(semana)
+  const { data, error } = await supabase.rpc('horas_por_dia', { p_semana: semana })
+  if (error) throw erroDoBanco(error)
+  return data.map((l) => ({ dia: l.dia, horasSede: l.horas_sede, horasTotal: l.horas_total }))
 }

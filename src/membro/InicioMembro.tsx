@@ -54,6 +54,7 @@ const COR_SITUACAO = {
   naoCumpriu: 'bg-perigo-fundo text-perigo border-perigo/30',
   dispensada: 'bg-secondary text-secondary-foreground border-primary/20',
   futura: 'bg-muted text-muted-foreground border-transparent',
+  semMeta: 'bg-muted text-muted-foreground border-transparent',
 }
 
 function BarrasDeTempo({ progresso }: { progresso?: ProgressoSemana }) {

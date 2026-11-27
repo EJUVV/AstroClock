@@ -540,6 +540,14 @@ export type Database = {
           membro_id: string
         }[]
       }
+      horas_por_dia: {
+        Args: { p_semana: string }
+        Returns: {
+          dia: string
+          horas_sede: number
+          horas_total: number
+        }[]
+      }
       horas_do_mes: {
         Args: { p_mes: string }
         Returns: {
