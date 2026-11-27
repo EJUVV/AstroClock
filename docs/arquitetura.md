@@ -355,15 +355,15 @@ Funções (todas `async`; em erro, lançam `Error` com mensagem em português pr
 | `rh.ts` | `listarMetas()` | `Metas[]` | Johannes | Semana 2 |
 | `rh.ts` | `alterarMetas(horasTotal: number, horasSede: number, vigenteDesde: string)` | `void` | Johannes | Semana 2 |
 | `rh.ts` | `cancelarMeta(vigenteDesde: string)` | `void` | Johannes | Depois da B15 (decidido em 25/11/2026) |
-| `rh.ts` | `percentualDaSemana(semana: string, setor?: string)` | `number` (0 a 100) | Johannes | Semana 3 |
-| `rh.ts` | `resumoDaSemana(semana: string, setor?: string)` | `ResumoMembroSemana[]` | Johannes | Semana 3 |
-| `rh.ts` | `abaixoDaMeta(semana: string, setor?: string)` | `ResumoMembroSemana[]` | Johannes | Semana 3 |
-| `rh.ts` | `mediasDaSemana(semana: string, setor?: string)` | `MediasDaSemana` | Johannes | Semana 3 |
-| `rh.ts` | `progressoDeMembro(membroId: string, semana: string)` | `ProgressoSemana` | Johannes | J10 (`progresso_de_membro`; `semMeta` = `not elegivel`) |
-| `rh.ts` | `semanasSeguidasAbaixo(semana: string)` | `MembroAbaixoSeguido[]` | Johannes | Semana 3 |
+| `rh.ts` | `percentualDaSemana(semana: string, setor?: string)` | `number` (0 a 100) | Johannes | Real desde 27/11 (J10) |
+| `rh.ts` | `resumoDaSemana(semana: string, setor?: string)` | `ResumoMembroSemana[]` | Johannes | Real desde 27/11 (J10) |
+| `rh.ts` | `abaixoDaMeta(semana: string, setor?: string)` | `ResumoMembroSemana[]` | Johannes | Real desde 27/11 (J10) |
+| `rh.ts` | `mediasDaSemana(semana: string, setor?: string)` | `MediasDaSemana` | Johannes | Real desde 27/11 (J10) |
+| `rh.ts` | `progressoDeMembro(membroId: string, semana: string)` | `ProgressoSemana` | Johannes | Real desde 27/11 (J10: `progresso_de_membro`; `semMeta` = `not elegivel`) |
+| `rh.ts` | `semanasSeguidasAbaixo(semana: string)` | `MembroAbaixoSeguido[]` | Johannes | Real desde 27/11 (J10) |
 | `rh.ts` | `cronometrosEmRevisao()` | `Registro[]` | Johannes | Semana 3 |
 | `rh.ts` | `revisarCronometro(id: string, aprovar: boolean)` | `void` | Johannes | Semana 3 |
-| `rh.ts` | `rankingDoMes(mes: string)` | `LinhaRanking[]` | Johannes | Depois da J10 (função do banco `ranking_do_mes` pronta na entrega do pódio) |
+| `rh.ts` | `rankingDoMes(mes: string)` | `LinhaRanking[]` | Johannes | Real desde 27/11 (J10, `ranking_do_mes`) |
 | `rh.ts` | `buscarRegistrosDoMembro(membroId: string, semana: string)` | `Registro[]` | Johannes | A definir |
 | `rh.ts` | `criarRegistroDeMembro(membroId: string, dados: NovoRegistro, motivo: string)` | `Registro` | Johannes | A definir |
 | `rh.ts` | `editarRegistroDeMembro(id: string, dados: NovoRegistro, motivo: string)` | `Registro` | Johannes | A definir |
