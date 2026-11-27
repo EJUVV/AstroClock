@@ -1,23 +1,130 @@
-// Registros corrigidos pelo RH, revisão de cronômetros e metas já são reais. O resto deste painel
-// (progresso, ranking, requerimentos) ainda é falso e vem de rh-falso.ts.
-import type { Metas, Registro, NovoRegistro } from '../tipos.ts'
+// Painel do RH real: cálculo da semana (B9), ranking do mês, registros corrigidos pelo RH, revisão de
+// cronômetros e metas. Só os requerimentos ainda são falsos e vêm de rh-falso.ts.
+// Quem vê o quê é decidido no banco: o diretor de setor só recebe os setores que dirige.
+import type {
+  LinhaRanking,
+  MediasDaSemana,
+  Membro,
+  MembroAbaixoSeguido,
+  Metas,
+  NovoRegistro,
+  ProgressoSemana,
+  Registro,
+  ResumoMembroSemana,
+} from '../tipos.ts'
+import type { Database } from '../tipos-banco.ts'
 import { instante, partesPorDia, segundaDaSemana, semanaAtual, somarDias } from '../datas.ts'
 import { supabase } from '../supabase.ts'
 import { loginFalso } from './auth.ts'
 import { erroDoBanco, paraRegistro } from './banco.ts'
 import * as falso from './rh-falso.ts'
 
-export {
-  abaixoDaMeta,
-  listarRequerimentos,
-  mediasDaSemana,
-  percentualDaSemana,
-  progressoDeMembro,
-  rankingDoMes,
-  responderRequerimento,
-  resumoDaSemana,
-  semanasSeguidasAbaixo,
-} from './rh-falso.ts'
+export { listarRequerimentos, responderRequerimento } from './rh-falso.ts'
+
+type Funcoes = Database['public']['Functions']
+type LinhaResumo = Funcoes['resumo_da_semana']['Returns'][number]
+
+// Colunas de membro que as funções do banco devolvem junto com as horas.
+function membroDaLinha(l: Pick<LinhaResumo, 'membro_id' | 'nome' | 'email' | 'perfil' | 'setor' | 'ativo' | 'data_entrada'>): Membro {
+  return {
+    id: l.membro_id,
+    nome: l.nome,
+    email: l.email,
+    perfil: l.perfil,
+    setor: l.setor,
+    ativo: l.ativo,
+    dataEntrada: l.data_entrada,
+  }
+}
+
+function paraResumo(l: LinhaResumo): ResumoMembroSemana {
+  return {
+    membro: membroDaLinha(l),
+    horasSede: l.horas_sede,
+    horasTotal: l.horas_total,
+    cumpriu: l.cumpriu,
+    dispensada: l.dispensada,
+  }
+}
+
+const porNome = (a: { membro: Membro }, b: { membro: Membro }) => a.membro.nome.localeCompare(b.membro.nome)
+
+// Percentual por membros: cumpriram ÷ (elegíveis − dispensados). Sem setor, tudo o que a pessoa pode ver.
+export async function percentualDaSemana(semana: string, setor?: string): Promise<number> {
+  if (loginFalso) return falso.percentualDaSemana(semana, setor)
+  const { data, error } = await supabase.rpc('percentual_da_semana', { p_semana: semana, p_setor: setor })
+  if (error) throw erroDoBanco(error)
+  return Number(data)
+}
+
+export async function resumoDaSemana(semana: string, setor?: string): Promise<ResumoMembroSemana[]> {
+  if (loginFalso) return falso.resumoDaSemana(semana, setor)
+  const { data, error } = await supabase.rpc('resumo_da_semana', { p_semana: semana, p_setor: setor })
+  if (error) throw erroDoBanco(error)
+  return data.map(paraResumo).sort(porNome)
+}
+
+export async function abaixoDaMeta(semana: string, setor?: string): Promise<ResumoMembroSemana[]> {
+  if (loginFalso) return falso.abaixoDaMeta(semana, setor)
+  const { data, error } = await supabase.rpc('abaixo_da_meta', { p_semana: semana, p_setor: setor })
+  if (error) throw erroDoBanco(error)
+  return data.map(paraResumo).sort(porNome)
+}
+
+// Médias por membro na semana, sem quem teve a semana dispensada. A diária divide pelos 5 dias úteis.
+export async function mediasDaSemana(semana: string, setor?: string): Promise<MediasDaSemana> {
+  if (loginFalso) return falso.mediasDaSemana(semana, setor)
+  const { data, error } = await supabase.rpc('medias_da_semana', { p_semana: semana, p_setor: setor })
+  if (error) throw erroDoBanco(error)
+  const l = data[0]
+  if (!l) return { mediaTotal: 0, mediaSede: 0, mediaDiaria: 0 }
+  return { mediaTotal: l.media_total, mediaSede: l.media_sede, mediaDiaria: l.media_diaria }
+}
+
+// Progresso de uma semana de outro membro, para o detalhe no painel do RH.
+export async function progressoDeMembro(membroId: string, semana: string): Promise<ProgressoSemana> {
+  if (loginFalso) return falso.progressoDeMembro(membroId, semana)
+  const { data, error } = await supabase.rpc('progresso_de_membro', { p_membro_id: membroId, p_semana: semana })
+  if (error) throw erroDoBanco(error, DE_QUEM)
+  const l = data[0]
+  // Sem linha: o membro não existe ou não é de um setor que a pessoa pode ver (RLS).
+  if (!l) throw new Error('Membro não encontrado')
+  return {
+    semana: l.semana,
+    horasSede: l.horas_sede,
+    horasTotal: l.horas_total,
+    metaSede: l.meta_sede ?? 0,
+    metaTotal: l.meta_total ?? 0,
+    cumpriu: l.cumpriu,
+    dispensada: l.dispensada,
+    semMeta: !l.elegivel,
+  }
+}
+
+// Só quem está há 2 semanas ou mais abaixo da meta, contando para trás a partir da semana pedida.
+export async function semanasSeguidasAbaixo(semana: string): Promise<MembroAbaixoSeguido[]> {
+  if (loginFalso) return falso.semanasSeguidasAbaixo(semana)
+  const { data, error } = await supabase.rpc('semanas_seguidas_abaixo', { p_semana: semana })
+  if (error) throw erroDoBanco(error)
+  return data
+    .map((l) => ({ membro: membroDaLinha(l), semanasSeguidas: l.semanas_seguidas }))
+    .sort((a, b) => b.semanasSeguidas - a.semanasSeguidas || porNome(a, b))
+}
+
+// Ranking completo do mês: rh, presidente e quem dirige o RH veem a EJ; quem dirige setores, só esses
+// setores (com a posição dentro de cada setor). O membro não vê.
+export async function rankingDoMes(mes: string): Promise<LinhaRanking[]> {
+  if (loginFalso) return falso.rankingDoMes(mes)
+  const { data, error } = await supabase.rpc('ranking_do_mes', { p_mes: mes })
+  if (error) throw erroDoBanco(error)
+  return data.map((l) => ({
+    posicao: l.posicao,
+    membro: membroDaLinha(l),
+    horasTotal: l.horas_total,
+    horasSede: l.horas_sede,
+    dispensado: l.dispensado,
+  }))
+}
 
 const DE_QUEM = 'deste membro'
 
