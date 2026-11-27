@@ -91,9 +91,9 @@ Esboço inicial, refinado pelo Bernardo na semana 1. Nomes em snake_case.
 | `historico_diretorias` | `id`, `setor_id`, `membro_id`, `inicio`, `fim` (null enquanto vale), `registrado_por`, `encerrado_por` (null = direto no banco; só as funções do banco gravam) | Não | Quem tem o painel do RH lê, como em `diretorias` (inclusive o `diretor_setor`) |
 | `auditoria` | `id`, `tabela`, `registro_id`, `acao`, `quem`, `quando`, `motivo`, `antes`, `depois` (só as funções do banco gravam) | Não | `rh`, `diretor_rh` e `presidente` leem. O `diretor_setor` não |
 
-**Requerimento de ausência** (seção 7 do `regras-de-negocio.md`): substitui a antiga tabela `dispensas`. Só requerimento `aprovado` muda a meta: `so_remoto` zera a exigência de sede; `ausencia_total` dispensa a semana. Vale para **todas as semanas que as datas tocam, inteiras**, da segunda de `data_inicio` à segunda de `data_fim`. O e-mail vai para todos os membros ativos com perfil `rh` ou `diretor_rh`. Só o `diretor_rh` responde. A reprovação grava `motivo_resposta` e manda e-mail ao membro. A aprovação **apaga o anexo** do Storage e limpa `anexo_caminho`. Ainda depende da diretora de RH ([`pauta-diretora-rh.md`](pauta-diretora-rh.md)): aviso ao membro na aprovação e dispensa direta pelo RH.
+**Requerimento de ausência** (seção 7 do `regras-de-negocio.md`): substitui a antiga tabela `dispensas`. Só requerimento `aprovado` muda a meta: `so_remoto` zera a exigência de sede; `ausencia_total` dispensa a semana. Vale para **todas as semanas que as datas tocam, inteiras**, da segunda de `data_inicio` à segunda de `data_fim`. Os e-mails (aviso ao RH no envio e ao membro na resposta) ficam para a parte 2 (G8): até lá, o RH vê o pedido no menu "Requerimentos" e o membro vê a resposta na tela dele. Só o `diretor_rh` responde (`responder_requerimento`). A reprovação grava `motivo_resposta`. A aprovação **apaga o anexo** do Storage e limpa `anexo_caminho` (`anexo_apagado`, que mantém `anexo_nome`). Ordem no site: responde primeiro, depois apaga o arquivo e só então chama `anexo_apagado` (a regra de apagar do Storage só deixa enquanto o pedido ainda tem `anexo_caminho`). O Storage responde sem erro e com a lista vazia quando a regra recusa: o site só chama `anexo_apagado` se a lista devolvida tiver o caminho. O insert em `requerimentos` manda só `membro_id`, `tipo`, `data_inicio`, `data_fim`, `motivo`, `anexo_caminho` e `anexo_nome` (o grant é só nessas colunas). O cálculo usa duas camadas: `ajuste_da_semana_interno` (sem filtro, sem execute para ninguém; só o ranking, `horas_do_mes`, que precisa do dispensado certo de todos) e `ajuste_da_semana` (o mesmo, mas só para membro que quem chama já vê: ele mesmo, `ve_tudo` ou setor que dirige; usada por `progresso_de_membro` e `resumo_da_semana`). Ainda depende da diretora de RH ([`pauta-diretora-rh.md`](pauta-diretora-rh.md)): aviso ao membro na aprovação e dispensa direta pelo RH.
 
-**Anexo do requerimento:** arquivo em um bucket **privado** do Supabase Storage, com regras de acesso só para quem enviou, para `rh`, `diretor_rh` e `presidente`. A tela abre o arquivo por link temporário (`linkDoAnexo`). Limite técnico inicial: PDF, JPG ou PNG, até 5 MB. **O backup diário só copia o banco, não os arquivos**: é preciso incluir o bucket no backup antes de abrir o anexo em produção.
+**Anexo do requerimento:** arquivo em um bucket **privado** do Supabase Storage, com regras de acesso só para quem enviou, para `rh`, `diretor_rh` e `presidente`. A tela abre o arquivo por link temporário (`linkDoAnexo`). Limite técnico inicial: PDF, JPG ou PNG, até 5 MB. **O backup diário só copia o banco, não os arquivos, e os anexos ficam fora dele** (decisão da IA aceita no desenho do requerimento, 27/11/2026): os anexos são temporários (apagados na aprovação, ou um mês depois da reprovação) e copiá-los para os artefatos do GitHub espalharia dado de saúde. Se o armazenamento perder um arquivo, o membro reenvia.
 
 **Presença na sede** (seção 13 do `regras-de-negocio.md`): não registra horas. Índice único parcial: uma única linha com `saida is null` por membro. Como o membro só vê a própria linha de `membros`, a lista de quem está na sede precisa de uma visão ou função que exponha só o nome e o setor. O sistema desmarca sozinho quem esquecer (tarefa agendada no banco); o horário ainda depende da diretora de RH.
 
@@ -220,7 +220,7 @@ export interface Requerimento {
   situacao: SituacaoRequerimento
   criadoEm: string      // ISO datetime
   anexoNome: string | null
-  motivoResposta: string | null // motivo da reprovação, que vai no e-mail para o membro
+  motivoResposta: string | null // motivo da reprovação, que o membro vê na tela de Requerimentos
 }
 
 export interface NovoRequerimento {
@@ -368,11 +368,11 @@ Funções (todas `async`; em erro, lançam `Error` com mensagem em português pr
 | `rh.ts` | `criarRegistroDeMembro(membroId: string, dados: NovoRegistro, motivo: string)` | `Registro` | Johannes | A definir |
 | `rh.ts` | `editarRegistroDeMembro(id: string, dados: NovoRegistro, motivo: string)` | `Registro` | Johannes | A definir |
 | `rh.ts` | `cancelarRegistroDeMembro(id: string, motivo: string)` | `void` | Johannes | A definir |
-| `requerimentos.ts` | `enviarRequerimento(dados: NovoRequerimento)` | `Requerimento` | Guilherme | Semana 3 |
-| `requerimentos.ts` | `meusRequerimentos()` | `Requerimento[]` | Guilherme | Semana 3 |
-| `requerimentos.ts` | `linkDoAnexo(id: string)` | `string` | Guilherme, Johannes | Semana 4 |
-| `rh.ts` | `listarRequerimentos(situacao?: SituacaoRequerimento)` | `Requerimento[]` | Johannes | Semana 3 |
-| `rh.ts` | `responderRequerimento(id: string, aprovar: boolean, motivo?: string)` | `void` | Johannes | Semana 3 |
+| `requerimentos.ts` | `enviarRequerimento(dados: NovoRequerimento)` | `Requerimento` | Guilherme | Real desde 27/11 (B8 e G7: envia o anexo para `<meu id>/<uuid>.<ext>` e depois grava o pedido; se a gravação falhar, apaga o arquivo) |
+| `requerimentos.ts` | `meusRequerimentos()` | `Requerimento[]` | Guilherme | Real desde 27/11 (B8 e G7; `anexoNome` vem null quando o arquivo já foi apagado) |
+| `requerimentos.ts` | `linkDoAnexo(id: string)` | `string` | Guilherme, Johannes | Real desde 27/11 (J6: link temporário de 1 minuto) |
+| `rh.ts` | `listarRequerimentos(situacao?: SituacaoRequerimento)` | `Requerimento[]` | Johannes | Real desde 27/11 (J7; antes de listar, apaga os anexos vencidos com `anexos_para_apagar` e `anexo_apagado`, sem travar a lista se falhar) |
+| `rh.ts` | `responderRequerimento(id: string, aprovar: boolean, motivo?: string)` | `void` | Johannes | Real desde 27/11 (J7: `responder_requerimento`; na aprovação, apaga o arquivo e chama `anexo_apagado`) |
 | `diretorias.ts` | `minhasDiretorias()` | `Diretoria[]` (setores que o logado dirige; vazio para quem não dirige) | Todos (sessão) | Diretorias acumuladas |
 | `diretorias.ts` | `situacaoDosSetores()` | `SituacaoSetor[]` (todos os setores, com diretor ou vago; lida por quem tem painel do RH) | Johannes | Diretorias acumuladas |
 | `diretorias.ts` | `atribuirDiretoria(setor: string, membroId: string)` | `void` (só quem dirige o RH e o `presidente`; troca o diretor se o setor já tem um) | Johannes | Diretorias acumuladas |

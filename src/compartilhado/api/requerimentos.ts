@@ -1,65 +1,134 @@
-// FALSO: trocar pela versão real (ver docs/arquitetura.md)
+// Requerimentos de ausência (B8 e G7), lado do membro. O anexo vai do navegador direto para o bucket
+// privado anexos-requerimentos, no caminho <meu id>/<uuid>.<ext>. Quem vê o quê é decidido no banco
+// (RLS da tabela e regras do Storage): o membro só os próprios; rh, presidente e quem dirige o RH, todos.
 import type { NovoRequerimento, Requerimento } from '../tipos.ts'
-import { ehDiretor, veRequerimentos } from '../perfis.ts'
-import { anexos, apagarAnexosVencidos, atraso, copia, membroLogado, perfilEfetivoFalso, requerimentos } from './dados-falsos.ts'
+import type { Database } from '../tipos-banco.ts'
+import { supabase } from '../supabase.ts'
+import { loginFalso } from './auth.ts'
+import { ERRO_CONEXAO, erroDoBanco, meuId } from './banco.ts'
+import * as falso from './requerimentos-falso.ts'
 
-const TIPOS_DE_ANEXO = ['application/pdf', 'image/jpeg', 'image/png']
+const BUCKET = 'anexos-requerimentos'
+const LINK_VALE_SEGUNDOS = 60 // o link do anexo vale 1 minuto: o suficiente para abrir
+
+// Mesmas regras do bucket (o banco recusa de novo se passar daqui).
+const EXTENSOES: Record<string, string> = { 'application/pdf': 'pdf', 'image/jpeg': 'jpg', 'image/png': 'png' }
 const TAMANHO_MAXIMO_DO_ANEXO = 5 * 1024 * 1024 // 5 MB
 
 function validarAnexo(anexo: File): void {
-  if (!TIPOS_DE_ANEXO.includes(anexo.type)) throw new Error('O anexo precisa ser PDF, JPG ou PNG')
+  if (!EXTENSOES[anexo.type]) throw new Error('O anexo precisa ser PDF, JPG ou PNG')
   if (anexo.size > TAMANHO_MAXIMO_DO_ANEXO) throw new Error('O anexo pode ter no máximo 5 MB')
 }
 
+// Erros do Storage chegam em inglês: mostra uma mensagem pronta para a tela. Sem status = sem conexão.
+interface ErroDoStorage {
+  message: string
+  status?: number
+  statusCode?: string // código do Storage; numa recusa da regra pode vir "403" com status 400
+}
+
+function erroDoArquivo(e: ErroDoStorage, acao: string): Error {
+  if (!e.status) return new Error(ERRO_CONEXAO)
+  if (e.status === 403 || e.statusCode === '403' || /row-level security|unauthorized/i.test(e.message)) return new Error('Você não tem permissão para fazer isso')
+  if (e.status === 413 || e.statusCode === '413') return new Error('O anexo pode ter no máximo 5 MB')
+  return new Error(`Não foi possível ${acao} o anexo. Tente de novo.`)
+}
+
+type LinhaRequerimento = Database['public']['Tables']['requerimentos']['Row'] & { membros: { nome: string } | null }
+
+// Duas chaves de requerimentos para membros (membro_id e respondido_por): o embed diz qual usar.
+export const COLUNAS_REQUERIMENTO = '*, membros!requerimentos_membro_id_fkey(nome)'
+
+// anexoNome vem null quando o arquivo já foi apagado (anexo_caminho vazio), como na demonstração.
+export function paraRequerimento(l: LinhaRequerimento): Requerimento {
+  return {
+    id: l.id,
+    membroId: l.membro_id,
+    nomeMembro: l.membros?.nome ?? '',
+    tipo: l.tipo,
+    inicio: l.data_inicio,
+    fim: l.data_fim,
+    motivo: l.motivo,
+    situacao: l.situacao,
+    criadoEm: l.criado_em,
+    anexoNome: l.anexo_caminho ? l.anexo_nome : null,
+    motivoResposta: l.motivo_resposta,
+  }
+}
+
+// Apaga o arquivo do bucket. Devolve true só se o Storage confirmou: quando a regra de apagar recusa,
+// ele responde sem erro e com a lista vazia.
+export async function apagarArquivoDoAnexo(caminho: string): Promise<boolean> {
+  const { data, error } = await supabase.storage.from(BUCKET).remove([caminho])
+  if (error) throw erroDoArquivo(error, 'apagar')
+  return data.some((o) => o.name === caminho)
+}
+
+// Envia o arquivo primeiro; se a gravação do pedido falhar, apaga o arquivo (o dono pode apagar o
+// arquivo da própria pasta que não está ligado a nenhum pedido).
 export async function enviarRequerimento(dados: NovoRequerimento): Promise<Requerimento> {
-  await atraso()
-  const eu = membroLogado()
-  if (ehDiretor(eu.perfil)) throw new Error('Diretores não abrem requerimento, porque não têm meta')
-  if (!dados.motivo.trim()) throw new Error('O motivo é obrigatório')
+  if (loginFalso) return falso.enviarRequerimento(dados)
+  const motivo = dados.motivo.trim()
+  if (!motivo) throw new Error('O motivo é obrigatório')
   if (!dados.inicio || !dados.fim) throw new Error('Escolha as datas')
   if (dados.fim < dados.inicio) throw new Error('O fim precisa ser depois do início')
   if (dados.anexo) validarAnexo(dados.anexo)
-  const novo: Requerimento = {
-    id: crypto.randomUUID(),
-    membroId: eu.id,
-    nomeMembro: eu.nome,
-    tipo: dados.tipo,
-    inicio: dados.inicio,
-    fim: dados.fim,
-    motivo: dados.motivo.trim(),
-    situacao: 'pendente',
-    criadoEm: new Date().toISOString(),
-    anexoNome: dados.anexo?.name ?? null,
-    motivoResposta: null,
+
+  const eu = await meuId()
+  let caminho: string | null = null
+  if (dados.anexo) {
+    caminho = `${eu}/${crypto.randomUUID()}.${EXTENSOES[dados.anexo.type]}`
+    const { error } = await supabase.storage
+      .from(BUCKET)
+      .upload(caminho, dados.anexo, { contentType: dados.anexo.type, upsert: false })
+    if (error) throw erroDoArquivo(error, 'enviar')
   }
-  requerimentos.push(novo)
-  if (dados.anexo) anexos.set(novo.id, dados.anexo)
-  return copia(novo)
+
+  // Só as colunas do pedido: situação, resposta e criado_em ficam com o padrão do banco.
+  const { data, error } = await supabase
+    .from('requerimentos')
+    .insert({
+      membro_id: eu,
+      tipo: dados.tipo,
+      data_inicio: dados.inicio,
+      data_fim: dados.fim,
+      motivo,
+      anexo_caminho: caminho,
+      anexo_nome: dados.anexo?.name ?? null,
+    })
+    .select(COLUNAS_REQUERIMENTO)
+    .single()
+  if (error) {
+    if (caminho) await supabase.storage.from(BUCKET).remove([caminho])
+    throw erroDoBanco(error)
+  }
+  return paraRequerimento(data)
 }
 
-// Do mais recente para o mais antigo.
+// Do mais recente para o mais antigo. Só os próprios (o rh também lê os dos outros pelo RLS).
 export async function meusRequerimentos(): Promise<Requerimento[]> {
-  await atraso()
-  const membroId = membroLogado().id
-  apagarAnexosVencidos()
-  return copia(
-    requerimentos
-      .filter((q) => q.membroId === membroId)
-      .sort((a, b) => Date.parse(b.criadoEm) - Date.parse(a.criadoEm)),
-  )
+  if (loginFalso) return falso.meusRequerimentos()
+  const { data, error } = await supabase
+    .from('requerimentos')
+    .select(COLUNAS_REQUERIMENTO)
+    .eq('membro_id', await meuId())
+    .order('criado_em', { ascending: false })
+  if (error) throw erroDoBanco(error)
+  return data.map(paraRequerimento)
 }
 
-// Só quem enviou, o RH e o presidente abrem o anexo. A versão real devolve um link temporário.
+// Só quem enviou, o RH e o presidente abrem o anexo (regras do Storage). Devolve um link temporário.
 export async function linkDoAnexo(id: string): Promise<string> {
-  await atraso()
-  const requerimento = requerimentos.find((q) => q.id === id)
-  if (!requerimento) throw new Error('Requerimento não encontrado')
-  const perfil = perfilEfetivoFalso()
-  if (requerimento.membroId !== membroLogado().id && !(perfil && veRequerimentos(perfil))) {
-    throw new Error('Você não pode abrir este anexo')
+  if (loginFalso) return falso.linkDoAnexo(id)
+  const { data, error } = await supabase.from('requerimentos').select('anexo_caminho').eq('id', id).maybeSingle()
+  if (error) throw erroDoBanco(error)
+  if (!data) throw new Error('Requerimento não encontrado')
+  if (!data.anexo_caminho) {
+    throw new Error('Este requerimento não tem anexo (ele é apagado na aprovação, ou um mês depois da reprovação)')
   }
-  apagarAnexosVencidos()
-  const anexo = anexos.get(id)
-  if (!anexo) throw new Error('Este requerimento não tem anexo (ele é apagado na aprovação, ou um mês depois da reprovação)')
-  return URL.createObjectURL(anexo)
+  const { data: link, error: erroLink } = await supabase.storage
+    .from(BUCKET)
+    .createSignedUrl(data.anexo_caminho, LINK_VALE_SEGUNDOS)
+  if (erroLink) throw erroDoArquivo(erroLink, 'abrir')
+  return link.signedUrl
 }

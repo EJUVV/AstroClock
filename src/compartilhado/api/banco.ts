@@ -27,6 +27,9 @@ const REGRAS: Record<string, string> = {
   registros_descricao_tamanho: 'A descrição pode ter no máximo 1000 caracteres',
   registros_fim_depois_do_inicio: 'O fim precisa ser depois do início',
   registros_manual_tem_fim: 'Informe o início e o fim',
+  requerimentos_datas: 'O fim precisa ser depois do início',
+  requerimentos_motivo: 'O motivo pode ter no máximo 1000 caracteres',
+  requerimentos_motivo_resposta: 'O motivo pode ter no máximo 1000 caracteres',
 }
 
 // Traduz o erro do banco. As regras feitas à mão (triggers) já vêm em português na mensagem.

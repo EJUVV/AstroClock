@@ -74,7 +74,7 @@ function RequerimentosMembro() {
         )}
       </Carregavel>
 
-      <p className="text-sm text-muted-foreground">Você recebe um e-mail quando o diretor do RH responder. Se ele reprovar, o e-mail traz o motivo.</p>
+      <p className="text-sm text-muted-foreground">A resposta do diretor do RH aparece aqui, nesta tela. Se ele reprovar, o motivo aparece junto.</p>
 
       {jaAbriu && (
         <Suspense fallback={null}>
@@ -83,7 +83,7 @@ function RequerimentosMembro() {
             onAbertoChange={setAberto}
             onEnviar={async (dados) => {
               await enviarRequerimento(dados)
-              toast.success('Requerimento enviado', { description: 'O RH foi avisado por e-mail.' })
+              toast.success('Requerimento enviado', { description: 'O RH já vê o pedido no menu Requerimentos.' })
               setVersao((v) => v + 1)
             }}
           />

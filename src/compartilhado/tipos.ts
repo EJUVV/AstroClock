@@ -77,7 +77,7 @@ export interface Requerimento {
   situacao: SituacaoRequerimento
   criadoEm: string      // ISO datetime
   anexoNome: string | null
-  motivoResposta: string | null // motivo da reprovação, que vai no e-mail para o membro
+  motivoResposta: string | null // motivo da reprovação, que o membro vê na tela de Requerimentos
 }
 
 export interface NovoRequerimento {
