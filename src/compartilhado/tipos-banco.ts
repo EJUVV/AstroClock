@@ -319,6 +319,35 @@ export type Database = {
           },
         ]
       }
+      presenca_sede: {
+        Row: {
+          entrada: string
+          id: string
+          membro_id: string
+          saida: string | null
+        }
+        Insert: {
+          entrada?: string
+          id?: string
+          membro_id: string
+          saida?: string | null
+        }
+        Update: {
+          entrada?: string
+          id?: string
+          membro_id?: string
+          saida?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "presenca_sede_membro_id_fkey"
+            columns: ["membro_id"]
+            isOneToOne: false
+            referencedRelation: "membros"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       registros: {
         Row: {
           atualizado_em: string
@@ -489,6 +518,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      desmarcar_na_sede: { Args: never; Returns: undefined }
       dirige_rh: { Args: { p_membro_id: string }; Returns: boolean }
       editar_registro_de_membro: {
         Args: {
@@ -530,8 +560,8 @@ export type Database = {
         }
         Returns: boolean
       }
-      desmarcar_na_sede: { Args: never; Returns: undefined }
       encerrar_cronometros_esquecidos: { Args: never; Returns: number }
+      encerrar_presencas_de_ontem: { Args: never; Returns: number }
       estou_na_sede: { Args: never; Returns: boolean }
       exigir_rh_com_motivo: { Args: { p_motivo: string }; Returns: undefined }
       horas_da_semana: {
@@ -560,6 +590,8 @@ export type Database = {
           horas_total: number
         }[]
       }
+      inicio_de_hoje: { Args: never; Returns: string }
+      marcar_na_sede: { Args: never; Returns: undefined }
       medias_da_semana: {
         Args: { p_semana: string; p_setor?: string }
         Returns: {
@@ -593,7 +625,6 @@ export type Database = {
           setor: string
         }[]
       }
-      marcar_na_sede: { Args: never; Returns: undefined }
       minha_posicao_no_ranking: {
         Args: { p_mes: string }
         Returns: {
@@ -675,6 +706,15 @@ export type Database = {
           semana: string
         }[]
       }
+      quem_esta_na_sede: {
+        Args: never
+        Returns: {
+          desde: string
+          membro_id: string
+          nome: string
+          setor: string
+        }[]
+      }
       ranking_do_mes: {
         Args: { p_mes: string }
         Returns: {
@@ -688,15 +728,6 @@ export type Database = {
           nome: string
           perfil: Database["public"]["Enums"]["perfil"]
           posicao: number
-          setor: string
-        }[]
-      }
-      quem_esta_na_sede: {
-        Args: never
-        Returns: {
-          desde: string
-          membro_id: string
-          nome: string
           setor: string
         }[]
       }
