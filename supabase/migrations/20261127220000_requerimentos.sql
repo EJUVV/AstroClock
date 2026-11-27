@@ -352,3 +352,275 @@ grant execute on function
   public.anexos_para_apagar(),
   public.anexo_apagado(uuid)
 to authenticated;
+
+
+-- =============================================================================
+-- PARTE B · cálculo da semana com os pedidos aprovados
+-- =============================================================================
+-- Só pedido aprovado muda a meta. O pedido vale para as semanas inteiras, da
+-- segunda de data_inicio à segunda de data_fim. Se só remoto e ausência total
+-- aprovados cobrem a mesma semana, vale a ausência total.
+--   - só remoto: meta_sede = 0 na semana (o total continua);
+--   - ausência total: a semana fica dispensada (fora do percentual, das médias
+--     e de "abaixo da meta"; não conta como descumprimento).
+-- cumpriu = elegível e não dispensada e horas >= metas.
+-- No ranking do mês, dispensado = todas as semanas do mês (com meta, em que a
+-- pessoa entra) dispensadas (seção 12).
+--
+-- Duas camadas, porque o diretor_setor (e o membro) não leem requerimentos:
+--   ajuste_da_semana_interno  sem filtro; só para o ranking (horas_do_mes,
+--                             security definer), que precisa do dispensado
+--                             certo de todos, inclusive no pódio do membro.
+--   ajuste_da_semana          o mesmo, mas só para quem o chamador já vê (ele
+--                             mesmo, ve_tudo ou setor que dirige; igual ao RLS
+--                             de membros); para os outros, false/false. Usada
+--                             por progresso_de_membro e resumo_da_semana, que
+--                             continuam security invoker.
+-- progresso_de_membro, resumo_da_semana e horas_do_mes: mesma assinatura e
+-- mesmas colunas (o replace mantém os grants). As que leem delas
+-- (percentual_da_semana, abaixo_da_meta, medias_da_semana,
+-- semanas_seguidas_abaixo, progresso_da_semana, progresso_do_mes e o ranking)
+-- passam a refletir os pedidos sem mudança.
+
+
+-- 8. Ajuste da semana -----------------------------------------------------------------
+
+create or replace function public.ajuste_da_semana_interno(p_membro_id uuid, p_semana date)
+returns table (dispensada boolean, so_remoto boolean)
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  with s as (
+    select public.segunda_da_semana(p_semana) as seg
+  ),
+  tipos as (
+    -- sem group by: sempre uma linha (null quando não há pedido)
+    select bool_or(r.tipo = 'ausencia_total') as total,
+           bool_or(r.tipo = 'so_remoto')      as remoto
+    from public.requerimentos r
+    cross join s
+    where r.membro_id = p_membro_id
+      and r.situacao = 'aprovado'
+      and public.segunda_da_semana(r.data_inicio) <= s.seg
+      and public.segunda_da_semana(r.data_fim)    >= s.seg
+  )
+  select coalesce(t.total, false),
+         coalesce(t.remoto, false) and not coalesce(t.total, false)   -- ausência total vence
+  from tipos t
+$$;
+
+comment on function public.ajuste_da_semana_interno(uuid, date) is
+  'Interna (ranking): pedidos aprovados que cobrem a semana. dispensada = ausência total; so_remoto = só remoto (a ausência total vence). Sem filtro de quem vê.';
+
+create or replace function public.ajuste_da_semana(p_membro_id uuid, p_semana date)
+returns table (dispensada boolean, so_remoto boolean)
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  -- só para membro que quem chama já vê (igual ao RLS de membros); senão, false/false
+  select coalesce(v.pode and a.dispensada, false),
+         coalesce(v.pode and a.so_remoto, false)
+  from (
+    select p_membro_id = public.meu_id()
+           or public.ve_tudo()
+           or exists (
+                select 1 from public.membros m
+                where m.id = p_membro_id
+                  and m.setor_id in (select public.setores_que_dirijo())
+              ) as pode
+  ) v
+  cross join public.ajuste_da_semana_interno(p_membro_id, p_semana) a
+$$;
+
+comment on function public.ajuste_da_semana(uuid, date) is
+  'Pedidos aprovados que cobrem a semana, só para membro que quem chama já vê (ele mesmo, ve_tudo ou setor que dirige); senão false/false.';
+
+revoke all on function public.ajuste_da_semana_interno(uuid, date) from public, anon, authenticated;
+-- progresso_de_membro e resumo_da_semana rodam como quem chama: precisam do execute
+revoke all on function public.ajuste_da_semana(uuid, date) from public, anon;
+grant execute on function public.ajuste_da_semana(uuid, date) to authenticated;
+
+
+-- 9. progresso_de_membro (B9) com o ajuste ----------------------------------------------
+-- Sem linha = o membro não existe ou quem chamou não pode ver.
+-- elegivel = false: a semana não conta para ele (entrou depois, desativado,
+-- diretor, ou a semana é de antes da primeira meta).
+
+create or replace function public.progresso_de_membro(p_membro_id uuid, p_semana date)
+returns table (
+  semana      date,
+  horas_sede  numeric,
+  horas_total numeric,
+  meta_sede   numeric,
+  meta_total  numeric,
+  cumpriu     boolean,
+  dispensada  boolean,
+  elegivel    boolean
+)
+language sql
+stable
+set search_path = ''
+as $$
+  with s as (
+    select public.segunda_da_semana(p_semana) as seg
+  ),
+  meta as (
+    select mt.horas_total, mt.horas_sede from public.meta_da_semana(p_semana) mt
+  )
+  select s.seg,
+         round(coalesce(h.horas_sede, 0), 2),
+         round(coalesce(h.horas_total, 0), 2),
+         ms.sede,
+         meta.horas_total,
+         coalesce(e.ok and not aj.dispensada
+                       and coalesce(h.horas_total, 0) >= meta.horas_total
+                       and coalesce(h.horas_sede, 0) >= ms.sede, false),
+         aj.dispensada,
+         e.ok
+  from public.membros m
+  cross join s
+  cross join meta
+  cross join lateral (
+    select public.elegivel_na_semana(m.perfil, m.ativo, m.data_entrada, s.seg)
+           and meta.horas_total is not null as ok
+  ) e
+  cross join lateral public.ajuste_da_semana(m.id, s.seg) aj
+  cross join lateral (
+    -- só remoto: a exigência de sede some
+    select case when aj.so_remoto and meta.horas_sede is not null then 0::numeric
+                else meta.horas_sede end as sede
+  ) ms
+  left join public.horas_da_semana(s.seg, p_membro_id) h on h.membro_id = m.id
+  where m.id = p_membro_id
+$$;
+
+
+-- 10. resumo_da_semana (versão das diretorias) com o ajuste ------------------------------
+-- Filtro de setores igual ao das diretorias acumuladas.
+
+create or replace function public.resumo_da_semana(p_semana date, p_setor text default null)
+returns table (
+  membro_id    uuid,
+  nome         text,
+  email        text,
+  perfil       public.perfil,
+  setor        text,
+  ativo        boolean,
+  data_entrada date,
+  horas_sede   numeric,
+  horas_total  numeric,
+  meta_sede    numeric,
+  meta_total   numeric,
+  cumpriu      boolean,
+  dispensada   boolean
+)
+language sql
+stable
+set search_path = ''
+as $$
+  with s as (
+    select public.segunda_da_semana(p_semana) as seg
+  ),
+  meta as (
+    select mt.horas_total, mt.horas_sede from public.meta_da_semana(p_semana) mt
+  ),
+  pedido as (
+    select st.id from public.setores st where st.nome = p_setor
+  ),
+  meus as (
+    select x.setor_id from public.setores_que_dirijo() x(setor_id)
+  ),
+  filtro as (
+    -- null = todos os setores; senão, só os da lista
+    select case
+             when public.ve_tudo() or not exists (select 1 from meus) then
+               case when p_setor is null then null::uuid[] else array(select p.id from pedido p) end
+             when exists (select 1 from meus mm join pedido p on p.id = mm.setor_id) then
+               array(select p.id from pedido p)
+             else
+               array(select mm.setor_id from meus mm)
+           end as setores
+  )
+  select m.id, m.nome, m.email, m.perfil, st.nome, m.ativo, m.data_entrada,
+         round(coalesce(h.horas_sede, 0), 2),
+         round(coalesce(h.horas_total, 0), 2),
+         ms.sede,
+         meta.horas_total,
+         not aj.dispensada
+           and coalesce(h.horas_total, 0) >= meta.horas_total
+           and coalesce(h.horas_sede, 0) >= ms.sede,
+         aj.dispensada
+  from public.membros m
+  join public.setores st on st.id = m.setor_id
+  cross join s
+  cross join meta
+  cross join filtro
+  cross join lateral public.ajuste_da_semana(m.id, s.seg) aj
+  cross join lateral (
+    -- só remoto: a exigência de sede some
+    select case when aj.so_remoto then 0::numeric else meta.horas_sede end as sede
+  ) ms
+  left join public.horas_da_semana(s.seg) h on h.membro_id = m.id
+  where public.elegivel_na_semana(m.perfil, m.ativo, m.data_entrada, s.seg)
+    and meta.horas_total is not null
+    and (filtro.setores is null or m.setor_id = any (filtro.setores))
+  order by m.nome
+$$;
+
+
+-- 11. horas_do_mes (ranking) com o ajuste ---------------------------------------------------
+-- dispensado = todas as semanas do mês (com meta, em que a pessoa entra)
+-- dispensadas. Usa a camada interna: o pódio e a posição do membro precisam do
+-- dispensado certo de todos. Continua interna (sem execute para ninguém).
+
+create or replace function public.horas_do_mes(p_mes text)
+returns table (
+  membro_id   uuid,
+  setor_id    uuid,
+  horas_total numeric,
+  horas_sede  numeric,
+  dispensado  boolean
+)
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  with segundas as (
+    select d::date as seg
+    from generate_series(to_date(p_mes || '-01', 'YYYY-MM-DD'),
+                         to_date(p_mes || '-01', 'YYYY-MM-DD') + interval '1 month - 1 day',
+                         interval '1 day') as d
+    where extract(isodow from d) = 1
+  ),
+  com_meta as (
+    select s.seg
+    from segundas s
+    cross join lateral public.meta_da_semana(s.seg) mt
+    where mt.horas_total is not null
+  ),
+  quem_entra as (
+    -- uma linha por pessoa; dispensado só se todas as semanas em que entra foram
+    select m.id, m.setor_id, bool_and(aj.dispensada) as dispensado
+    from public.membros m
+    join com_meta c on public.elegivel_na_semana(m.perfil, m.ativo, m.data_entrada, c.seg)
+    cross join lateral public.ajuste_da_semana_interno(m.id, c.seg) aj
+    group by m.id, m.setor_id
+  ),
+  horas as (
+    select h.membro_id, sum(h.horas_total) as total, sum(h.horas_sede) as sede
+    from com_meta c
+    cross join lateral public.horas_da_semana(c.seg) h
+    group by h.membro_id
+  )
+  select q.id, q.setor_id,
+         round(coalesce(h.total, 0), 2),
+         round(coalesce(h.sede, 0), 2),
+         q.dispensado
+  from quem_entra q
+  left join horas h on h.membro_id = q.id
+$$;
