@@ -107,7 +107,7 @@ export function FormRequerimento({
         onAbertoChange(a)
       }}
       titulo="Novo requerimento"
-      descricao="Todo o RH recebe um e-mail quando você envia."
+      descricao="O RH vê o seu pedido no menu Requerimentos assim que você envia."
       rodape={
         <div className="flex gap-2">
           <Button variant="outline" className="flex-1" onClick={() => onAbertoChange(false)} disabled={enviando}>
@@ -189,6 +189,7 @@ export function FormRequerimento({
           <Textarea
             id="req-motivo"
             value={motivo}
+            maxLength={1000}
             onChange={(e) => {
               setMotivo(e.target.value)
               setErros((er) => ({ ...er, motivo: undefined }))

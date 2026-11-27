@@ -1,5 +1,5 @@
 // Painel do RH real: cálculo da semana (B9), ranking do mês, registros corrigidos pelo RH, revisão de
-// cronômetros e metas. Só os requerimentos ainda são falsos e vêm de rh-falso.ts.
+// cronômetros, metas e requerimentos (B8 e J7).
 // Quem vê o quê é decidido no banco: o diretor de setor só recebe os setores que dirige.
 import type {
   LinhaRanking,
@@ -10,16 +10,17 @@ import type {
   NovoRegistro,
   ProgressoSemana,
   Registro,
+  Requerimento,
   ResumoMembroSemana,
+  SituacaoRequerimento,
 } from '../tipos.ts'
 import type { Database } from '../tipos-banco.ts'
 import { instante, partesPorDia, segundaDaSemana, semanaAtual, somarDias } from '../datas.ts'
 import { supabase } from '../supabase.ts'
 import { loginFalso } from './auth.ts'
 import { erroDoBanco, paraRegistro } from './banco.ts'
+import { apagarArquivoDoAnexo, arquivoDoAnexoExiste, COLUNAS_REQUERIMENTO, paraRequerimento } from './requerimentos.ts'
 import * as falso from './rh-falso.ts'
-
-export { listarRequerimentos, responderRequerimento } from './rh-falso.ts'
 
 type Funcoes = Database['public']['Functions']
 type LinhaResumo = Funcoes['resumo_da_semana']['Returns'][number]
@@ -311,4 +312,70 @@ export async function alterarMetas(horasTotal: number, horasSede: number, vigent
     .from('metas')
     .insert({ horas_total: horasTotal, horas_sede: horasSede, vigente_desde: vigenteDesde })
   if (error) throw erroDoBanco(error)
+}
+
+// Apaga o arquivo e marca no banco. Só marca se o arquivo saiu do bucket. Quando a regra de apagar
+// recusa, o Storage responde sem erro e com a lista vazia; a lista também vem vazia se o arquivo já
+// tinha sumido (apagado numa vez em que anexo_apagado falhou depois). Por isso, lista vazia: confere se
+// o arquivo ainda existe. Existe = recusado, não marca. Sumiu = marca, senão o pedido ficaria para sempre
+// com anexo_caminho. Só quem vê tudo chega aqui, e quem vê tudo lê o bucket inteiro.
+async function apagarAnexo(id: string, caminho: string): Promise<void> {
+  if (!(await apagarArquivoDoAnexo(caminho)) && (await arquivoDoAnexoExiste(caminho))) return
+  const { error } = await supabase.rpc('anexo_apagado', { p_id: id })
+  if (error) throw erroDoBanco(error)
+}
+
+// Anexos de pedidos aprovados, ou reprovados há mais de um mês. Roda quando o RH abre a lista.
+async function apagarAnexosVencidos(): Promise<void> {
+  const { data, error } = await supabase.rpc('anexos_para_apagar')
+  if (error) throw erroDoBanco(error)
+  for (const a of data) {
+    try {
+      await apagarAnexo(a.id, a.anexo_caminho)
+    } catch {
+      // Um que falhou não impede os outros: fica para a próxima vez.
+    }
+  }
+}
+
+// Do mais recente para o mais antigo. Sem situacao, devolve todos.
+// Veem: rh, presidente e quem dirige o RH (RLS). O diretor de setor não vê.
+export async function listarRequerimentos(situacao?: SituacaoRequerimento): Promise<Requerimento[]> {
+  if (loginFalso) return falso.listarRequerimentos(situacao)
+  try {
+    await apagarAnexosVencidos()
+  } catch {
+    // A limpeza não trava a lista: tenta de novo na próxima vez que o RH abrir a tela.
+  }
+  let consulta = supabase.from('requerimentos').select(COLUNAS_REQUERIMENTO)
+  if (situacao) consulta = consulta.eq('situacao', situacao)
+  const { data, error } = await consulta.order('criado_em', { ascending: false })
+  if (error) throw erroDoBanco(error)
+  return data.map(paraRequerimento)
+}
+
+// Só quem dirige o RH responde, nunca o próprio. A reprovação exige motivo, que o membro vê na tela.
+// Na aprovação, o anexo é apagado (pode ter dado de saúde); na reprovação, fica guardado por um mês.
+export async function responderRequerimento(id: string, aprovar: boolean, motivo = ''): Promise<void> {
+  if (loginFalso) return falso.responderRequerimento(id, aprovar, motivo)
+  if (!aprovar) exigirMotivo(motivo)
+  // Lê o caminho antes: depois de responder, a resposta já vale e só falta o arquivo.
+  const { data: antes, error: erroLeitura } = await supabase
+    .from('requerimentos')
+    .select('anexo_caminho')
+    .eq('id', id)
+    .maybeSingle()
+  if (erroLeitura) throw erroDoBanco(erroLeitura)
+  const { error } = await supabase.rpc('responder_requerimento', {
+    p_id: id,
+    p_aprovar: aprovar,
+    p_motivo: aprovar ? undefined : motivo.trim(),
+  })
+  if (error) throw erroDoBanco(error)
+  if (!aprovar || !antes?.anexo_caminho) return
+  try {
+    await apagarAnexo(id, antes.anexo_caminho)
+  } catch {
+    // Falhar aqui não desfaz a aprovação: a limpeza de listarRequerimentos apaga depois.
+  }
 }

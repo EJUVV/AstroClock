@@ -121,7 +121,7 @@ function RequerimentosRH() {
       <p className="flex items-start gap-2 text-sm text-muted-foreground">
         <InfoIcon className="mt-0.5 size-4 shrink-0" />
         {podeResponder
-          ? 'O membro recebe um e-mail com a resposta. A reprovação pede um motivo, que vai no e-mail. Ao aprovar, o anexo é apagado; se reprovar, ele fica guardado por um mês.'
+          ? 'O membro vê a resposta na tela de Requerimentos dele. A reprovação pede um motivo, que aparece para ele lá. Ao aprovar, o anexo é apagado; se reprovar, ele fica guardado por um mês.'
           : 'Só o diretor do RH aprova ou reprova. Você pode acompanhar os pedidos aqui.'}
       </p>
       <Carregavel carga={carga} esqueleto={<Skeleton className="h-96 rounded-[24px]" />}>
@@ -206,15 +206,15 @@ function RequerimentosRH() {
         titulo="Aprovar requerimento?"
         descricao={
           respondendo?.q.tipo === 'so_remoto'
-            ? `A exigência de sede some nas semanas afetadas de ${respondendo.q.nomeMembro}. O total continua. Ele recebe um e-mail e o anexo é apagado.`
-            : `As semanas afetadas de ${respondendo?.q.nomeMembro} ficam dispensadas e fora do cálculo. Ele recebe um e-mail e o anexo é apagado.`
+            ? `A exigência de sede some nas semanas afetadas de ${respondendo.q.nomeMembro}. O total continua. Ele vê a resposta na tela de Requerimentos e o anexo é apagado.`
+            : `As semanas afetadas de ${respondendo?.q.nomeMembro} ficam dispensadas e fora do cálculo. Ele vê a resposta na tela de Requerimentos e o anexo é apagado.`
         }
         confirmar="Aprovar"
         onConfirmar={async () => {
           if (!respondendo) return
           try {
             await responderRequerimento(respondendo.q.id, true)
-            toast.success('Requerimento aprovado', { description: 'O membro vai receber um e-mail.' })
+            toast.success('Requerimento aprovado', { description: 'O membro vê a resposta na tela de Requerimentos.' })
             setVersao((v) => v + 1)
           } catch (e) {
             toast.error((e as Error).message)
@@ -226,13 +226,13 @@ function RequerimentosRH() {
         aberto={respondendo?.aprovar === false}
         onAbertoChange={(a) => !a && setRespondendo(null)}
         titulo="Reprovar requerimento"
-        descricao="A meta continua a mesma para este membro. O motivo vai no e-mail que ele recebe."
+        descricao="A meta continua a mesma para este membro. Ele vê o motivo na tela de Requerimentos."
         confirmar="Reprovar"
         perigoso
         onConfirmar={async (motivo) => {
           if (!respondendo) return
           await responderRequerimento(respondendo.q.id, false, motivo)
-          toast.success('Requerimento reprovado', { description: 'O membro vai receber um e-mail com o motivo.' })
+          toast.success('Requerimento reprovado', { description: 'O membro vê o motivo na tela de Requerimentos.' })
           setVersao((v) => v + 1)
         }}
       />

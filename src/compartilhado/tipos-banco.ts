@@ -398,6 +398,69 @@ export type Database = {
           },
         ]
       }
+      requerimentos: {
+        Row: {
+          anexo_caminho: string | null
+          anexo_nome: string | null
+          criado_em: string
+          data_fim: string
+          data_inicio: string
+          id: string
+          membro_id: string
+          motivo: string
+          motivo_resposta: string | null
+          respondido_em: string | null
+          respondido_por: string | null
+          situacao: Database["public"]["Enums"]["situacao_requerimento"]
+          tipo: Database["public"]["Enums"]["tipo_requerimento"]
+        }
+        Insert: {
+          anexo_caminho?: string | null
+          anexo_nome?: string | null
+          criado_em?: string
+          data_fim: string
+          data_inicio: string
+          id?: string
+          membro_id?: string
+          motivo: string
+          motivo_resposta?: string | null
+          respondido_em?: string | null
+          respondido_por?: string | null
+          situacao?: Database["public"]["Enums"]["situacao_requerimento"]
+          tipo: Database["public"]["Enums"]["tipo_requerimento"]
+        }
+        Update: {
+          anexo_caminho?: string | null
+          anexo_nome?: string | null
+          criado_em?: string
+          data_fim?: string
+          data_inicio?: string
+          id?: string
+          membro_id?: string
+          motivo?: string
+          motivo_resposta?: string | null
+          respondido_em?: string | null
+          respondido_por?: string | null
+          situacao?: Database["public"]["Enums"]["situacao_requerimento"]
+          tipo?: Database["public"]["Enums"]["tipo_requerimento"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "requerimentos_membro_id_fkey"
+            columns: ["membro_id"]
+            isOneToOne: false
+            referencedRelation: "membros"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "requerimentos_respondido_por_fkey"
+            columns: ["respondido_por"]
+            isOneToOne: false
+            referencedRelation: "membros"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       setores: {
         Row: {
           ativo: boolean
@@ -461,6 +524,36 @@ export type Database = {
           nome: string
           perfil: Database["public"]["Enums"]["perfil"]
           setor: string
+        }[]
+      }
+      ajuste_da_semana: {
+        Args: { p_membro_id: string; p_semana: string }
+        Returns: {
+          dispensada: boolean
+          so_remoto: boolean
+        }[]
+      }
+      ajuste_da_semana_interno: {
+        Args: { p_membro_id: string; p_semana: string }
+        Returns: {
+          dispensada: boolean
+          so_remoto: boolean
+        }[]
+      }
+      anexo_apagado: { Args: { p_id: string }; Returns: undefined }
+      anexo_deve_sumir: {
+        Args: {
+          p_respondido_em: string
+          p_situacao: Database["public"]["Enums"]["situacao_requerimento"]
+        }
+        Returns: boolean
+      }
+      anexo_pode_ser_apagado: { Args: { p_caminho: string }; Returns: boolean }
+      anexos_para_apagar: {
+        Args: never
+        Returns: {
+          anexo_caminho: string
+          id: string
         }[]
       }
       atribuir_diretoria: {
@@ -756,6 +849,10 @@ export type Database = {
         }[]
       }
       remover_diretoria: { Args: { p_setor: string }; Returns: undefined }
+      responder_requerimento: {
+        Args: { p_aprovar: boolean; p_id: string; p_motivo?: string }
+        Returns: undefined
+      }
       resumo_da_semana: {
         Args: { p_semana: string; p_setor?: string }
         Returns: {
@@ -834,6 +931,8 @@ export type Database = {
       local_registro: "sede" | "online"
       origem_registro: "manual" | "cronometro"
       perfil: "membro" | "rh" | "diretor_rh" | "diretor_setor" | "presidente"
+      situacao_requerimento: "pendente" | "aprovado" | "reprovado"
+      tipo_requerimento: "so_remoto" | "ausencia_total"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -967,6 +1066,8 @@ export const Constants = {
       local_registro: ["sede", "online"],
       origem_registro: ["manual", "cronometro"],
       perfil: ["membro", "rh", "diretor_rh", "diretor_setor", "presidente"],
+      situacao_requerimento: ["pendente", "aprovado", "reprovado"],
+      tipo_requerimento: ["so_remoto", "ausencia_total"],
     },
   },
 } as const
