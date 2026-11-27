@@ -24,7 +24,7 @@ function titulos(perfil: Perfil, setoresQueDirijo: string[]): TituloPagina[] {
     { prefixo: '/rh/membros', titulo: 'Membros', subtitulo: membros },
     { prefixo: '/rh/requerimentos', titulo: 'Requerimentos', subtitulo: 'Pedidos de só remoto e de ausência total.' },
     { prefixo: '/rh/cronometros', titulo: 'Revisão de cronômetros', subtitulo: 'Cronômetros que pararam sozinhos após 10h.' },
-    { prefixo: '/rh/ranking', titulo: 'Ranking mensal', subtitulo: 'Horas totais, com desempate pelas horas na sede.' },
+    { prefixo: '/rh/ranking', titulo: 'Ranking mensal', subtitulo: 'Horas totais, com desempate pelas horas na sede e por quem chegou primeiro.' },
     { prefixo: '/rh/metas', titulo: 'Metas', subtitulo: 'Meta semanal de horas, igual para todos.' },
     { prefixo: '/rh/configuracoes', titulo: 'Configurações', subtitulo: 'Sua foto, aparência e preferências.' },
     { prefixo: '/rh/sede', titulo: 'Sede', subtitulo: 'Veja quem está lá agora e avise quando você chegar.' },

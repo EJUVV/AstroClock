@@ -1,23 +1,23 @@
 // FALSO: versão de demonstração, usada só com VITE_LOGIN_FALSO=true (ver ranking.ts)
-// Mesmas regras das funções do banco (migração ranking_e_podio), calculadas sobre os dados falsos.
+// Mesmas regras das funções do banco (migrações ranking_e_podio e ranking_sem_empate), calculadas
+// sobre os dados falsos.
 import type { LinhaPodio, LinhaRanking, LinhaRankingSetor, PodioDoMes, PosicaoRanking } from '../tipos.ts'
-import { atraso, calcularRanking, estaDispensada, membroLogado, semanasDoMes } from './dados-falsos.ts'
+import { atraso, calcularRanking, estaDispensada, membroLogado, semanasDoMes, ultimoFimDoMes } from './dados-falsos.ts'
 
 const PODIO_EJ = 5
 const PODIO_SETOR = 3
 
-function comparar(a: LinhaRanking, b: LinhaRanking): number {
-  return Number(a.dispensado) - Number(b.dispensado) || b.horasTotal - a.horasTotal || b.horasSede - a.horasSede
-}
-
-// Posição com empate dividido (1º, 2º, 2º, 4º), como o rank() do banco.
-function comPosicoes(linhas: LinhaRanking[]): LinhaRanking[] {
-  const ordem = [...linhas].sort(comparar)
-  let posicao = 0
-  return ordem.map((linha, i) => {
-    if (i === 0 || comparar(ordem[i - 1], linha) !== 0) posicao = i + 1
-    return { ...linha, posicao }
-  })
+// Posições sem repetir (1º, 2º, 3º...), como o row_number() do banco: horas totais, horas na sede,
+// quem chegou primeiro (sem registro fica depois) e, por fim, o nome.
+function comPosicoes(linhas: LinhaRanking[], ultimoFim: Map<string, number>): LinhaRanking[] {
+  const fim = (l: LinhaRanking) => ultimoFim.get(l.membro.id) ?? Infinity
+  const comparar = (a: LinhaRanking, b: LinhaRanking) =>
+    Number(a.dispensado) - Number(b.dispensado) ||
+    b.horasTotal - a.horasTotal ||
+    b.horasSede - a.horasSede ||
+    (fim(a) === fim(b) ? 0 : fim(a) < fim(b) ? -1 : 1) ||
+    a.membro.nome.localeCompare(b.membro.nome)
+  return [...linhas].sort(comparar).map((linha, i) => ({ ...linha, posicao: i + 1 }))
 }
 
 function noPodio(linha: LinhaRanking, limite: number): boolean {
@@ -55,17 +55,17 @@ function linhasDoMes(mes: string): LinhaRanking[] {
 }
 
 function rankingDaEJ(mes: string): LinhaRanking[] {
-  return comPosicoes(linhasDoMes(mes))
+  return comPosicoes(linhasDoMes(mes), ultimoFimDoMes(mes))
 }
 
-function rankingDoSetor(ej: LinhaRanking[], setor: string): LinhaRanking[] {
-  return comPosicoes(ej.filter((l) => l.membro.setor === setor))
+function rankingDoSetor(mes: string, ej: LinhaRanking[], setor: string): LinhaRanking[] {
+  return comPosicoes(ej.filter((l) => l.membro.setor === setor), ultimoFimDoMes(mes))
 }
 
 export async function podioDoMes(mes: string): Promise<PodioDoMes> {
   await atraso()
   const ej = rankingDaEJ(mes)
-  const setor = rankingDoSetor(ej, membroLogado().setor)
+  const setor = rankingDoSetor(mes, ej, membroLogado().setor)
   const ordenar = (a: LinhaPodio, b: LinhaPodio) => a.posicao - b.posicao || a.nome.localeCompare(b.nome)
   return {
     ej: ej.filter((l) => noPodio(l, PODIO_EJ)).map(paraPodio).sort(ordenar),
@@ -79,7 +79,7 @@ export async function minhaPosicaoNoRanking(mes: string): Promise<PosicaoRanking
   const ej = rankingDaEJ(mes)
   const euEJ = ej.find((l) => l.membro.id === id)
   if (!euEJ) return null
-  const setor = rankingDoSetor(ej, euEJ.membro.setor)
+  const setor = rankingDoSetor(mes, ej, euEJ.membro.setor)
   const euSetor = setor.find((l) => l.membro.id === id) ?? euEJ
   return {
     posicaoEJ: euEJ.posicao,
@@ -106,12 +106,7 @@ export async function rankingDosSetores(mes: string): Promise<LinhaRankingSetor[
     mediaTotal: media(membros.map((m) => m.horasTotal)),
     mediaSede: media(membros.map((m) => m.horasSede)),
   }))
-  const comparar = (a: (typeof linhas)[number], b: (typeof linhas)[number]) =>
-    b.mediaTotal - a.mediaTotal || b.mediaSede - a.mediaSede
-  linhas.sort((a, b) => comparar(a, b) || a.setor.localeCompare(b.setor))
-  let posicao = 0
-  return linhas.map((linha, i) => {
-    if (i === 0 || comparar(linhas[i - 1], linha) !== 0) posicao = i + 1
-    return { posicao, ...linha }
-  })
+  // Sem repetir posição: média total, média na sede e, por fim, o nome do setor.
+  linhas.sort((a, b) => b.mediaTotal - a.mediaTotal || b.mediaSede - a.mediaSede || a.setor.localeCompare(b.setor))
+  return linhas.map((linha, i) => ({ posicao: i + 1, ...linha }))
 }

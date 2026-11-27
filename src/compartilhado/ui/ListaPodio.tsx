@@ -7,7 +7,8 @@ import { EtiquetaSetor } from '@/compartilhado/ui/EtiquetaSetor'
 // Ouro, prata e bronze (as mesmas cores do pódio do ranking do RH).
 const CORES_POSICAO = ['bg-[#FDE68A] text-[#92400E]', 'bg-[#E5E7EB] text-[#374151]', 'bg-[#FED7AA] text-[#9A3412]']
 
-// Pódio do mês: só nome, setor e horas. Com empate, as posições se repetem (1º, 2º, 2º, 4º).
+// Pódio do mês: só nome, setor e horas. Cada um tem a sua posição (1º, 2º, 3º...): o desempate
+// é pelas horas na sede e por quem chegou primeiro (seção 12 do regras-de-negocio.md).
 export function ListaPodio({ linhas, destaqueId }: { linhas: LinhaPodio[]; destaqueId?: string }) {
   if (linhas.length === 0) {
     return <p className="py-6 text-center text-sm text-muted-foreground">Ainda não há horas registradas neste mês.</p>
