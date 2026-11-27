@@ -549,10 +549,27 @@ export function semanasDoMes(mes: string): string[] {
   return semanas
 }
 
-// Ordem: horas totais, desempate por horas na sede. Quem teve semana dispensada aparece normalmente,
-// com as horas que fez; dispensado só sinaliza que houve ao menos uma semana dispensada no mês.
+// Quando cada membro fechou as horas do mês: fim do último registro que conta (mesmos registros
+// e semanas do cálculo das horas). Usado no desempate do ranking (quem chegou primeiro).
+export function ultimoFimDoMes(mes: string): Map<string, number> {
+  const semanas = new Set(semanasDoMes(mes))
+  const ultimo = new Map<string, number>()
+  for (const r of registros) {
+    if (r.cancelado || r.precisaRevisao || r.fim === null) continue
+    if (!semanas.has(segundaDaSemana(dataEmBrasilia(r.inicio)))) continue
+    const fim = Date.parse(r.fim)
+    if (fim > (ultimo.get(r.membroId) ?? -Infinity)) ultimo.set(r.membroId, fim)
+  }
+  return ultimo
+}
+
+// Ordem, sem repetir posição: horas totais, horas na sede, quem chegou primeiro e, por fim, o nome.
+// Quem teve semana dispensada aparece normalmente, com as horas que fez; dispensado só sinaliza que
+// houve ao menos uma semana dispensada no mês.
 export function calcularRanking(mes: string): LinhaRanking[] {
   const semanas = semanasDoMes(mes)
+  const ultimoFim = ultimoFimDoMes(mes)
+  const fim = (id: string) => ultimoFim.get(id) ?? Infinity
   const linhas = membros
     .filter((m) => m.ativo && !ehDiretor(m.perfil))
     .map((m) => {
@@ -564,7 +581,13 @@ export function calcularRanking(mes: string): LinhaRanking[] {
         dispensado: semanas.some((s) => estaDispensada(m.id, s)),
       }
     })
-    .sort((a, b) => b.horasTotal - a.horasTotal || b.horasSede - a.horasSede)
+    .sort(
+      (a, b) =>
+        b.horasTotal - a.horasTotal ||
+        b.horasSede - a.horasSede ||
+        (fim(a.membro.id) === fim(b.membro.id) ? 0 : fim(a.membro.id) < fim(b.membro.id) ? -1 : 1) ||
+        a.membro.nome.localeCompare(b.membro.nome),
+    )
   return linhas.map((linha, i) => ({ posicao: i + 1, ...linha }))
 }
 

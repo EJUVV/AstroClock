@@ -1,10 +1,16 @@
 # Andamento da Fase 0
 
-Retrato de onde a Fase 0 parou (atualizado em 26/11/2026). Ao retomar com uma IA, peça para ela ler este arquivo e o [`fase-0.md`](fase-0.md). Quando a Fase 0 terminar, este arquivo pode ser apagado (antes, passe a seção "Ambientes" para o `arquitetura.md` ou o `README.md`).
+Retrato de onde a Fase 0 parou (atualizado em 27/11/2026). Ao retomar com uma IA, peça para ela ler este arquivo e o [`fase-0.md`](fase-0.md). Quando a Fase 0 terminar, este arquivo pode ser apagado (antes, passe a seção "Ambientes" para o `arquitetura.md` ou o `README.md`).
 
 ## Próxima sessão: comece por aqui
 
-Onde paramos (26/11/2026, semana 4): **o cálculo semanal (B9), o cronômetro que para sozinho (B10), as correções da B7 (B7.1), a G10, a J5, a G13, a G12, o ranking com pódio e as diretorias acumuladas estão na `main` e no `horas-dev`.** O site de teste `https://astro-clock-xi.vercel.app` usa login real e o `horas-dev` (sem a demonstração) desde 26/11. Falta trocar os painéis pelo cálculo real (G11 do membro e J10 do RH), a tela de mudar setor (J4) e levar tudo para o `horas-prod` (B14). O acompanhamento das tarefas está no Notion (Quadro de Sprints, projeto AstroClock). As regras estão fechadas no [`regras-de-negocio.md`](regras-de-negocio.md).
+Onde paramos (27/11/2026, semana 4): **o cálculo semanal (B9), o cronômetro que para sozinho (B10), as correções da B7 (B7.1), a G10, a J5, a G13, a G12, o ranking com pódio (agora sem posições repetidas) e as diretorias acumuladas estão na `main` e no `horas-dev`.** A G11 foi entregue em 26/11 na branch `feat/g11-calculo-real` (sem PR ainda). O site de teste `https://astro-clock-xi.vercel.app` usa login real e o `horas-dev` (sem a demonstração) desde 26/11. Falta trocar os painéis pelo cálculo real (G11 do membro e J10 do RH), a tela de mudar setor (J4) e levar tudo para o `horas-prod` (B14). O acompanhamento das tarefas está no Notion (Quadro de Sprints, projeto AstroClock). As regras estão fechadas no [`regras-de-negocio.md`](regras-de-negocio.md).
+
+### Feito em 27/11/2026
+
+- **Ranking sem posições repetidas** (decidido pelo líder do projeto em 27/11; seção 12 do [`regras-de-negocio.md`](regras-de-negocio.md)): cada pessoa tem a sua posição, também no pódio (no máximo 5 na EJ e 3 no setor). Ordem dos membros: horas totais, horas na sede, quem chegou primeiro (o último registro que conta no mês terminou antes) e, por fim, o nome. Setores: média total, média na sede e o nome. Migração nova `20261127120000_ranking_sem_empate` (função interna `ultimo_registro_do_mes`; `ranking_interno` e `ranking_dos_setores` com `row_number`), `teste-ranking.sql` atualizado (Beto 2º e Caio 3º), demonstração com a mesma regra. **Aplicada no `horas-dev`** em 27/11; as 3 suítes passaram; tipos gerados de novo. Resolve também o "1º para todos" da aba Setores com todos em 0h.
+- **Setores pequenos aparecem normalmente** no ranking dos setores (decisão do Victor em 27/11; a sugestão de esconder setores com menos de 3 membros foi descartada).
+- **Notion conferido:** G11 em Validação Interna (entregue na branch, falta PR); J10 e J4 atrasadas e sem branch; B14 não aconteceu em 26/11 (precisa de data nova e agora inclui também a `ranking_sem_empate`).
 
 ### Feito em 26/11/2026
 
@@ -159,12 +165,11 @@ Semana 4 (23 a 27/11). Meta: o piloto completo, em produção. O teste com membr
 
 1. **Guilherme:** G11 (painel do membro com o cálculo real), que venceu em 25/11 e ainda não tem branch. Antes, `git pull` na `main`: o PR #12 entrou com 2 commits da revisão por cima, e o PR #13 mudou bastante o `InicioMembro.tsx` (ranking no topo, cartão "Horas no mês" e `GraficoColunas` no lugar do `CapsuleBarChart`). A G12 já está na `main`. Pode herdar a J10 se ela não andar.
 2. **Johannes:** J4 (tela de mudar o setor) e J10 (painel do RH com o cálculo real), a partir da `main` atual, depois de um `git pull`: o PR #13 mudou a `VisaoGeral.tsx` ("Cumpriram a meta" virou o `CartaoPico`) e trocou o setor pela `EtiquetaSetor` em várias telas do RH. A J5 já está na `main`.
-3. **Bernardo:** B14 com o Victor (26/11): aplicar no `horas-prod` todas as migrações da `main` (sem o seed) e cadastrar o primeiro diretor do RH. Depois, B15 (cancelar meta).
+3. **Bernardo:** B14 com o Victor (não aconteceu em 26/11; marcar data nova): aplicar no `horas-prod` todas as migrações da `main` (sem o seed, incluindo as das diretorias e a `ranking_sem_empate`) e cadastrar o primeiro diretor do RH. Depois, B15 (cancelar meta).
 4. **Victor:**
    - Testar a revisão de cronômetros (G10) com o perfil `rh`: aprovar um e reprovar outro; depois marcar a G10 como concluída.
    - V7: a produção está montada e o login com Google passa (Google Cloud feito em 25/11). Falta a B14 com o Bernardo (26/11) e testar o login de novo.
    - V6 (validação com o RH) assim que a B9 estiver no `horas-dev` e a J10 na `main`.
-   - Ranking com pódio: decidir o caso dos setores pequenos (mostrar só setores com 3 ou mais membros, ou deixar como está).
 
 ### Tarefas do Victor fora da IA
 
@@ -176,7 +181,6 @@ Semana 4 (23 a 27/11). Meta: o piloto completo, em produção. O teste com membr
 - **Regra do cronômetro na meia-noite:** resolvida pela B10 e pela G13 (o banco divide na meia-noite e corta em 10h; o site só manda parar).
 - **Resend:** revogar a chave criada antes da decisão de usar o Gmail da EJ.
 - **Google Cloud:** feito em 25/11 (ver "Feito em 25/11"). Só confirmar se o endereço do prod antigo (`zetjgqdagnlkodbexnoe`) saiu do cliente "AstroClock Supabase".
-- **Ranking, setores pequenos:** decidir até a lista de membros do RH chegar (26 ou 27/11). Se algum setor tiver menos de 3 membros, a sugestão é mostrar só setores com 3 ou mais.
 - **Lista de membros do RH** (nome, e-mail `@ejuvv.com`, setor e perfil): o Victor pega em 26 ou 27/11, para o cadastro na estabilização.
 - **V5 (conta de envio):** usar a conta da diretoria de RH (decidido em 25/11; confirmar o endereço). Quem tem a conta ativa a verificação em duas etapas e cria a senha de app "AstroClock"; depois, gravar `EMAIL_REMETENTE` e `EMAIL_SENHA_APP` nos segredos do Supabase com a IA. Só é usada na G8, que depende do requerimento (B8).
 - **Domínio e DNS:** o `ejuvv.com` vale até 21/02/2027 (registro no UOL Host, pela Tucows). DNS na Hostinger desde 24/11, com MX, SPF e DMARC do Google e o CNAME `astroclock` da produção. DKIM ativo desde 25/11. Falta: ligar a renovação automática no UOL Host; trocar o e-mail de contato da conta do UOL para um que não seja `@ejuvv.com`. Detalhes no relatório do Victor de 24/11 ("Relatório técnico: migração de DNS e restabelecimento do e-mail").
