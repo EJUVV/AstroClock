@@ -1,42 +1,33 @@
-// FALSO: trocar pela versão real (ver docs/arquitetura.md)
+// Presença na sede (B13): não registra horas, só avisa quem está na sede agora.
+// Quem vê o quê é decidido no banco: os outros aparecem só com nome, setor e desde.
 import type { PresencaSede } from '../tipos.ts'
-import { atraso, desmarcarQuemFicouDeOntem, membroLogado, membros, presencas } from './dados-falsos.ts'
+import { supabase } from '../supabase.ts'
+import { loginFalso } from './auth.ts'
+import { erroDoBanco } from './banco.ts'
+import * as falso from './presenca-falso.ts'
 
-function minhaPresenca(membroId: string) {
-  desmarcarQuemFicouDeOntem()
-  return presencas.find((p) => p.membroId === membroId && p.saida === null)
-}
-
-// Não registra horas: só informa quem está na sede agora.
 export async function quemEstaNaSede(): Promise<PresencaSede[]> {
-  await atraso()
-  desmarcarQuemFicouDeOntem()
-  return presencas
-    .filter((p) => p.saida === null)
-    .map((p) => ({
-      membroId: p.membroId,
-      nome: membros.find((m) => m.id === p.membroId)?.nome ?? '',
-      setor: membros.find((m) => m.id === p.membroId)?.setor ?? '',
-      desde: p.entrada,
-    }))
-    .sort((a, b) => a.nome.localeCompare(b.nome))
+  if (loginFalso) return falso.quemEstaNaSede()
+  const { data, error } = await supabase.rpc('quem_esta_na_sede')
+  if (error) throw erroDoBanco(error)
+  return data.map((l) => ({ membroId: l.membro_id, nome: l.nome, setor: l.setor, desde: l.desde }))
 }
 
 export async function estouNaSede(): Promise<boolean> {
-  await atraso()
-  return minhaPresenca(membroLogado().id) !== undefined
+  if (loginFalso) return falso.estouNaSede()
+  const { data, error } = await supabase.rpc('estou_na_sede')
+  if (error) throw erroDoBanco(error)
+  return data
 }
 
 export async function marcarNaSede(): Promise<void> {
-  await atraso()
-  const membroId = membroLogado().id
-  if (minhaPresenca(membroId)) throw new Error('Você já está marcado como na sede')
-  presencas.push({ membroId, entrada: new Date().toISOString(), saida: null })
+  if (loginFalso) return falso.marcarNaSede()
+  const { error } = await supabase.rpc('marcar_na_sede')
+  if (error) throw erroDoBanco(error)
 }
 
 export async function desmarcarNaSede(): Promise<void> {
-  await atraso()
-  const presenca = minhaPresenca(membroLogado().id)
-  if (!presenca) throw new Error('Você não está marcado como na sede')
-  presenca.saida = new Date().toISOString()
+  if (loginFalso) return falso.desmarcarNaSede()
+  const { error } = await supabase.rpc('desmarcar_na_sede')
+  if (error) throw erroDoBanco(error)
 }

@@ -530,7 +530,9 @@ export type Database = {
         }
         Returns: boolean
       }
+      desmarcar_na_sede: { Args: never; Returns: undefined }
       encerrar_cronometros_esquecidos: { Args: never; Returns: number }
+      estou_na_sede: { Args: never; Returns: boolean }
       exigir_rh_com_motivo: { Args: { p_motivo: string }; Returns: undefined }
       horas_da_semana: {
         Args: { p_membro_id?: string; p_semana: string }
@@ -591,6 +593,7 @@ export type Database = {
           setor: string
         }[]
       }
+      marcar_na_sede: { Args: never; Returns: undefined }
       minha_posicao_no_ranking: {
         Args: { p_mes: string }
         Returns: {
@@ -685,6 +688,15 @@ export type Database = {
           nome: string
           perfil: Database["public"]["Enums"]["perfil"]
           posicao: number
+          setor: string
+        }[]
+      }
+      quem_esta_na_sede: {
+        Args: never
+        Returns: {
+          desde: string
+          membro_id: string
+          nome: string
           setor: string
         }[]
       }

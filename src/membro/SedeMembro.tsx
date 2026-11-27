@@ -11,7 +11,7 @@ import { EtiquetaSetor } from '@/compartilhado/ui/EtiquetaSetor'
 
 function SedeMembro() {
   const { naSede, enviando, alternar } = usePresenca()
-  const carga = useCarregar(() => quemEstaNaSede(), [naSede])
+  const carga = useCarregar(() => quemEstaNaSede(), [naSede], 60_000)
   // No painel do RH, o topo já mostra o título em todos os tamanhos de tela.
   const noPainelRH = useLocation().pathname.startsWith('/rh')
 
