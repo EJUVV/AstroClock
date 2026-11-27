@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react'
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { BellIcon, ClockIcon, FileTextIcon, LayoutDashboardIcon, MapPinIcon, SearchIcon, TargetIcon, TimerIcon, TrophyIcon, UsersIcon } from 'lucide-react'
 import { cronometrosEmRevisao, listarRequerimentos } from '@/compartilhado/api/rh'
-import { juntarSetores, veRequerimentos } from '@/compartilhado/perfis'
+import { juntarSetores, veRequerimentos as podeVerRequerimentos } from '@/compartilhado/perfis'
+import { temRequerimentos, temSede } from '@/compartilhado/recursos'
 import type { Perfil } from '@/compartilhado/tipos'
 import { BotaoSedeTopo, ProvedorPresenca } from '@/membro/usePresenca'
 import { LayoutPainel, type ItemMenu, type TituloPagina } from '@/compartilhado/ui/LayoutPainel'
@@ -32,6 +33,9 @@ function titulos(perfil: Perfil, setoresQueDirijo: string[]): TituloPagina[] {
   ]
 }
 
+// Requerimentos só aparecem quando já são reais (recursos.ts) e para quem pode vê-los.
+const veRequerimentos = (perfil: Perfil) => temRequerimentos && podeVerRequerimentos(perfil)
+
 const SECAO: Record<Perfil, string> = {
   membro: '',
   rh: 'Painel do RH',
@@ -59,7 +63,7 @@ function PainelRH() {
     { para: '/rh/cronometros', rotulo: 'Revisão de cronômetros', icone: TimerIcon, contador: emRevisao },
     { para: '/rh/ranking', rotulo: 'Ranking', icone: TrophyIcon },
     ...(perfil === 'diretor_rh' ? [{ para: '/rh/metas', rotulo: 'Metas', icone: TargetIcon }] : []),
-    { para: '/rh/sede', rotulo: 'Sede', icone: MapPinIcon },
+    ...(temSede ? [{ para: '/rh/sede', rotulo: 'Sede', icone: MapPinIcon }] : []),
   ]
   // Celular e tablet: 3 abas na barra de baixo; o resto fica no botão "Mais".
   // Quem não vê requerimentos (diretor de setor) fica com o Ranking no lugar.

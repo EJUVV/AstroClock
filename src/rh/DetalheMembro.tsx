@@ -26,6 +26,7 @@ import { CartaoSemana, situacaoDaSemana } from '@/compartilhado/ui/CartaoSemana'
 import { FormRegistro } from '@/compartilhado/ui/FormRegistro'
 import { ItemRegistro } from '@/compartilhado/ui/ItemRegistro'
 import { ItemRequerimento } from '@/compartilhado/ui/ItemRequerimento'
+import { temRequerimentos } from '@/compartilhado/recursos'
 import { corrigeRegistros, ehDiretor, NOME_PERFIL } from '@/compartilhado/perfis'
 import { SecaoDiretorias } from './SecaoDiretorias'
 import { useSessao } from '@/compartilhado/ui/RotaProtegida'
@@ -41,7 +42,7 @@ type Acao =
 function DetalheMembro() {
   const { perfil, cargo } = useSessao()
   const podeCorrigir = corrigeRegistros(perfil)
-  const veRequerimentosDoMembro = perfil !== 'diretor_setor'
+  const veRequerimentosDoMembro = temRequerimentos && perfil !== 'diretor_setor'
   const { id = '' } = useParams()
   const [semana, setSemana] = useState(semanaAtual())
   const [versao, setVersao] = useState(0)

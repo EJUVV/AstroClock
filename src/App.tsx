@@ -1,5 +1,6 @@
 import { lazy, Suspense, type ComponentType } from 'react'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { temRequerimentos, temSede } from './compartilhado/recursos.ts'
 import { PainelDemo } from './compartilhado/ui/demo.tsx'
 import { RotaProtegida, TelaCarregando } from './compartilhado/ui/RotaProtegida.tsx'
 import Inicio from './membro/Inicio.tsx'
@@ -48,8 +49,8 @@ function App() {
           >
             <Route index element={<InicioMembro />} />
             <Route path="registros" element={<RegistrosMembro />} />
-            <Route path="requerimentos" element={<RequerimentosMembro />} />
-            <Route path="sede" element={<SedeMembro />} />
+            {temRequerimentos && <Route path="requerimentos" element={<RequerimentosMembro />} />}
+            {temSede && <Route path="sede" element={<SedeMembro />} />}
             <Route path="ranking" element={<RankingMembro />} />
             <Route path="configuracoes" element={<Configuracoes />} />
           </Route>
@@ -64,11 +65,11 @@ function App() {
             <Route index element={<VisaoGeral />} />
             <Route path="membros" element={<Membros />} />
             <Route path="membros/:id" element={<DetalheMembro />} />
-            <Route path="requerimentos" element={<RequerimentosRH />} />
+            {temRequerimentos && <Route path="requerimentos" element={<RequerimentosRH />} />}
             <Route path="cronometros" element={<RevisaoCronometros />} />
             <Route path="ranking" element={<Ranking />} />
             <Route path="metas" element={<Metas />} />
-            <Route path="sede" element={<SedeMembro />} />
+            {temSede && <Route path="sede" element={<SedeMembro />} />}
             <Route path="configuracoes" element={<Configuracoes />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />

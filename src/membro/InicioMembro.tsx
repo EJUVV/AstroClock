@@ -44,6 +44,7 @@ import { useEhDesktop } from '@/compartilhado/ui/useEhDesktop'
 import { cn } from '@/compartilhado/ui/utils'
 import { CartaoCronometro } from './CartaoCronometro'
 import { frasePosicao } from './frasePosicao.ts'
+import { temSede } from '@/compartilhado/recursos'
 import { usePresenca } from './usePresenca'
 
 type Carga<T> = Carregamento<T> & { recarregar: () => void }
@@ -400,8 +401,8 @@ function InicioMembro() {
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           <GradeDoMes selecionada={semana} onSelecionar={setSemana} dica="Clique numa semana para ver os números dela acima." />
           <CartaoHorasNoMes />
-          {tempo}
-          <CartaoSede comBotao={false} />
+          {temSede ? tempo : <div className="lg:col-span-2">{tempo}</div>}
+          {temSede && <CartaoSede comBotao={false} />}
         </div>
       </>
     )
@@ -428,9 +429,11 @@ function InicioMembro() {
       <GradeDoMes selecionada={semana} onSelecionar={setSemana} dica="Toque numa semana para ver o detalhe dela no cartão acima." />
       <CartaoHorasNoMes />
       {tempo}
-      <div className="md:col-span-2">
-        <CartaoSede />
-      </div>
+      {temSede && (
+        <div className="md:col-span-2">
+          <CartaoSede />
+        </div>
+      )}
     </div>
   )
 }

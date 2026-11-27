@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useState, type React
 import { MapPinIcon, MapPinOffIcon } from 'lucide-react'
 import { toast } from 'sonner'
 import { desmarcarNaSede, estouNaSede, marcarNaSede } from '@/compartilhado/api/presenca'
+import { temSede } from '@/compartilhado/recursos'
 import { Button } from '@/compartilhado/ui/shadcn/button'
 
 interface Presenca {
@@ -19,6 +20,7 @@ export function ProvedorPresenca({ children }: { children: ReactNode }) {
   const [enviando, setEnviando] = useState(false)
 
   useEffect(() => {
+    if (!temSede) return
     estouNaSede()
       .then(setNaSede)
       .catch(() => setNaSede(false))
@@ -54,6 +56,7 @@ export function usePresenca(): Presenca {
 
 export function BotaoSedeTopo() {
   const { naSede, enviando, alternar } = usePresenca()
+  if (!temSede) return null // presença ainda não é real (recursos.ts)
   return (
     <Button
       variant={naSede ? 'outline' : 'default'}
