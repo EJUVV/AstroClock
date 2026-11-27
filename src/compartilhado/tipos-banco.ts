@@ -540,14 +540,6 @@ export type Database = {
           membro_id: string
         }[]
       }
-      horas_por_dia: {
-        Args: { p_semana: string }
-        Returns: {
-          dia: string
-          horas_sede: number
-          horas_total: number
-        }[]
-      }
       horas_do_mes: {
         Args: { p_mes: string }
         Returns: {
@@ -556,6 +548,14 @@ export type Database = {
           horas_total: number
           membro_id: string
           setor_id: string
+        }[]
+      }
+      horas_por_dia: {
+        Args: { p_semana: string }
+        Returns: {
+          dia: string
+          horas_sede: number
+          horas_total: number
         }[]
       }
       medias_da_semana: {
