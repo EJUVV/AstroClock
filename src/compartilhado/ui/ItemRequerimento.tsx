@@ -1,6 +1,7 @@
-import { CircleCheckIcon, CircleXIcon, ClockIcon, HouseIcon, PaperclipIcon, PlaneIcon } from 'lucide-react'
+import { CircleCheckIcon, CircleXIcon, ClockIcon, ExternalLinkIcon, HouseIcon, PaperclipIcon, PlaneIcon } from 'lucide-react'
 import { diaMes } from '@/compartilhado/datas'
 import type { Requerimento, SituacaoRequerimento } from '@/compartilhado/tipos'
+import { Button } from '@/compartilhado/ui/shadcn/button'
 import { StatusPill } from '@/compartilhado/ui/StatusPill'
 
 export function PilulaRequerimento({ situacao }: { situacao: SituacaoRequerimento }) {
@@ -11,7 +12,8 @@ export function PilulaRequerimento({ situacao }: { situacao: SituacaoRequeriment
 
 export const NOME_TIPO = { so_remoto: 'Só remoto', ausencia_total: 'Ausência total' } as const
 
-export function ItemRequerimento({ requerimento: q }: { requerimento: Requerimento }) {
+// onAbrirAnexo: com ele, o nome do anexo vira um botão que abre o arquivo (tela do membro).
+export function ItemRequerimento({ requerimento: q, onAbrirAnexo }: { requerimento: Requerimento; onAbrirAnexo?: (id: string) => void }) {
   const Icone = q.tipo === 'so_remoto' ? HouseIcon : PlaneIcon
   return (
     <li className="flex items-start gap-3 rounded-[20px] border bg-card p-4">
@@ -32,7 +34,13 @@ export function ItemRequerimento({ requerimento: q }: { requerimento: Requerimen
             <strong>Motivo da reprovação:</strong> {q.motivoResposta}
           </p>
         )}
-        {q.anexoNome && (
+        {q.anexoNome && onAbrirAnexo && (
+          <Button variant="outline" size="sm" className="mt-2 max-w-full" onClick={() => onAbrirAnexo(q.id)}>
+            <PaperclipIcon data-icon="inline-start" /> <span className="truncate">Abrir anexo: {q.anexoNome}</span>{' '}
+            <ExternalLinkIcon data-icon="inline-end" />
+          </Button>
+        )}
+        {q.anexoNome && !onAbrirAnexo && (
           <p className="mt-2 flex items-center gap-1.5 text-xs text-muted-foreground">
             <PaperclipIcon className="size-3.5" /> {q.anexoNome}
           </p>

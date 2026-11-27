@@ -16,6 +16,7 @@ export async function enviarRequerimento(dados: NovoRequerimento): Promise<Reque
   const eu = membroLogado()
   if (ehDiretor(eu.perfil)) throw new Error('Diretores não abrem requerimento, porque não têm meta')
   if (!dados.motivo.trim()) throw new Error('O motivo é obrigatório')
+  if (dados.motivo.trim().length > 1000) throw new Error('O motivo pode ter no máximo 1000 caracteres')
   if (!dados.inicio || !dados.fim) throw new Error('Escolha as datas')
   if (dados.fim < dados.inicio) throw new Error('O fim precisa ser depois do início')
   if (dados.anexo) validarAnexo(dados.anexo)

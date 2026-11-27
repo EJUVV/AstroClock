@@ -1,7 +1,7 @@
 import { lazy, Suspense, useState } from 'react'
 import { FileTextIcon, PlusIcon } from 'lucide-react'
 import { toast } from 'sonner'
-import { enviarRequerimento, meusRequerimentos } from '@/compartilhado/api/requerimentos'
+import { enviarRequerimento, linkDoAnexo, meusRequerimentos } from '@/compartilhado/api/requerimentos'
 import { Carregavel, useCarregar } from '@/compartilhado/ui/demo'
 import { Button } from '@/compartilhado/ui/shadcn/button'
 import { Skeleton } from '@/compartilhado/ui/shadcn/skeleton'
@@ -9,6 +9,15 @@ import { ItemRequerimento } from '@/compartilhado/ui/ItemRequerimento'
 
 // O formulário traz o calendário e o date-fns (cerca de 70 kB): só é baixado na primeira vez que abre.
 const FormRequerimento = lazy(() => import('./FormRequerimento').then((m) => ({ default: m.FormRequerimento })))
+
+// O link vale 1 minuto: é pedido na hora do clique.
+async function abrirAnexo(id: string) {
+  try {
+    window.open(await linkDoAnexo(id), '_blank', 'noopener')
+  } catch (e) {
+    toast.error((e as Error).message)
+  }
+}
 
 function RequerimentosMembro() {
   const [versao, setVersao] = useState(0)
@@ -68,7 +77,7 @@ function RequerimentosMembro() {
         {(lista) => (
           <ul className="grid grid-cols-1 gap-3 md:grid-cols-2">
             {lista.map((q) => (
-              <ItemRequerimento key={q.id} requerimento={q} />
+              <ItemRequerimento key={q.id} requerimento={q} onAbrirAnexo={(id) => void abrirAnexo(id)} />
             ))}
           </ul>
         )}

@@ -189,6 +189,7 @@ export function FormRequerimento({
           <Textarea
             id="req-motivo"
             value={motivo}
+            maxLength={1000}
             onChange={(e) => {
               setMotivo(e.target.value)
               setErros((er) => ({ ...er, motivo: undefined }))

@@ -14,6 +14,7 @@ const LINK_VALE_SEGUNDOS = 60 // o link do anexo vale 1 minuto: o suficiente par
 // Mesmas regras do bucket (o banco recusa de novo se passar daqui).
 const EXTENSOES: Record<string, string> = { 'application/pdf': 'pdf', 'image/jpeg': 'jpg', 'image/png': 'png' }
 const TAMANHO_MAXIMO_DO_ANEXO = 5 * 1024 * 1024 // 5 MB
+const TAMANHO_MAXIMO_DO_MOTIVO = 1000 // igual à regra requerimentos_motivo do banco
 
 function validarAnexo(anexo: File): void {
   if (!EXTENSOES[anexo.type]) throw new Error('O anexo precisa ser PDF, JPG ou PNG')
@@ -74,12 +75,26 @@ export async function arquivoDoAnexoExiste(caminho: string): Promise<boolean> {
   return false
 }
 
+// O pedido não foi gravado: apaga o arquivo enviado, com uma segunda tentativa. Se nada der certo, o
+// arquivo fica sem pedido no bucket (limpeza manual, ver docs/arquitetura.md); quem chama lança o erro
+// do pedido de qualquer jeito.
+async function apagarOrfao(caminho: string): Promise<void> {
+  for (let tentativa = 0; tentativa < 2; tentativa++) {
+    try {
+      if (await apagarArquivoDoAnexo(caminho)) return
+    } catch {
+      // tenta de novo
+    }
+  }
+}
+
 // Envia o arquivo primeiro; se a gravação do pedido falhar, apaga o arquivo (o dono pode apagar o
 // arquivo da própria pasta que não está ligado a nenhum pedido).
 export async function enviarRequerimento(dados: NovoRequerimento): Promise<Requerimento> {
   if (loginFalso) return falso.enviarRequerimento(dados)
   const motivo = dados.motivo.trim()
   if (!motivo) throw new Error('O motivo é obrigatório')
+  if (motivo.length > TAMANHO_MAXIMO_DO_MOTIVO) throw new Error('O motivo pode ter no máximo 1000 caracteres')
   if (!dados.inicio || !dados.fim) throw new Error('Escolha as datas')
   if (dados.fim < dados.inicio) throw new Error('O fim precisa ser depois do início')
   if (dados.anexo) validarAnexo(dados.anexo)
@@ -109,8 +124,8 @@ export async function enviarRequerimento(dados: NovoRequerimento): Promise<Reque
     .select(COLUNAS_REQUERIMENTO)
     .single()
   if (error) {
-    if (caminho) await supabase.storage.from(BUCKET).remove([caminho])
-    throw erroDoBanco(error)
+    if (caminho) await apagarOrfao(caminho)
+    throw erroDoBanco(error) // o erro do pedido, mesmo que a limpeza do arquivo falhe
   }
   return paraRequerimento(data)
 }
