@@ -79,6 +79,9 @@ O requerimento é o primeiro item do P1 do piloto (seção 14 do `regras-de-nego
 - **Sem cancelar/editar** pedido enviado na parte 1.
 - Link do anexo vale **1 minuto** (o suficiente para abrir; não fica circulando).
 - Quem pode apagar anexo vencido: `rh`, presidente e quem dirige o RH (qualquer um que abra a tela), só dos pedidos que já devem sumir.
+- `ajuste_da_semana` é **security definer**: o `diretor_setor` não lê `requerimentos`, mas o painel dele precisa mostrar a semana dispensada dos membros que ele vê.
+- No site, `anexoNome` vem **null quando o arquivo já foi apagado** (`anexo_caminho` vazio), como a demonstração já faz; o tipo `Requerimento` não muda.
+- Os avisos da tela do RH que dizem "o membro vai receber um e-mail" mudam enquanto não houver e-mail (parte 2).
 
 ## O que fica para quem constrói
 
