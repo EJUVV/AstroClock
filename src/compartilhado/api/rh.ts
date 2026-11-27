@@ -19,7 +19,7 @@ import { instante, partesPorDia, segundaDaSemana, semanaAtual, somarDias } from 
 import { supabase } from '../supabase.ts'
 import { loginFalso } from './auth.ts'
 import { erroDoBanco, paraRegistro } from './banco.ts'
-import { apagarArquivoDoAnexo, COLUNAS_REQUERIMENTO, paraRequerimento } from './requerimentos.ts'
+import { apagarArquivoDoAnexo, arquivoDoAnexoExiste, COLUNAS_REQUERIMENTO, paraRequerimento } from './requerimentos.ts'
 import * as falso from './rh-falso.ts'
 
 type Funcoes = Database['public']['Functions']
@@ -314,10 +314,13 @@ export async function alterarMetas(horasTotal: number, horasSede: number, vigent
   if (error) throw erroDoBanco(error)
 }
 
-// Apaga o arquivo e marca no banco. Só marca se o Storage confirmou que apagou (quando a regra de apagar
-// recusa, ele responde sem erro e com a lista vazia).
+// Apaga o arquivo e marca no banco. Só marca se o arquivo saiu do bucket. Quando a regra de apagar
+// recusa, o Storage responde sem erro e com a lista vazia; a lista também vem vazia se o arquivo já
+// tinha sumido (apagado numa vez em que anexo_apagado falhou depois). Por isso, lista vazia: confere se
+// o arquivo ainda existe. Existe = recusado, não marca. Sumiu = marca, senão o pedido ficaria para sempre
+// com anexo_caminho. Só quem vê tudo chega aqui, e quem vê tudo lê o bucket inteiro.
 async function apagarAnexo(id: string, caminho: string): Promise<void> {
-  if (!(await apagarArquivoDoAnexo(caminho))) return
+  if (!(await apagarArquivoDoAnexo(caminho)) && (await arquivoDoAnexoExiste(caminho))) return
   const { error } = await supabase.rpc('anexo_apagado', { p_id: id })
   if (error) throw erroDoBanco(error)
 }

@@ -64,6 +64,16 @@ export async function apagarArquivoDoAnexo(caminho: string): Promise<boolean> {
   return data.some((o) => o.name === caminho)
 }
 
+// O arquivo ainda está no bucket? Para quem vê tudo (lê o bucket inteiro): "não achou" = já sumiu.
+// Outros erros (conexão, por exemplo) são lançados, para ninguém marcar como apagado sem saber.
+export async function arquivoDoAnexoExiste(caminho: string): Promise<boolean> {
+  const { data, error } = await supabase.storage.from(BUCKET).exists(caminho)
+  if (data) return true
+  if (error?.status === 400 || error?.status === 404) return false
+  if (error) throw erroDoArquivo(error, 'abrir')
+  return false
+}
+
 // Envia o arquivo primeiro; se a gravação do pedido falhar, apaga o arquivo (o dono pode apagar o
 // arquivo da própria pasta que não está ligado a nenhum pedido).
 export async function enviarRequerimento(dados: NovoRequerimento): Promise<Requerimento> {
