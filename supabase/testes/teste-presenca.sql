@@ -33,7 +33,7 @@ begin
     (c_caio, 'zz Caio', 'zz.pres.caio@ejuvv.com', 'membro', c_setor, false, '2020-01-01');
 
   -- Caio (desativado) com presença aberta de hoje: não pode aparecer na lista.
-  insert into public.presenca_sede (membro_id, entrada) values (c_caio, now() - interval '1 hour');
+  insert into public.presenca_sede (membro_id, entrada) values (c_caio, now());
 
   ---------------------------------------------------------------------------
   -- 1. Ana marca, não marca duas vezes, e o Beto vê só nome, setor e desde
@@ -49,9 +49,9 @@ begin
     perform public.marcar_na_sede();
     msg := null;
   exception when others then
-    msg := sqlerrm;
+    msg := sqlstate || ':' || sqlerrm;
   end;
-  assert msg like '%já está marcado%', format('Ana: marcar duas vezes deveria dar erro (%s)', msg);
+  assert msg like 'P0002:%já está marcado%', format('Ana: marcar duas vezes deveria dar erro (%s)', msg);
 
   -- Ninguém lê a tabela direto (só pelas funções).
   begin
@@ -85,9 +85,9 @@ begin
     perform public.desmarcar_na_sede();
     msg := null;
   exception when others then
-    msg := sqlerrm;
+    msg := sqlstate || ':' || sqlerrm;
   end;
-  assert msg like '%não está marcado%', format('Ana: desmarcar sem estar deveria dar erro (%s)', msg);
+  assert msg like 'P0002:%não está marcado%', format('Ana: desmarcar sem estar deveria dar erro (%s)', msg);
 
   ---------------------------------------------------------------------------
   -- 3. Presença esquecida de ontem: não aparece e a tarefa fecha à meia-noite
@@ -104,7 +104,8 @@ begin
 
   perform set_config('role', 'postgres', true);
   n := public.encerrar_presencas_de_ontem();
-  assert n = 1, format('a tarefa deveria fechar 1 presença de ontem (fechou %s)', n);
+  -- >= 1: no horas-dev pode haver presenças reais esquecidas de ontem.
+  assert n >= 1, format('a tarefa deveria fechar a presença de ontem (fechou %s)', n);
   select p.saida into v_saida from public.presenca_sede p where p.membro_id = c_beto;
   assert v_saida = (hoje::timestamp at time zone 'America/Sao_Paulo'),
     format('a presença de ontem deveria fechar à meia-noite de Brasília (%s)', v_saida);
@@ -127,7 +128,7 @@ begin
     perform public.marcar_na_sede();
     msg := null;
   exception when others then
-    msg := sqlerrm;
+    msg := sqlstate || ':' || sqlerrm;
   end;
   assert msg is not null, 'conta sem cadastro: marcar deveria dar erro';
 

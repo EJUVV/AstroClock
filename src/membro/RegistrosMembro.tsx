@@ -3,6 +3,7 @@ import { ChevronLeftIcon, ChevronRightIcon, PlusIcon } from 'lucide-react'
 import { toast } from 'sonner'
 import { desmarcarNaSede, estouNaSede } from '@/compartilhado/api/presenca'
 import { temSede } from '@/compartilhado/recursos'
+import { usePresenca } from './usePresenca'
 import { progressoDaSemana } from '@/compartilhado/api/progresso'
 import { buscarMeusRegistros, cancelarRegistro, criarRegistro, editarRegistro } from '@/compartilhado/api/registros'
 import { dataEmBrasilia, rotuloSemana, segundaDaSemana, semanaAtual, somarDias } from '@/compartilhado/datas'
@@ -32,6 +33,7 @@ function RegistrosMembro() {
   const [cancelando, setCancelando] = useState<Registro | null>(null)
   // A lista não traz cancelados: os desta visita ficam riscados até recarregar.
   const [canceladosAgora, setCanceladosAgora] = useState<Registro[]>([])
+  const { atualizar: atualizarPresenca } = usePresenca()
 
   async function salvar(dados: NovoRegistro) {
     if (editando) await editarRegistro(editando.id, dados)
@@ -44,7 +46,11 @@ function RegistrosMembro() {
         description: 'Se já saiu, desmarque para os outros saberem.',
         action: {
           label: 'Saí da sede',
-          onClick: () => void desmarcarNaSede().then(() => toast.success('Você saiu da sede')),
+          onClick: () =>
+            void desmarcarNaSede()
+              .then(() => toast.success('Você saiu da sede'))
+              .catch((e: Error) => toast.error(e.message))
+              .finally(atualizarPresenca),
         },
         duration: 10_000,
       })

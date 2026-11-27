@@ -14,6 +14,7 @@
 --     ninguém aparece na sede depois da meia-noite, mesmo antes da tarefa rodar.
 --   - A tabela não é lida direto pelo site: tudo passa pelas funções abaixo.
 --
+-- Erros das regras com errcode P0002: o site (erroDoBanco) mostra a mensagem.
 -- Pelo site (supabase.rpc, presenca.ts): quem_esta_na_sede, estou_na_sede,
 -- marcar_na_sede e desmarcar_na_sede.
 -- =============================================================================
@@ -115,7 +116,7 @@ begin
   insert into public.presenca_sede (membro_id) values (eu);
 exception
   when unique_violation then
-    raise exception 'Você já está marcado como na sede' using errcode = 'P0001';
+    raise exception 'Você já está marcado como na sede' using errcode = 'P0002';
 end;
 $$;
 
@@ -141,7 +142,7 @@ begin
   get diagnostics n = row_count;
 
   if n = 0 then
-    raise exception 'Você não está marcado como na sede' using errcode = 'P0001';
+    raise exception 'Você não está marcado como na sede' using errcode = 'P0002';
   end if;
 end;
 $$;
