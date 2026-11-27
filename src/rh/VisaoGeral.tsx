@@ -24,7 +24,8 @@ import {
 } from '@/compartilhado/api/rh'
 import { listarMembros, listarSetores } from '@/compartilhado/api/membros'
 import { rankingDosSetores } from '@/compartilhado/api/ranking'
-import { veRequerimentos } from '@/compartilhado/perfis'
+import { veRequerimentos as podeVerRequerimentos } from '@/compartilhado/perfis'
+import { temRequerimentos } from '@/compartilhado/recursos'
 import type { Perfil } from '@/compartilhado/tipos'
 import { diaMes, formatarHoras, mesDoRanking, rotuloMes, rotuloSemana, semanaAtual, somarDias } from '@/compartilhado/datas'
 import { AvatarMembro } from '@/compartilhado/ui/AvatarMembro'
@@ -44,6 +45,9 @@ import { cn } from '@/compartilhado/ui/utils'
 import { SeletorSemana } from './SeletorSemana'
 import { EtiquetaSetor } from '@/compartilhado/ui/EtiquetaSetor'
 import { RankingSetores } from '@/compartilhado/ui/RankingSetores'
+
+// Requerimentos só aparecem quando já são reais (recursos.ts) e para quem pode vê-los.
+const veRequerimentos = (perfil: Perfil) => temRequerimentos && podeVerRequerimentos(perfil)
 
 // Os gráficos (recharts) são o pacote mais pesado do site: só são baixados no computador, quando aparecem.
 const DonutCard = lazy(() => import('@/compartilhado/ui/DonutCard').then((m) => ({ default: m.DonutCard })))

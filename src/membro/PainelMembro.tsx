@@ -10,13 +10,14 @@ import { useSessao } from '@/compartilhado/ui/RotaProtegida'
 import { Button } from '@/compartilhado/ui/shadcn/button'
 import { BotaoInstalarApp } from '@/compartilhado/ui/instalarApp'
 import { useEhDesktop } from '@/compartilhado/ui/useEhDesktop'
+import { temRequerimentos, temSede } from '@/compartilhado/recursos'
 import { BotaoSedeTopo, ProvedorPresenca } from './usePresenca'
 
 const ABAS: ItemMenu[] = [
   { para: '/membro', rotulo: 'Início', icone: HouseIcon, fim: true },
   { para: '/membro/registros', rotulo: 'Registros', icone: ListIcon },
-  { para: '/membro/requerimentos', rotulo: 'Requerimentos', icone: FileTextIcon },
-  { para: '/membro/sede', rotulo: 'Sede', icone: MapPinIcon },
+  ...(temRequerimentos ? [{ para: '/membro/requerimentos', rotulo: 'Requerimentos', icone: FileTextIcon }] : []),
+  ...(temSede ? [{ para: '/membro/sede', rotulo: 'Sede', icone: MapPinIcon }] : []),
   { para: '/membro/ranking', rotulo: 'Ranking', icone: TrophyIcon },
 ]
 

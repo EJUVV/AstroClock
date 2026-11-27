@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { ChevronLeftIcon, ChevronRightIcon, PlusIcon } from 'lucide-react'
 import { toast } from 'sonner'
 import { desmarcarNaSede, estouNaSede } from '@/compartilhado/api/presenca'
+import { temSede } from '@/compartilhado/recursos'
 import { progressoDaSemana } from '@/compartilhado/api/progresso'
 import { buscarMeusRegistros, cancelarRegistro, criarRegistro, editarRegistro } from '@/compartilhado/api/registros'
 import { dataEmBrasilia, rotuloSemana, segundaDaSemana, semanaAtual, somarDias } from '@/compartilhado/datas'
@@ -38,7 +39,7 @@ function RegistrosMembro() {
     toast.success('Registro salvo')
     setVersao((v) => v + 1)
     // Lembrete: lançou horas e ainda está marcado como na sede.
-    if (await estouNaSede()) {
+    if (temSede && (await estouNaSede())) {
       toast('Você ainda está marcado como na sede', {
         description: 'Se já saiu, desmarque para os outros saberem.',
         action: {
